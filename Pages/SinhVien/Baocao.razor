@@ -1,7 +1,7 @@
 ﻿@page "/file/baocao"
 @using UehInternFrontend.Components
-@inject IJSRuntime JSRuntime
-@inject HttpClient HttpClient
+@inject IJSRuntime JS
+@inject HttpClient Http
 @using UehInternFrontend
 @using System.Net.Http
 @using System.Net.Http.Headers
@@ -14,46 +14,39 @@
         apiLink = Configuration["apiBackend"];
     }
 
-    private long maxFileSize = long.MaxValue;
+private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
     private List<string> fileNames = new();
     private List<UploadResult> uploadResults = new();
 
-    private async Task LoadFiles(InputFileChangeEventArgs e) {
-        var formData = new MultipartFormDataContent();
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(maxAllowedFiles);
+        var mssv = "31201024426"; // Thay thế "your_mssv_value" bằng giá trị MSSV thực tế
 
         using var content = new MultipartFormDataContent();
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+
+        foreach (var file in files)
         {
             var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
             fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
 
             fileNames.Add(file.Name);
 
-            content.Add(
-                content: fileContent,
-                name: "\"files\"",
-                fileName: file.Name); 
-
-
-            formData.Add(fileContent, "files", file.Name);
-
+            content.Add(fileContent, "files", file.Name);
         }
 
-        // Thêm các tham số khác vào formData
-        formData.Add(new StringContent("31201024451"), "mssv");
-        formData.Add(new StringContent("pdf"), "filetype");
 
-        var response = await HttpClient.PostAsync(apiLink + "api/File", formData);
+        var response = await Http.PostAsync($"https://localhost:7000/api/File/{Uri.EscapeDataString(mssv)}", content);
+        response.EnsureSuccessStatusCode();
 
         var newUploadResults = await response.Content.ReadFromJsonAsync<List<UploadResult>>();
-
-        if(newUploadResults is not null)
+        if (newUploadResults is not null)
         {
             uploadResults = uploadResults.Concat(newUploadResults).ToList();
         }
-
     }
+
 
 
     private string? GetStoredFileName(string fileName)
@@ -67,18 +60,18 @@
         return "File not Found";
     }
 
-    private async Task DownloadFile(string storedFileName, string originalFileName)
+    private async Task DownloadFile(string storedFileName, string originalFileName, string mssv)
     {
-        var response = await HttpClient.GetAsync(apiLink + $"api/File/{storedFileName}");
+        var response = await Http.GetAsync($"https://localhost:7000/api/File/{storedFileName}/{mssv}");
         if (!response.IsSuccessStatusCode)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "File not found.");
         }
         else
         {
-            var fileStream = response.Content.ReadAsStream();
+            var fileStream = await response.Content.ReadAsStreamAsync();
             using var streamRef = new DotNetStreamReference(stream: fileStream);
-            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", originalFileName, streamRef);
+            await JS.InvokeVoidAsync("downloadFileFromStream", originalFileName, streamRef);
         }
     }
 
@@ -160,7 +153,7 @@
                                 <span>
                                     Stored File Name : @GetStoredFileName(fileName)
                                 </span>
-                                <button @onclick="@(() => DownloadFile(GetStoredFileName(fileName),fileName))">
+                                 <button @onclick="@(() => DownloadFile("s1rocgfy.5rq",fileName,"31201024426"))">
                                     Download File
                                 </button>
                             </li>
