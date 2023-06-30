@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="lib.ueh" Version="1.0.5" />
 	</ItemGroup>
 
 </Project>

@@ -1,0 +1,88 @@
+﻿@page "/LoginCallback/"
+@layout EmptyLayout
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.WebUtilities
+@using UehInternFrontend
+@using System.Text.Json;
+@using global::Login.ST.UEH;
+@code {
+
+    string jsonString = "";
+
+    string plainText = "";
+    string key = "";
+    string iv = "";
+    string encryptedText = "";
+    string decryptedText = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+        var t = queryParameters["t"];
+        await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+        await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+
+        if (t == "gv"){
+
+            User? user = new User
+            {
+                Code = "001747",
+                Email = "thinhdt@ueh.edu.vn",
+                Name = "Đặng Thái Thịnh",
+                Role = "giangvien"
+            };
+            await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+            NavigationManager.NavigateTo("/sinhvien");
+
+        }
+        else if (t == "admin") {
+
+            User? user = new User
+            {
+                Code = "000688",
+                Email = "hienphan@ueh.edu.vn",
+                Name = "Phan Hiền",
+                Role = "admin"
+            };
+            await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+            NavigationManager.NavigateTo("/tongquan");
+
+        }
+        else {
+
+            var obj = LoginStUEH.GetInfo(t);
+            if (obj != null)
+            {
+
+                Student stu = (Student) obj;
+                @* jsonString = JsonSerializer.Serialize(stu); *@
+
+                User? user = (User) stu;
+                await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+                NavigationManager.NavigateTo("/thongtin");
+
+                @* plainText = "Tôi là Như Trứng Here is some data to encrypt!";
+
+                // Encrypt the plain text
+                encryptedText = AES.EncryptData(plainText);
+
+                // Decrypt the encrypted text
+                decryptedText = AES.DecryptData(encryptedText);
+
+                StateHasChanged(); *@
+
+            }   
+
+        }
+
+    }
+
+
+
+}
+
+@* <p>Plaintext: @plainText</p>
+<p>Encrypted Text: @encryptedText</p>
+<p>Decrypted Text: @decryptedText</p> *@

@@ -15,9 +15,9 @@
     {
         apiLink = Configuration["api"];
 
-        if (role != null && role != "null"){
+        @* if (role != null && role != "null"){
             NavigateTo(role);
-        }
+        } *@
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -32,56 +32,29 @@
 
     private async Task HandleValidSubmit()
     {
-        var response = await HttpClient.PostAsJsonAsync( apiLink + "User/login", loginRequest);
+        @* var response = await HttpClient.PostAsJsonAsync( apiLink + "User/login", loginRequest);
 
         if (response.IsSuccessStatusCode)
         {
-
             // Implement additional login logic here, such as storing the authentication token
             User? user = await response.Content.ReadFromJsonAsync<User>();
-            await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+        } *@
 
-            await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-            await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-
-            if (user != null && user.Role != null)
-                NavigateTo(user.Role);
+        if (loginRequest.Username == "thinhdt")
+        {
+            NavigationManager.NavigateTo("/LoginCallback/?t=gv");
+        }
+        else
+        if (loginRequest.Username == "hienphan")
+        {
+            NavigationManager.NavigateTo("/LoginCallback/?t=admin");
         }
         else
         {
             await JSRuntime.InvokeVoidAsync("showElement", "div.validation-summary-errors");
         }
     }
-
-    private void NavigateTo(string role) {
-        switch (role) {
-            case "admin":
-                NavigationManager.NavigateTo("/tongquan");
-                break;
-            case "sinhvien":
-                NavigationManager.NavigateTo("/thongtin");
-                break;
-            case "giangvien":
-                NavigationManager.NavigateTo("/sinhvien");
-                break;
-        }
-    }
     
-    public class User
-    {
-        public int Id { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public string? Name { get; set; }
-        public string? Email { get; set; }
-        public string? Role { get; set; }
-    }
-    
-    public class LoginRequest
-    {
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-    }
 }
 
 <PageTitle>UEH | Đăng nhập</PageTitle>
@@ -107,7 +80,7 @@
 
                 <div class="wrap-input100 validate-input uselocalaccount" data-validate="Mật khẩu không được để trống">
                     <InputText class="input100" data-val="true" data-val-required="The password field is required."
-                        id="password" name="password" required="true" type="password" @bind-Value="@loginRequest.Password"  />
+                        id="password" name="password" required="false" type="password" @bind-Value="@loginRequest.Password"  />
             
                     <span class="focus-input100"></span>
                     <span class="label-input100">Mật khẩu</span>

@@ -1,6 +1,12 @@
 {
   "files.exclude": {
     "obj": true,
-    "bin": true
+    "bin": true,
+    "UehInternFrontend.user": true,
+    "UehInternFrontend.sln": true,
+    "appsettings.Development.json": true,
+    ".gitattributes": true,
+    ".gitignore": true,
+    ".vs": true
   }
 }

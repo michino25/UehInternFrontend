@@ -1,5 +1,89 @@
 ﻿@page "/file/baocao"
 @using UehInternFrontend.Components
+@inject IJSRuntime JSRuntime
+@inject HttpClient HttpClient
+@using UehInternFrontend
+@using System.Net.Http
+@using System.Net.Http.Headers
+@inject IConfiguration Configuration
+
+@code {
+    public string? apiLink;
+    protected override void OnInitialized()
+    {
+        apiLink = Configuration["apiBackend"];
+    }
+
+    private long maxFileSize = long.MaxValue;
+    private int maxAllowedFiles = int.MaxValue;
+    private List<string> fileNames = new();
+    private List<UploadResult> uploadResults = new();
+
+    private async Task LoadFiles(InputFileChangeEventArgs e) {
+        var formData = new MultipartFormDataContent();
+
+        using var content = new MultipartFormDataContent();
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+            fileNames.Add(file.Name);
+
+            content.Add(
+                content: fileContent,
+                name: "\"files\"",
+                fileName: file.Name); 
+
+
+            formData.Add(fileContent, "files", file.Name);
+
+        }
+
+        // Thêm các tham số khác vào formData
+        formData.Add(new StringContent("31201024451"), "mssv");
+        formData.Add(new StringContent("pdf"), "filetype");
+
+        var response = await HttpClient.PostAsync(apiLink + "api/File", formData);
+
+        var newUploadResults = await response.Content.ReadFromJsonAsync<List<UploadResult>>();
+
+        if(newUploadResults is not null)
+        {
+            uploadResults = uploadResults.Concat(newUploadResults).ToList();
+        }
+
+    }
+
+
+    private string? GetStoredFileName(string fileName)
+    {
+        var uploadResult = uploadResults.SingleOrDefault(f => f.FileName == fileName);
+        if (uploadResult is not null)
+        {
+            return uploadResult.StoredFileName;
+
+        }
+        return "File not Found";
+    }
+
+    private async Task DownloadFile(string storedFileName, string originalFileName)
+    {
+        var response = await HttpClient.GetAsync(apiLink + $"api/File/{storedFileName}");
+        if (!response.IsSuccessStatusCode)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "File not found.");
+        }
+        else
+        {
+            var fileStream = response.Content.ReadAsStream();
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", originalFileName, streamRef);
+        }
+    }
+
+
+}
 
 <PageTitle>Báo cáo</PageTitle>
 
@@ -11,14 +95,153 @@
             nút xóa file báo cáo thì mới được thêm cái khác
         </h1>
 
+    <div class="col-span-2">
+        <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2  sm:p-6">
+
+            <h3 class="mb-4 text-xl font-semibold">Nộp báo cáo cuối kì</h3>
+            <div class="flex flex-col items-start space-x-2 sm:space-x-3">
+
+                <div class="flex items-center justify-center p-4 space-y-4 space-x-8 text-center bg-white rounded-t-lg">
+
+                    <div class="flex items-center justify-center space-x-3">
+                        <svg class="rounded-full w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M16 3.25C14.7402 3.25 13.532 3.75045 12.6412 4.64124C11.7504 5.53204 11.25 6.74022 11.25 8V10.25H6C5.27065 10.25 4.57118 10.5397 4.05546 11.0555C3.53973 11.5712 3.25 12.2707 3.25 13V18C3.25 18.7293 3.53973 19.4288 4.05546 19.9445C4.57118 20.4603 5.27065 20.75 6 20.75H13C13.7293 20.75 14.4288 20.4603 14.9445 19.9445C15.4603 19.4288 15.75 18.7293 15.75 18V13C15.75 12.2707 15.4603 11.5712 14.9445 11.0555C14.4288 10.5397 13.7293 10.25 13 10.25H12.75V8C12.75 7.13805 13.0924 6.3114 13.7019 5.7019C14.3114 5.09241 15.138 4.75 16 4.75C16.862 4.75 17.6886 5.09241 18.2981 5.7019C18.9076 6.3114 19.25 7.13805 19.25 8C19.25 8.19891 19.329 8.38968 19.4697 8.53033C19.6103 8.67098 19.8011 8.75 20 8.75C20.1989 8.75 20.3897 8.67098 20.5303 8.53033C20.671 8.38968 20.75 8.19891 20.75 8C20.75 6.74022 20.2496 5.53204 19.3588 4.64124C18.468 3.75045 17.2598 3.25 16 3.25ZM14.25 13V18C14.25 18.3315 14.1183 18.6495 13.8839 18.8839C13.6495 19.1183 13.3315 19.25 13 19.25H6C5.66848 19.25 5.35054 19.1183 5.11612 18.8839C4.8817 18.6495 4.75 18.3315 4.75 18V13C4.75 12.6685 4.8817 12.3505 5.11612 12.1161C5.35054 11.8817 5.66848 11.75 6 11.75H13C13.3315 11.75 13.6495 11.8817 13.8839 12.1161C14.1183 12.3505 14.25 12.6685 14.25 13Z"
+                                    fill="#000000"></path>
+                            </g>
+                        </svg>
+                        <div class="space-y-0.5 font-medium dark:text-white text-left">
+                            <div>Opened</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Sunday, 4 June 2023, 12:00 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center space-x-3">
+                        <svg class="rounded-full w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M17 10.25H16.75V8C16.75 6.74022 16.2496 5.53204 15.3588 4.64124C14.468 3.75045 13.2598 3.25 12 3.25C10.7402 3.25 9.53204 3.75045 8.64124 4.64124C7.75045 5.53204 7.25 6.74022 7.25 8V10.25H7C6.27065 10.25 5.57118 10.5397 5.05546 11.0555C4.53973 11.5712 4.25 12.2707 4.25 13V18C4.25 18.7293 4.53973 19.4288 5.05546 19.9445C5.57118 20.4603 6.27065 20.75 7 20.75H17C17.7293 20.75 18.4288 20.4603 18.9445 19.9445C19.4603 19.4288 19.75 18.7293 19.75 18V13C19.75 12.2707 19.4603 11.5712 18.9445 11.0555C18.4288 10.5397 17.7293 10.25 17 10.25ZM8.75 8C8.75 7.13805 9.09241 6.3114 9.7019 5.7019C10.3114 5.09241 11.138 4.75 12 4.75C12.862 4.75 13.6886 5.09241 14.2981 5.7019C14.9076 6.3114 15.25 7.13805 15.25 8V10.25H8.75V8ZM18.25 18C18.25 18.3315 18.1183 18.6495 17.8839 18.8839C17.6495 19.1183 17.3315 19.25 17 19.25H7C6.66848 19.25 6.35054 19.1183 6.11612 18.8839C5.8817 18.6495 5.75 18.3315 5.75 18V13C5.75 12.6685 5.8817 12.3505 6.11612 12.1161C6.35054 11.8817 6.66848 11.75 7 11.75H17C17.3315 11.75 17.6495 11.8817 17.8839 12.1161C18.1183 12.3505 18.25 12.6685 18.25 13V18Z"
+                                    fill="#000000"></path>
+                            </g>
+                        </svg>
+                        <div class="space-y-0.5 font-medium dark:text-white text-left">
+                            <div>Due</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Sunday, 4 June 2023, 11:59 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button
+                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Nhập file
+                </button>
+
+                <InputFile OnChange="@LoadFiles" multiple />
+
+                @if (fileNames.Count > 0)
+                {
+                    <ul>
+                        @foreach (var fileName in fileNames)
+                        {
+                            <li>
+                                File : @fileName
+                                <br>
+                                <span>
+                                    Stored File Name : @GetStoredFileName(fileName)
+                                </span>
+                                <button @onclick="@(() => DownloadFile(GetStoredFileName(fileName),fileName))">
+                                    Download File
+                                </button>
+                            </li>
+                        }
+                    </ul>
+
+                }
+
+            </div>
+
+            <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                File
+                            </th>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Giờ nộp
+                            </th>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Thời gian còn lại
+                            </th>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Hành động
+                            </th>
+                        </tr>
+                    </thead>
+
+                <tbody class="bg-white divide-y divide-gray-200">
+
+                    <tr class="hover:bg-gray-100">
+                        <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                            <div class="text-sm font-normal text-gray-500">
+                                <div class="text-base font-semibold text-gray-900">Baocao_NguyenNhuTrung.docx
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                            12h34m
+                        </td>
+                        <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                            3h43m</td>
+                        <td class="p-4 space-x-2 whitespace-nowrap">
+                            <button type="button" data-modal-toggle="edit-user-modal"
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
+                                >
+                                @* @onclick="@(() => DownloadFile(GetStoredFileName(fileNames[0]),fileNames[0]))" *@
+                                
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                                    </path>
+                                    <path fill-rule="evenodd"
+                                        d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                Tải xuống
+                            </button>
+                            <button type="button" data-modal-toggle="delete-user-modal"
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                Xóa file
+                            </button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
     </ItemContent>
 </CheckUserComponent>
-
-@code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}
