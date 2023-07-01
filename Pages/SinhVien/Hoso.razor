@@ -114,10 +114,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await RenderFiles();
+        await RenderDatas();
     }
 
-    private async Task RenderFiles()
+    private async Task RenderDatas()
     {
         SinhvienModel result = await GetSinhVien("31151024214");
         KhoaModel resultKhoa = await GetSinhVienByKhoa("31151024214");

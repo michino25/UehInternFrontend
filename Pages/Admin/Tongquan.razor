@@ -1,13 +1,94 @@
 ﻿@page "/tongquan"
 @using UehInternFrontend.Components
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using Newtonsoft.Json
 
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
 @code {
     private int currentCount = 0;
+    private int sumsv = 0;
+    private int sumgv = 0;
+    private int sumcn = 0;
 
     private void IncrementCount()
     {
         currentCount++;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RenderDatas();
+    }
+
+    private async Task RenderDatas()
+    {
+        List<SinhvienkhoaModel> sinhvienkhoas   = await GetSinhvienByKhoas("CNTTKD");
+        List<GiangvienkhoaModel> giangviens   = await GetGiangvienByKhoas("CNTTKD");
+        List<ChuyennganhModel> chuyennganhs   = await GetChuyennganhsByKhoa("CNTTKD");
+
+        if (sinhvienkhoas != null )
+        {
+            sumsv += sinhvienkhoas.Count;
+            sumgv += giangviens.Count;
+            sumcn += chuyennganhs.Count;
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
+        }
+    }
+    private async Task<List<SinhvienkhoaModel>> GetSinhvienByKhoas(string makhoa)
+    {
+       var response = await Http.GetAsync($"https://localhost:7000/api/Khoa/sinhviens/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienkhoaModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task<List<GiangvienkhoaModel>> GetGiangvienByKhoas(string makhoa)
+    {
+       var response = await Http.GetAsync($"https://localhost:7000/api/Khoa/giangviens/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienkhoaModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+     private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
+    {
+       var response = await Http.GetAsync($"https://localhost:7000/api/Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<ChuyennganhModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất khoa: {response.StatusCode}");
+            return null;
+        }
+    }
+    
 }
 
 <PageTitle>Tổng quan</PageTitle>
@@ -48,21 +129,21 @@
         <div class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
             <div class="w-full">
                 <h3 class="text-base font-normal text-gray-500">Giảng viên</h3>
-                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">16</span>
+                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumgv</span>
             </div>
         </div>
 
         <div class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
             <div class="w-full">
                 <h3 class="text-base font-normal text-gray-500">Sinh viên</h3>
-                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">329</span>
+                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumsv</span>
             </div>
         </div>
 
         <div class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
             <div class="w-full">
                 <h3 class="text-base font-normal text-gray-500">Chuyên ngành</h3>
-                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">5</span>
+                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumcn</span>
             </div>
         </div>
     </div>

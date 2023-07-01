@@ -106,4 +106,55 @@ namespace UehInternFrontend
 
     }
 
+    public class SinhvienkhoaModel
+    {
+        public string makhoa { get; set; }
+        public string mssv { get; set; }
+
+    }
+
+     public class GiangvienkhoaModel
+    {
+        public string makhoa { get; set; }
+        public string magv { get; set; }
+
+    }
+
+    public class ChuyennganhModel
+    {
+        public string macn { get; set; }
+        public string tencn { get; set; }
+        public string makhoa { get; set; }
+
+    }
+
+     public class GiangvienModel
+    {
+        public string? magv { get; set; }
+        public string? tengv { get; set; }
+        public string? email { get; set; }
+        public string? sdt { get; set; }
+        public string? makhoa { get; set; }
+        public string? chuyenmon { get; set; }
+    }
+
+    public class GiangvienViewModel
+    {
+        public string MaGiangVien { get; set; }
+        public string TenGiangVien { get; set; }
+        public int SoSinhVienHuongDan { get; set; }
+        public string Email { get; set; }
+        public string SDT { get; set; }
+
+    }
+    public class ChamcheoViewModel
+    {
+        public string magv1 { get; set; }
+        public string magv2 { get; set; }
+        public string tengv1 { get; set; }
+        public string tengv2 { get; set; }
+        public string email1 { get; set; }
+        public string email2 { get; set; }
+    }
+
 }

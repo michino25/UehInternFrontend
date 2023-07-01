@@ -1,53 +1,98 @@
 ﻿@page "/giangvien/danhsach"
 @using UehInternFrontend.Components
-@inject IJSRuntime JSRuntime
-@inject HttpClient HttpClient
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using Newtonsoft.Json
+@using Microsoft.AspNetCore.Components
+@inject IJSRuntime JS
+@inject HttpClient Http
 @inject IConfiguration Configuration
-@using System.Text.Json
 
 @code {
     public string? apiLink;
-    List<Giangvien>? giangviens = new List<Giangvien>();
-    string json = "";
+    List<GiangvienModel>? giangviens = new List<GiangvienModel>();
+    private long maxFileSize = long.MaxValue;
+    private int maxAllowedFiles = int.MaxValue;
+
     protected override void OnInitialized()
     {
         apiLink = Configuration["apiBackend"];
     }
 
-
     protected override async Task OnInitializedAsync()
     {
-        @* json = await HttpClient.GetStringAsync(apiLink + "Giangvien"); *@
-
-        @* Tạm thay bằng chuỗi string để khỏi chạy backend *@
-        json = "{\"$id\":\"1\",\"$values\":[{\"$id\":\"2\",\"magv\":\"000067\",\"tengv\":\"Bùi Xuân Huy\",\"email\":\"huybx@ueh.edu.vn\",\"sdt\":\"0938979793\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"3\",\"magv\":\"000256\",\"tengv\":\"Võ Hà Quang Định\",\"email\":\"vhqdinh@ueh.edu.vn\",\"sdt\":\"0913713238\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"4\",\"magv\":\"000688\",\"tengv\":\"Phan Hiền\",\"email\":\"hienphan@ueh.edu.vn\",\"sdt\":\"0909259404\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"5\",\"magv\":\"000690\",\"tengv\":\"Trương Việt Phương\",\"email\":\"truong@ueh.edu.vn\",\"sdt\":\"0853009009\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"6\",\"magv\":\"000701\",\"tengv\":\"Huỳnh Văn Đức\",\"email\":\"hvduc@ueh.edu.vn\",\"sdt\":\"0918203108\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"7\",\"magv\":\"001112\",\"tengv\":\"Trần Hồng Thái\",\"email\":\"thaitran@ueh.edu.vn\",\"sdt\":\"0901376023\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"8\",\"magv\":\"001747\",\"tengv\":\"Đặng Thái Thịnh\",\"email\":\"thinhdt@ueh.edu.vn\",\"sdt\":\"0905553609\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"9\",\"magv\":\"002057\",\"tengv\":\"Nguyễn Mạnh Tuấn\",\"email\":\"tuannm@ueh.edu.vn\",\"sdt\":\"0918878088\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"10\",\"magv\":\"002609\",\"tengv\":\"Nguyễn Thành Huy\",\"email\":\"huynt@ueh.edu.vn\",\"sdt\":\"0935195535\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"11\",\"magv\":\"009130\",\"tengv\":\"Nguyễn An Tế\",\"email\":\"tena@ueh.edu.vn\",\"sdt\":\"0938912065\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"12\",\"magv\":\"009459\",\"tengv\":\"Hồ Thị Thanh Tuyến\",\"email\":\"tuyenhtt@ueh.edu.vn\",\"sdt\":\"0903800693\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"13\",\"magv\":\"009462\",\"tengv\":\"Ngô Tấn Vũ Khanh\",\"email\":\"khanhntv@ueh.edu.vn\",\"sdt\":\"0911115611\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"14\",\"magv\":\"009603\",\"tengv\":\"Bùi Thanh Hiếu\",\"email\":\"hieubt@ueh.edu.vn\",\"sdt\":\"0903364358\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"15\",\"magv\":\"009607\",\"tengv\":\"Đặng Ngọc Hoàng Thành\",\"email\":\"thanhdnh@ueh.edu.vn\",\"sdt\":\"0987391215\",\"makhoa\":null,\"chuyenmon\":null},{\"$id\":\"16\",\"magv\":\"009608\",\"tengv\":\"Nguyễn Quốc Hùng\",\"email\":\"hungngq@ueh.edu.vn\",\"sdt\":\"0912251253\",\"makhoa\":null,\"chuyenmon\":null}]}";
-        using (JsonDocument document = JsonDocument.Parse(json))
-        {
-            JsonElement root = document.RootElement;
-            JsonElement valuesElement = root.GetProperty("$values");
-            giangviens = JsonSerializer.Deserialize<List<Giangvien>>(valuesElement.GetRawText());
-        }
-
+        await RenderDatas();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task RenderDatas()
     {
-        if (firstRender)
+         var result = await GetGiangvienByKhoas("CNTTKD");
+        if (result != null )
         {
-            await JSRuntime.InvokeVoidAsync("console.log", giangviens);
-            await JSRuntime.InvokeVoidAsync("console.log", json);
+            giangviens = result;
+            StateHasChanged();
+
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-
-    public class Giangvien
+    private async Task<List<GiangvienModel>> GetGiangvienByKhoas(string makhoa)
     {
-        public string? magv { get; set; }
-        public string? tengv { get; set; }
-        public string? email { get; set; }
-        public string? sdt { get; set; }
-        public string? makhoa { get; set; }
-        public string? chuyenmon { get; set; }
+       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/khoa/{makhoa}/giangvien");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
     }
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(maxAllowedFiles);
+        var makhoa = "CNTTKD";
+
+        using var content = new MultipartFormDataContent();
+
+        foreach (var file in files)
+        {
+            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+            content.Add(fileContent, "formFile", file.Name);
+        }
+
+
+        var apiUrl = $"https://localhost:7000/api/Giangvien/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var response = await Http.PostAsync(apiUrl, content);
+        if (!response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "File not found.");
+        }
+        response.EnsureSuccessStatusCode();
+        
+    }
+
+
+
+
+        @* protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JSRuntime.InvokeVoidAsync("console.log", giangviens);
+                await JSRuntime.InvokeVoidAsync("console.log", json);
+            }
+        } *@
+
+   
     
 
 }
@@ -109,6 +154,12 @@
                             d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                             clip-rule="evenodd"></path>
                     </svg>Nhập file</a>
+                    
+                <InputFile OnChange="OnInputFileChange" multiple />
+
+
+
+
             </div>
         </div>
     </div>

@@ -29,6 +29,17 @@
         await RenderFiles();
     }
 
+    private string? mssv ="";
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mssv = await JS.InvokeAsync<string>("getUserData","Code");
+            StateHasChanged();
+            await JS.InvokeVoidAsync("console.log",mssv);
+        }
+    }
+
     private async Task RenderFiles()
     {
        var result = await GetFiles("31201024426");
@@ -203,7 +214,9 @@
                         </thead>
 
                     <tbody class="bg-white divide-y divide-gray-200">
-                   @foreach (var file in files)
+                @if (files != null)
+                {
+                    @foreach (var file in files)
                         {
                             <tr class="hover:bg-gray-100">
                                 <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
@@ -238,6 +251,8 @@
                                 </td>
                             </tr>
                         }
+                }
+                   
                     </tbody>
 
                 </table>
