@@ -1,6 +1,13 @@
 ﻿@page "/hoso"
 @using UehInternFrontend.Components
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using Newtonsoft.Json
 
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
 <PageTitle>Hồ Sơ</PageTitle>
 
 <CheckUserComponent CheckRole="sinhvien">
@@ -15,7 +22,7 @@
                         Mã sinh viên
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        31201024451
+                        @sinhvien.mssv
                     </p>
                 </div>
                 <div class="col-span-6 sm:col-span-3">
@@ -23,65 +30,44 @@
                         Họ tên
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        Nguyễn Như Trung
+                       @sinhvien.ho  @sinhvien.ten
                     </p>
                 </div>
                 <div class="col-span-6 sm:col-span-3">
                     <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                        Ngày sinh
+                        Lớp
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        25/04/2002
+                        @sinhvien.thuoclop
+
                     </p>
                 </div>
                 <div class="col-span-6 sm:col-span-3">
                     <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                        CCCD
+                        Khoá
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        079202022718
+                        @sinhvien.khoagoc
                     </p>
                 </div>
                 <div class="col-span-6 sm:col-span-3">
                     <label for="country" class="block mb-2 text-sm font-medium text-gray-900">
-                        Lớp
+                        Tên học phần
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        DH46ST001
+                        @sinhvien.tenhp
                     </p>
                 </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="city" class="block mb-2 text-sm font-medium text-gray-900">
-                        Khóa
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        Khóa 46 CTT
-                    </p>
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900">
-                        Email trường
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        trungnguyen.31201024451@st.ueh.edu.vn
-                    </p>
-                </div>
+               
                 <div class="col-span-6 sm:col-span-3">
                     <label for="email" class="block mb-2 text-sm font-medium text-gray-900">
-                        Email cá nhân
+                        Thuộc khoa
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        nguyennhutrung.nnt@gmail.com
+                        @khoa.tenkhoa
                     </p>
                 </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-900">
-                        Số điện thoại
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        0393976845
-                    </p>
-                </div>
+
             </div>
         </div>
 
@@ -118,9 +104,64 @@
 
 @code {
     private int currentCount = 0;
+    private SinhvienModel? sinhvien = new SinhvienModel();
+    private KhoaModel? khoa = new KhoaModel();
 
     private void IncrementCount()
     {
         currentCount++;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RenderFiles();
+    }
+
+    private async Task RenderFiles()
+    {
+        SinhvienModel result = await GetSinhVien("31151024214");
+        KhoaModel resultKhoa = await GetSinhVienByKhoa("31151024214");
+        if (result != null && resultKhoa != null)
+        {
+            khoa = resultKhoa;
+            sinhvien = result;
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
+        }
+    }
+    private async Task<KhoaModel> GetSinhVienByKhoa(string mssv)
+    {
+       var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/khoa/{mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<KhoaModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task<SinhvienModel> GetSinhVien(string mssv)
+    {
+       var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/{mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<SinhvienModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+
 }

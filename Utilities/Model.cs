@@ -66,7 +66,7 @@ namespace UehInternFrontend
         public string? Password { get; set; }
     }
 
-    public class UploadResult
+    public class UploadModel
     {
 
         public Guid Id { get; set; }
@@ -75,8 +75,35 @@ namespace UehInternFrontend
         public string? FileName { get; set; }
         public string? StoredFileName { get; set; }
         public string? ContentType { get; set; }
-        public DateTime DateTime { get; set; } = DateTime.Now;
-        public string Status { get; set; } = "true";
+        public DateTime DateTime { get; set; }
+        public string Status { get; set; }
+    }
+
+
+    public class SinhvienModel
+    {
+        public string mssv { get; set; }
+        public string ho { get; set; }
+        public string ten { get; set; }
+        public string thuoclop { get; set; }
+        public string khoagoc { get; set; }
+        public string khoahoc { get; set; }
+        public string mahp { get; set; }
+        public string malhp { get; set; }
+        public string tenhp { get; set; }
+        public string soct { get; set; }
+        public string malop { get; set; }
+        public string bacdt { get; set; }
+        public string loaihinh { get; set; }
+        public string? macn { get; set; }
+
+
+    }
+    public class KhoaModel
+    {
+        public string makhoa { get; set; }
+        public string tenkhoa { get; set; }
+
     }
 
 }

@@ -20,9 +20,9 @@
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
     private List<string> fileNames = new();
-    private List<UploadResult> uploadResults = new();
+    private List<UploadModel> UploadModels = new();
 
-   private List<UploadResult> files = new List<UploadResult>();
+   private List<UploadModel> files = new List<UploadModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,13 +44,13 @@
 
     }
 
-    private async Task<List<UploadResult>> GetFiles(string mssv)
+    private async Task<List<UploadModel>> GetFiles(string mssv)
     {
         var response = await Http.GetAsync($"https://localhost:7000/api/File?mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var listfiles = JsonConvert.DeserializeObject<List<UploadResult>>(content);
+            var listfiles = JsonConvert.DeserializeObject<List<UploadModel>>(content);
             return listfiles;
         }
         else
@@ -82,10 +82,10 @@
         var response = await Http.PostAsync($"https://localhost:7000/api/File/{Uri.EscapeDataString(mssv)}", content);
         response.EnsureSuccessStatusCode();
 
-        var newUploadResults = await response.Content.ReadFromJsonAsync<List<UploadResult>>();
-        if (newUploadResults is not null)
+        var newUploadModels = await response.Content.ReadFromJsonAsync<List<UploadModel>>();
+        if (newUploadModels is not null)
         {
-            uploadResults = uploadResults.Concat(newUploadResults).ToList();
+            UploadModels = UploadModels.Concat(newUploadModels).ToList();
         }
     }
 
