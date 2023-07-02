@@ -112,15 +112,24 @@
         currentCount++;
     }
 
-    protected override async Task OnInitializedAsync()
+    private string? mssv = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
+            StateHasChanged();
+        }
     }
+
 
     private async Task RenderDatas()
     {
-        SinhvienModel result = await GetSinhVien("31151024214");
-        KhoaModel resultKhoa = await GetSinhVienByKhoa("31151024214");
+        SinhvienModel result = await GetSinhVien(mssv);
+        KhoaModel resultKhoa = await GetSinhVienByKhoa(mssv);
         if (result != null && resultKhoa != null)
         {
             khoa = resultKhoa;

@@ -24,25 +24,22 @@
 
    private List<UploadModel> files = new List<UploadModel>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await RenderFiles();
-    }
+     private string? mssv = "";
 
-    private string? mssv ="";
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            mssv = await JS.InvokeAsync<string>("getUserData","Code");
+            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
             StateHasChanged();
-            await JS.InvokeVoidAsync("console.log",mssv);
         }
     }
 
-    private async Task RenderFiles()
+    private async Task RenderDatas()
     {
-       var result = await GetFiles("31201024426");
+       var result = await GetFiles(mssv);
        if (result != null)
         {
             files = result;
@@ -75,7 +72,6 @@
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var mssv = "31201024426"; 
 
         using var content = new MultipartFormDataContent();
 
@@ -215,7 +211,7 @@
                                     @file.DateTime
                                 </td>
                                 <td class="p-4 space-x-2 whitespace-nowrap">
-                                    <button @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName, "31201024426"))"
+                                    <button @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName, mssv))"
                                             type="button" data-modal-toggle="edit-user-modal"
                                             class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
                                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">

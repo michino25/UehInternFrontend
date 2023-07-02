@@ -341,3 +341,15 @@ window.downloadFileFromStream = async (fileName, contentStreamReference) => {
     anchorElement.remove();
     URL.revokeObjectURL(url);
 }
+
+window.downloadFileExcel = (fileName, content, contentType) => {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+
+    const anchorElement = document.createElement('a');
+    anchorElement.href = url;
+    anchorElement.download = fileName ?? '';
+    anchorElement.click();
+
+    URL.revokeObjectURL(url);
+}

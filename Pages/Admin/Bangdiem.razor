@@ -1,5 +1,41 @@
 ﻿@page "/bangdiem"
 @using UehInternFrontend.Components
+@using UehInternFrontend
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using Newtonsoft.Json
+@using System.IO
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
+
+@code {
+    private int currentCount = 0;
+    private string makhoa ="CNTTKD";
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+    private async Task DownloadExcelFile(string makhoa)
+{
+     var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/ExportToExcelByKhoa?makhoa={Uri.EscapeDataString(makhoa)}");
+    if (response.IsSuccessStatusCode)
+    {
+        var fileName = response.Content.Headers.ContentDisposition.FileName;
+        var contentType = response.Content.Headers.ContentType.MediaType;
+        var content = await response.Content.ReadAsByteArrayAsync();
+
+        await JS.InvokeVoidAsync("downloadFileExcel", fileName, content, contentType);
+     
+
+    }
+    else
+    {
+        await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp tin.");
+    }
+}
+}
 
 <PageTitle>Bảng điểm tổng hợp</PageTitle>
 
@@ -13,7 +49,8 @@
     <p class="mb-3 font-normal text-gray-700">
         Bảng điểm tổng hợp của toàn bộ khoa sẽ được xuất file excel.
     </p>
-    <button type="button" class="inline-flex items-center text-teal-700 hover:text-white border border-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+    <button  @onclick="@(async () => await DownloadExcelFile(makhoa))"
+        type="button" class="inline-flex items-center text-teal-700 hover:text-white border border-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
         Xuất bảng điểm
         <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
     </button>
@@ -23,11 +60,3 @@
 </ItemContent>
 </CheckUserComponent>
 
-@code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}
