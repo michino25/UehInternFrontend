@@ -18,23 +18,23 @@
         currentCount++;
     }
     private async Task DownloadExcelFile(string makhoa)
-{
-     var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/ExportToExcelByKhoa?makhoa={Uri.EscapeDataString(makhoa)}");
-    if (response.IsSuccessStatusCode)
     {
-        var fileName = response.Content.Headers.ContentDisposition.FileName;
-        var contentType = response.Content.Headers.ContentType.MediaType;
-        var content = await response.Content.ReadAsByteArrayAsync();
+        var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/ExportToExcelByKhoa?makhoa={Uri.EscapeDataString(makhoa)}");
+        if (response.IsSuccessStatusCode)
+        {
+            var fileName = response.Content.Headers.ContentDisposition.FileName;
+            var contentType = response.Content.Headers.ContentType.MediaType;
+            var content = await response.Content.ReadAsByteArrayAsync();
 
-        await JS.InvokeVoidAsync("downloadFileExcel", fileName, content, contentType);
-     
+            await JS.InvokeVoidAsync("downloadFileExcel", fileName, content, contentType);
+        
 
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp tin.");
+        }
     }
-    else
-    {
-        await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp tin.");
-    }
-}
 }
 
 <PageTitle>Bảng điểm tổng hợp</PageTitle>
