@@ -106,15 +106,29 @@
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KhoaModel? khoa = new KhoaModel();
 
-    protected override async Task OnInitializedAsync()
+    private void IncrementCount()
     {
-        await RenderDatas();
+        currentCount++;
     }
+
+    private string? mssv = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
+            StateHasChanged();
+        }
+    }
+
 
     private async Task RenderDatas()
     {
-        SinhvienModel result = await GetSinhVien("31151024214");
-        KhoaModel resultKhoa = await GetSinhVienByKhoa("31151024214");
+        SinhvienModel result = await GetSinhVien(mssv);
+        KhoaModel resultKhoa = await GetSinhVienByKhoa(mssv);
         if (result != null && resultKhoa != null)
         {
             khoa = resultKhoa;
