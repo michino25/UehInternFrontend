@@ -34,6 +34,8 @@
                 Role = "giangvien"
             };
             await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+            await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+            await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
             NavigationManager.NavigateTo("/sinhvien");
 
         }
@@ -47,6 +49,8 @@
                 Role = "admin"
             };
             await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+            await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+            await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
             NavigationManager.NavigateTo("/tongquan");
 
         }

@@ -103,14 +103,8 @@
 </CheckUserComponent>
 
 @code {
-    private int currentCount = 0;
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KhoaModel? khoa = new KhoaModel();
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
 
     protected override async Task OnInitializedAsync()
     {

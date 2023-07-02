@@ -70,61 +70,61 @@ namespace UehInternFrontend
     {
 
         public Guid Id { get; set; }
-        public string Mssv { get; set; }
-        public string FileType { get; set; }
+        public string? Mssv { get; set; }
+        public string? FileType { get; set; }
         public string? FileName { get; set; }
         public string? StoredFileName { get; set; }
         public string? ContentType { get; set; }
         public DateTime DateTime { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }
     }
 
 
     public class SinhvienModel
     {
-        public string mssv { get; set; }
-        public string ho { get; set; }
-        public string ten { get; set; }
-        public string thuoclop { get; set; }
-        public string khoagoc { get; set; }
-        public string khoahoc { get; set; }
-        public string mahp { get; set; }
-        public string malhp { get; set; }
-        public string tenhp { get; set; }
-        public string soct { get; set; }
-        public string malop { get; set; }
-        public string bacdt { get; set; }
-        public string loaihinh { get; set; }
+        public string? mssv { get; set; }
+        public string? ho { get; set; }
+        public string? ten { get; set; }
+        public string? thuoclop { get; set; }
+        public string? khoagoc { get; set; }
+        public string? khoahoc { get; set; }
+        public string? mahp { get; set; }
+        public string? malhp { get; set; }
+        public string? tenhp { get; set; }
+        public string? soct { get; set; }
+        public string? malop { get; set; }
+        public string? bacdt { get; set; }
+        public string? loaihinh { get; set; }
         public string? macn { get; set; }
 
 
     }
     public class KhoaModel
     {
-        public string makhoa { get; set; }
-        public string tenkhoa { get; set; }
+        public string? makhoa { get; set; }
+        public string? tenkhoa { get; set; }
 
     }
 
     public class SinhvienkhoaModel
     {
-        public string makhoa { get; set; }
-        public string mssv { get; set; }
+        public string? makhoa { get; set; }
+        public string? mssv { get; set; }
 
     }
 
      public class GiangvienkhoaModel
     {
-        public string makhoa { get; set; }
-        public string magv { get; set; }
+        public string? makhoa { get; set; }
+        public string? magv { get; set; }
 
     }
 
     public class ChuyennganhModel
     {
-        public string macn { get; set; }
-        public string tencn { get; set; }
-        public string makhoa { get; set; }
+        public string? macn { get; set; }
+        public string? tencn { get; set; }
+        public string? makhoa { get; set; }
 
     }
 
@@ -140,21 +140,21 @@ namespace UehInternFrontend
 
     public class GiangvienViewModel
     {
-        public string MaGiangVien { get; set; }
-        public string TenGiangVien { get; set; }
-        public int SoSinhVienHuongDan { get; set; }
-        public string Email { get; set; }
-        public string SDT { get; set; }
+        public string? MaGiangVien { get; set; }
+        public string? TenGiangVien { get; set; }
+        public int? SoSinhVienHuongDan { get; set; }
+        public string? Email { get; set; }
+        public string? SDT { get; set; }
 
     }
     public class ChamcheoViewModel
     {
-        public string magv1 { get; set; }
-        public string magv2 { get; set; }
-        public string tengv1 { get; set; }
-        public string tengv2 { get; set; }
-        public string email1 { get; set; }
-        public string email2 { get; set; }
+        public string? magv1 { get; set; }
+        public string? magv2 { get; set; }
+        public string? tengv1 { get; set; }
+        public string? tengv2 { get; set; }
+        public string? email1 { get; set; }
+        public string? email2 { get; set; }
     }
 
     
