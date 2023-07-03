@@ -1,21 +1,111 @@
 ﻿@page "/lichsugap/them"
 @using UehInternFrontend.Components
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using Newtonsoft.Json
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+
+@code {
+    public string? apiLink;
+    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+    private string? magv = "";
+
+    private string selectedStudent;
+
+    private void ChooseStudent()
+    {
+        NavigationManager.NavigateTo($"/lichsugap/them/{selectedStudent}");
+    }
+
+    protected override void OnInitialized()
+    {
+        apiLink = Configuration["apiBackend"];
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            magv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task RenderDatas()
+    {
+        var result = await SinhVienByGiangVien(magv);
+        if (result != null )
+        {
+            sinhviens = result;
+            StateHasChanged();
+
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
+        }
+    }
+    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string magv)
+    {
+        var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+}
 
 <PageTitle>Thêm lịch sử gặp</PageTitle>
 
 <CheckUserComponent CheckRole="giangvien">
 <ItemContent>
 
-    <h1>thêm lịch sử gặp: select sinh viên, ghi nhận ngày gặp, nội dung gặp </h1>
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+    <div
+        class="bg-white block sm:flex items-center justify-between lg:mt-1.5">
+        <div class="w-full mb-3">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Thêm lịch sử gặp</h1>
+        </div>
+    </div>
+
+    <label for="students" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Chọn một sinh viên</label>
+    <select @bind="selectedStudent" id="students" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <option selected hidden>--Chọn sinh viên--</option>
+        @if (sinhviens != null)
+        {
+            @foreach (var sinhvien in sinhviens)
+            {
+                <option value="@sinhvien.mssv">@sinhvien.ho @sinhvien.ten</option>
+            }
+        }
+    </select>
+
+    <button @onclick="ChooseStudent"
+        class="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+        <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                clip-rule="evenodd"></path>
+        </svg>
+        Thêm lịch sử gặp
+    </button>
+
+</div>
 
 </ItemContent>
 </CheckUserComponent>
-
-@code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}
