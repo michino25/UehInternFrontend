@@ -59,11 +59,9 @@
 
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
     <div
-        class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
-        <div class="w-full mb-5">
-            <div class="mb-4">
-                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Thông tin sinh viên</h1>
-            </div>
+        class="bg-white block sm:flex items-center justify-between lg:mt-1.5">
+        <div class="w-full mb-3">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Thông tin sinh viên</h1>
         </div>
     </div>
     <div class="grid grid-cols-6 gap-6 mb-4">
@@ -100,7 +98,353 @@
                 @sinhvien.khoagoc
             </p>
         </div>
+        <div class="col-span-6 sm:col-span-3">
+            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                Loại hình
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                @sinhvien.tenhp
+            </p>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                Email
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                email@ueh.edu.vn
+            </p>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                Số điện thoại
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                0908372498
+            </p>
+        </div>
     </div>
+</div>
+
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+    <div
+        class="bg-white block sm:flex items-center justify-between lg:mt-1.5">
+        <div class="w-100 mb-3">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Lịch sử gặp mặt</h1>
+        </div>
+
+        <div class="flex items-center mb-3 ml-auto mr-2 space-x-2 sm:space-x-3">
+            <a href="lichsugap/them/@sinhvien.mssv"
+                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Ghi nhận thêm lịch sử 
+            </a>
+        </div>
+    </div>
+    
+    <table class="min-w-full divide-y divide-gray-200 table-fixed">
+        <thead class="bg-gray-100">
+            <tr>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Ngày gặp
+                </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Nội dung
+                </th>
+            </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-gray-200">
+            @if (true)
+            {
+                <tr class="hover:bg-gray-100">
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                        3/7/2023
+                    </td>
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                        Thông tin về các quy định, đi trễ 15p, hẹn 10/7 demo sản phẩm
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                        10/7/2023
+                    </td>
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                        Hoàn thành sản phẩm 95%, tiến độ tốt
+                    </td>
+                </tr>
+            } else {
+                <tr class="">
+                    <td class="flex items-center p-4 mr-12 space-x-1 whitespace-nowrap">
+                        <div class="text-sm font-normal text-gray-500">
+                            <div class="text-base text-gray-900">Chưa có file</div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+    <div
+        class="bg-white block sm:flex items-center justify-between lg:mt-1.5">
+        <div class="w-100 mb-3">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">File đã nộp</h1>
+        </div>
+
+        <div class="flex items-center mb-3 ml-auto mr-2 space-x-2 sm:space-x-3">
+            <button
+                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Tải toàn bộ 
+            </button>
+        </div>
+    </div>
+    
+    <table class="min-w-full divide-y divide-gray-200 table-fixed">
+        <thead class="bg-gray-100">
+            <tr>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    File
+                </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Giờ nộp
+                </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Hành động
+                </th>
+            </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-gray-200">
+            @if (true)
+            {
+                <tr class="hover:bg-gray-100">
+                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                        <div class="text-sm font-normal text-gray-500">
+                            <div class="text-base font-semibold text-gray-900">BaocaoCuoiki.pdf</div>
+                        </div>
+                    </td>
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                        3/7/2023
+                    </td>
+                    <td class="p-4 space-x-2 whitespace-nowrap">
+                        <button 
+                                @* @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName, mssv))" *@
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                            <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            Tải xuống
+                        </button>
+                    </td>
+                </tr>
+            } else {
+                <tr class="">
+                    <td class="flex items-center p-4 mr-12 space-x-1 whitespace-nowrap">
+                        <div class="text-sm font-normal text-gray-500">
+                            <div class="text-base text-gray-900">Chưa có file</div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+    <div
+        class="bg-white block sm:flex items-center justify-between lg:mt-1.5">
+        <div class="w-100 mb-3">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Bảng điểm chi tiết</h1>
+        </div>
+
+        <div class="flex items-center mb-3 ml-auto mr-2 space-x-2 sm:space-x-3">
+            <a href="diem/@sinhvien.mssv"
+                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                    </path>
+                    <path fill-rule="evenodd"
+                        d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Chỉnh sửa điểm
+            </a>
+        </div>
+    </div>
+
+    <table class="min-w-full divide-y divide-gray-200 table-fixed w-100">
+        <thead class="bg-gray-100">
+            <tr>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    STT
+                </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Tiêu chí
+                </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Điểm
+                </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Điểm tối đa
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Về vấn đề được đặt ra hay mục tiêu 
+                    (dựa trên có hay không, tính rõ ràng, tính hợp thời, tính mức độ cấp thiết, tính mức độ phức tạp,…)
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    2
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Phương pháp giải quyết vấn đề hay phương pháp để đạt mục tiêu:<br>
+                    + Rõ ràng và hợp lý | đúng.<br>
+                    + Mức độ áp dụng kiến thức ngành đã học | tự học.<br>
+                    + Hợp thời đại | thiết thực.
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1.5</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    3
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Kỹ năng giải quyết vấn đề và kết quả đạt được so với mục tiêu, gồm:<br>
+                    + Kỹ năng phân tích nghiệp vụ<br>
+                    + Kỹ năng phân tích mô hình | hệ thống | giải pháp.<br>
+                    + Kỹ năng thiết kế mô hình | hệ thống | giải pháp.<br>
+                    + Kỹ năng thiết kế dữ liệu.<br>
+                    + Kỹ năng thu thập và phân tích dữ liệu.<br>
+                    + Kỹ năng lập trình.<br>
+                    + Kỹ năng sử dụng, vận dụng các công cụ công nghệ giải quyết các vấn đề.<br>
+                    + Kỹ năng lập kế hoạch và chiến lược công nghệ.<br>
+                    + …<br>
+                    (Ít nhất phải thể hiện được 3 kỹ năng, mỗi kỹ năng tối đa được 3 điểm)
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    4
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    5</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    4
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Mức độ kết quả đạt được so với mục tiêu đã đề ra
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    5
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Cách thức trình bày nội dung
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    6
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Tuân thủ quy định làm thực tập tốt nghiệp (dựa trên thái độ, hành vi, tính chuyên cần, …)
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    7
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Điểm cộng thêm cho một số trường hợp đặc biệt:<br>
+                    + Bài mang tính mới, giải quyết được và cho kết quả chấp nhận được.<br>
+                    + Có bài báo được đăng trên các tạp chí khoa học.
+
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    0
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    0.5</td>
+            </tr>
+
+
+        </tbody>
+        <tfoot>
+            <tr class="font-semibold text-gray-900 dark:text-white">
+                <td class="px-6 py-3"></td>
+                <td class="px-6 py-3">Tổng điểm</td>
+                <td class="px-6 py-3">10</td>
+                <td class="px-6 py-3"></td>
+            </tr>
+        </tfoot>
+
+    </table>
 </div>
 
 
