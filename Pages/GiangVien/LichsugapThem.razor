@@ -12,6 +12,7 @@
     public string? apiLink;
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
+    private DotModel dot = new DotModel();
 
     private string selectedStudent;
 
@@ -40,7 +41,8 @@
 
     private async Task RenderDatas()
     {
-        var result = await SinhVienByGiangVien(magv);
+        dot = await KiemtraDot();
+        var result = await SinhVienByGiangVien(dot.madot,magv);
         if (result != null )
         {
             sinhviens = result;
@@ -49,12 +51,13 @@
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
+            await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
         }
     }
-    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string magv)
+
+     private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?magv={magv}");
+       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -67,6 +70,24 @@
             return null;
         }
     }
+
+    private async Task<DotModel> KiemtraDot()
+    {
+       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    
 }
 
 <PageTitle>Thêm lịch sử gặp</PageTitle>

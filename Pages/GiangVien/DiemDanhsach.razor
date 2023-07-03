@@ -9,8 +9,10 @@
 @code {
     public string? apiLink;
     List<KetquaViewModed>? sinhviens = new List<KetquaViewModed>();
-    private string? magv = "";
+    private DotModel dot = new DotModel();
 
+    private string? magv = "";
+    private double sum = 0;
     protected override void OnInitialized()
     {
         apiLink = Configuration["apiBackend"];
@@ -31,7 +33,10 @@
 
     private async Task RenderDatas()
     {
-        var result = await DanhSachDiem(magv);
+        dot = await KiemtraDot();
+
+        var result = await DanhSachDiem(dot.madot,magv);
+        
         if (result != null )
         {
             sinhviens = result;
@@ -43,9 +48,9 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<KetquaViewModed>> DanhSachDiem(string magv)
+    private async Task<List<KetquaViewModed>> DanhSachDiem(string madot,string magv)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/GetDanhSachDiem?magv={magv}");
+       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/GetDanhSachDiem?madot={madot}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -55,6 +60,21 @@
         else
         {
             Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+     private async Task<DotModel> KiemtraDot()
+    {
+       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
             return null;
         }
     }
@@ -127,6 +147,11 @@
                         { 
                             @foreach (var sinhvien in sinhviens)
                             {
+                                sum = sinhvien.Diem;
+                                if (sum >= 10)
+                                {
+                                    sum = 10;
+                                }
                                 <tr class="hover:bg-gray-100">
                                     <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                         <div class="text-sm font-normal text-gray-500">
@@ -423,11 +448,4 @@
 </ItemContent>
 </CheckUserComponent>
 
-@code {
-    private int currentCount = 0;
 
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}

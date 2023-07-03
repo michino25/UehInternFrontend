@@ -60,6 +60,13 @@ namespace UehInternFrontend
 
     }
 
+     public class LichsuModel
+    {
+        public string mssv {get;set;}
+        public string noidung { get; set; }
+        public DateTime ngay { get; set; }
+    }
+
     public class LoginRequest
     {
         public string? Username { get; set; }
@@ -137,6 +144,16 @@ namespace UehInternFrontend
         public string? chuyenmon { get; set; }
     }
 
+     public class GiangvienRequest
+    {
+        public string? magv { get; set; }
+        public string? tengv { get; set; }
+        public string? email { get; set; }
+        public string? sdt { get; set; }
+        public string? status { get; set; } ="true";
+        public string? chuyenmon { get; set; }
+    }
+
     public class GiangvienViewModel
     {
         public string? MaGiangVien { get; set; }
@@ -192,6 +209,15 @@ namespace UehInternFrontend
 
     }
 
-  
+    public class DotModel
+    {
+        public string madot { get; set; }
+        public string name { get; set; }
+        public DateTime dateStart { get; set; }
+        public DateTime dateEnd { get; set; }
+        public string status { get; set; }
+
+
+    }
 
 }

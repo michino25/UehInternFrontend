@@ -7,6 +7,7 @@
 
 @code {
     [Parameter] public string idSv { get; set; }
+    private LichsuModel lichsu = new LichsuModel();
 
     private SinhvienModel? sinhvien = new SinhvienModel();
 
@@ -47,6 +48,22 @@
         {
             Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
             return null;
+        }
+    }
+    private async Task SubmitLichSu(string mssv)
+    {
+        var url = $"https://localhost:7000/api/Lichsu?mssv={Uri.EscapeDataString(mssv)}";
+        var response = await Http.PostAsJsonAsync(url, lichsu);
+
+        if (response.IsSuccessStatusCode)
+        {
+             @* NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); *@
+
+
+        }
+        else
+        {
+            Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
         }
     }
 
@@ -110,7 +127,7 @@
                     <label for="content" class="block mb-2 text-sm font-medium text-gray-900">
                         Nội dung
                     </label>
-                    <input type="text" name="content" id="content" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                    <input type="text" @bind="@lichsu.noidung" name="content" id="content" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
                 <div class="col-span-6 sm:col-full">
