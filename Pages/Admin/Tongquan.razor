@@ -9,14 +9,14 @@
 @inject HttpClient Http
 @inject IConfiguration Configuration
 @code {
-    private int currentCount = 0;
     private int sumsv = 0;
     private int sumgv = 0;
     private int sumcn = 0;
 
-    private void IncrementCount()
+    public string? api;
+    protected override void OnInitialized()
     {
-        currentCount++;
+        api = Configuration["apiBackend"];
     }
 
     protected override async Task OnInitializedAsync()
@@ -26,7 +26,7 @@
 
     private async Task RenderDatas()
     {
-        List<SinhvienkhoaModel> sinhvienkhoas   = await GetSinhvienByKhoas("CNTTKD");
+        List<SinhvienkhoaModel> sinhvienkhoas = await GetSinhvienByKhoas("CNTTKD");
         List<GiangvienkhoaModel> giangviens   = await GetGiangvienByKhoas("CNTTKD");
         List<ChuyennganhModel> chuyennganhs   = await GetChuyennganhsByKhoa("CNTTKD");
 
@@ -43,7 +43,7 @@
     }
     private async Task<List<SinhvienkhoaModel>> GetSinhvienByKhoas(string makhoa)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Khoa/sinhviens/{makhoa}");
+        var response = await Http.GetAsync(api + $"Khoa/sinhviens/{makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -59,7 +59,7 @@
 
     private async Task<List<GiangvienkhoaModel>> GetGiangvienByKhoas(string makhoa)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Khoa/giangviens/{makhoa}");
+        var response = await Http.GetAsync(api + $"Khoa/giangviens/{makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -73,9 +73,9 @@
         }
     }
 
-     private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
+    private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
+        var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();

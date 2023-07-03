@@ -10,15 +10,15 @@
 @inject IConfiguration Configuration
 
 @code {
-    public string? apiLink;
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     List<GiangvienViewModel>? giangviens = new List<GiangvienViewModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-
-    protected override void OnInitialized()
-    {
-        apiLink = Configuration["apiBackend"];
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,7 +41,7 @@
     }
     private async Task<List<GiangvienViewModel>> GetGiangVienAndSinhVienHuongDan(string makhoa)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/sinhvientotal?makhoa={makhoa}");
+        var response = await Http.GetAsync(api + $"Giangvien/sinhvientotal?makhoa={makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -55,7 +55,7 @@
         }
     }
 
-     private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
         var makhoa = "CNTTKD";
@@ -70,8 +70,7 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-
-        var apiUrl = $"https://localhost:7000/api/Phancong/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var apiUrl = api + $"Phancong/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
@@ -80,10 +79,6 @@
         response.EnsureSuccessStatusCode();
         
     }
-
-
-
-    
 
 }
 
