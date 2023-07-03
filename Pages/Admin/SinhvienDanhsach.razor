@@ -14,6 +14,7 @@
     {
         api = Configuration["apiBackend"];
     }
+    private DotModel dot = new DotModel();
 
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
@@ -26,6 +27,7 @@
 
     private async Task RenderDatas()
     {
+        dot = await KiemtraDot();
         var result = await GetDssvByKhoa("CNTTKD");
         if (result != null )
         {
@@ -52,11 +54,27 @@
             return null;
         }
     }
+
+     private async Task<DotModel> KiemtraDot()
+    {
+       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
+            return null;
+        }
+    }
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
-
+        string makhoa = "CNTTKD";
+        string madot = "DOT001";
         using var content = new MultipartFormDataContent();
 
         foreach (var file in files)
@@ -68,15 +86,14 @@
         }
 
 
-        var apiUrl = api + $"Sinhvien/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var apiUrl = api + $"Sinhvien/formFile?madot={madot}&makhoa={makhoa}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "File not found.");
         }
         response.EnsureSuccessStatusCode();
-        await JS.InvokeVoidAsync("alert", "Import file thành công");
-        response.EnsureSuccessStatusCode();
+        RenderDatas();
 
 
     }

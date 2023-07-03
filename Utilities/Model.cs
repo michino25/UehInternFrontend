@@ -212,9 +212,9 @@ namespace UehInternFrontend
     {
         public string madot { get; set; }
         public string name { get; set; }
-        public DateTime dateStart { get; set; }
-        public DateTime dateEnd { get; set; }
-        public string status { get; set; }
+        public DateTime ngaybatdau { get; set; } = DateTime.Now;
+        public DateTime ngayketthuc { get; set; }= DateTime.Now;
+        public string status { get; set; } = "true";
 
 
     }

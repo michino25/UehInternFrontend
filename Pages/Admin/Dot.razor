@@ -1,6 +1,36 @@
 ﻿@page "/dot"
 @using UehInternFrontend.Components
 
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
+@inject  NavigationManager navigationManager
+@using Newtonsoft.Json
+
+@code {
+
+    private DotModel dot = new DotModel();
+    private async Task SubmitDot()
+    {
+        var url = "https://localhost:7000/api/Dot/add";
+        var response = await Http.PostAsJsonAsync(url, dot);
+
+        if (response.IsSuccessStatusCode)
+        {
+          
+          await JS.InvokeVoidAsync("Tạo đọt thành công");
+
+        }
+        else
+        {
+            Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
+        }
+    }
+
+
+
+}
+
 <PageTitle>Đợt</PageTitle>
 
 <CheckUserComponent CheckRole="admin">
@@ -15,32 +45,18 @@
                     <label for="magv" class="block mb-2 text-sm font-medium text-gray-900">
                         Mã đợt
                     </label>
-                    <input type="text" name="magv" id="magv" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                    <input type="text" @bind="@dot.madot" name="magv" id="magv" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
                 <div class="col-span-6 sm:col-span-3">
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900">
                         Tên đợt
                     </label>
-                    <input type="text" name="name" id="name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900">
-                        Thời gian bắt đầu 
-                    </label>
-                    <input type="email" name="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">
-                        Thời gian kết thúc
-                    </label>
-                    <input type="text" name="phone" id="phone" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                    <input type="text" @bind="@dot.name" name="name" id="name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
                 <div class="col-span-6 sm:col-full">
-                    <button class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
+                    <button @onclick="SubmitDot" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
                         Tạo đợt
                     </button>
                 </div>
