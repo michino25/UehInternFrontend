@@ -353,3 +353,26 @@ window.downloadFileExcel = (fileName, content, contentType) => {
 
     URL.revokeObjectURL(url);
 }
+
+window.downloadFileFromByteArray = function (fileName, byteArray) {
+    const blob = new Blob([byteArray], { type: 'application/zip' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName ?? 'file.zip';
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+  
+
+  window.downloadFileFromPDf = function (fileName, byteArray) {
+    const blob = new Blob([byteArray], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};

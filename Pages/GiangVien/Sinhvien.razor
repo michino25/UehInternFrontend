@@ -1,8 +1,63 @@
 ﻿@page "/sinhvien"
 @using UehInternFrontend.Components
-
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using Newtonsoft.Json
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
 @code {
+    public string? apiLink;
+    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+    private string? magv = "";
 
+    protected override void OnInitialized()
+    {
+        apiLink = Configuration["apiBackend"];
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            magv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task RenderDatas()
+    {
+        var result = await SinhVienByGiangVien(magv);
+        if (result != null )
+        {
+            sinhviens = result;
+            StateHasChanged();
+
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
+        }
+    }
+    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string magv)
+    {
+       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
 }
 
 <PageTitle>Danh sách sinh viên</PageTitle>
@@ -94,308 +149,45 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Đỗ Thị Phương Anh
-                                    </div>
+                    @if (sinhviens != null)
+                    { 
+                        @foreach (var sinhvien in sinhviens)
+                        {
+                                <tr class="hover:bg-gray-100">
+                                <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                     <div class="text-sm font-normal text-gray-500">
-                                        anh@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024387
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Đoàn Trần Bá Đạt
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        dat@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024394</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <a href="/sinhvien/31201024451" type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </a>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Hồ Văn Hân
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        han@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024396</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Nguyễn Thị Bích Kiều
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        kieu@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31191026460</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K45</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Nguyễn Hữu Lợi
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        loi@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024415</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Nguyễn Thị Bích Ngân
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        ngan@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024422</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Nguyễn Duy Nguyện
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        nguyen@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024424</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Trần Hoài Phương
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        phuong@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024426</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Đào Phạm Trung Tín
+                                        <div class="text-base font-semibold text-gray-900">@sinhvien.ho @sinhvien.ten
                                         </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        tin@st.ueh.edu.vn
+                                        <div class="text-sm font-normal text-gray-500">
+                                            anh@st.ueh.edu.vn</div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024432</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    @sinhvien.mssv
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    @sinhvien.thuoclop</td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    K @sinhvien.khoagoc.Substring(5,2)</td>
+                                <td class="p-4 space-x-2 whitespace-nowrap">
+                                    <button type="button" data-modal-toggle="edit-user-modal"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
+                                            </path>
+                                            <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
+                                        </svg>
+                                        Chi tiết
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                        
 
-                        <tr class="hover:bg-gray-100">
-                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base font-semibold text-gray-900">Nguyễn Như Trung
-                                    </div>
-                                    <div class="text-sm font-normal text-gray-500">
-                                        trung@st.ueh.edu.vn</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                31201024451</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                ST001</td>
-                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                K46</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" data-modal-toggle="edit-user-modal"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                        </path>
-                                        <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                    </svg>
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
+
 
                     </tbody>
                 </table>
