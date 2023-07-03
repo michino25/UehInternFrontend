@@ -11,15 +11,16 @@
 @inject IConfiguration Configuration
 
 @code {
-    private int currentCount = 0;
-    private string makhoa ="CNTTKD";
-    private void IncrementCount()
+    public string? api;
+    protected override void OnInitialized()
     {
-        currentCount++;
+        api = Configuration["apiBackend"];
     }
+
+    private string makhoa ="CNTTKD";
     private async Task DownloadExcelFile(string makhoa)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/ExportToExcelByKhoa?makhoa={Uri.EscapeDataString(makhoa)}");
+        var response = await Http.GetAsync(api + $"Ketqua/ExportToExcelByKhoa?makhoa={Uri.EscapeDataString(makhoa)}");
         if (response.IsSuccessStatusCode)
         {
             var fileName = response.Content.Headers.ContentDisposition.FileName;
@@ -27,8 +28,6 @@
             var content = await response.Content.ReadAsByteArrayAsync();
 
             await JS.InvokeVoidAsync("downloadFileExcel", fileName, content, contentType);
-        
-
         }
         else
         {

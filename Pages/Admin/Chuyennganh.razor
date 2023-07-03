@@ -12,21 +12,16 @@
 
 
 @code {
-    private int currentCount = 0;
-    private long maxFileSize = long.MaxValue;
-    private int maxAllowedFiles = int.MaxValue;
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-
-     public string? apiLink;
-
-    List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
+    public string? api;
     protected override void OnInitialized()
     {
-        apiLink = Configuration["apiBackend"];
+        api = Configuration["apiBackend"];
     }
+
+    private long maxFileSize = long.MaxValue;
+    private int maxAllowedFiles = int.MaxValue;
+
+    List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,7 +35,6 @@
         {
             chuyennganhs = result;
             StateHasChanged();
-
         }
         else
         {
@@ -49,7 +43,7 @@
     }
     private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
+        var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -63,7 +57,7 @@
         }
     }
 
-     private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
         var makhoa = "CNTTKD";
@@ -78,8 +72,7 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-
-        var apiUrl = $"https://localhost:7000/api/Chuyennganh/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var apiUrl = api + $"Chuyennganh/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
@@ -87,11 +80,8 @@
         }
         response.EnsureSuccessStatusCode();
         await JS.InvokeVoidAsync("alert", "Import file thành công");
-         response.EnsureSuccessStatusCode();
-
-
+        response.EnsureSuccessStatusCode();
     }
-
 
 }
 
@@ -148,7 +138,7 @@
                             d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                             clip-rule="evenodd"></path>
                     </svg>
-                      <label for="actual-btn">Nhập file</label>
+                    <label for="actual-btn">Nhập file</label>
                     <InputFile id="actual-btn" class="hidden" OnChange="@OnInputFileChange" multiple />
                 </button>
             </div>

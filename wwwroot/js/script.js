@@ -334,38 +334,37 @@ window.downloadFileFromStream = async (fileName, contentStreamReference) => {
     const arrayBuffer = await contentStreamReference.arrayBuffer();
     const blob = new Blob([arrayBuffer]);
     const url = URL.createObjectURL(blob);
-    const anchorElement = document.createElement('a');
+    const anchorElement = document.createElement("a");
     anchorElement.href = url;
-    anchorElement.download = fileName ?? '';
+    anchorElement.download = fileName ?? "";
     anchorElement.click();
     anchorElement.remove();
     URL.revokeObjectURL(url);
-}
+};
 
 window.downloadFileExcel = (fileName, content, contentType) => {
     const blob = new Blob([content], { type: contentType });
     const url = URL.createObjectURL(blob);
 
-    const anchorElement = document.createElement('a');
+    const anchorElement = document.createElement("a");
     anchorElement.href = url;
-    anchorElement.download = fileName ?? '';
+    anchorElement.download = fileName ?? "";
     anchorElement.click();
 
     URL.revokeObjectURL(url);
-}
+};
 
 window.downloadFileFromByteArray = function (fileName, byteArray) {
-    const blob = new Blob([byteArray], { type: 'application/zip' });
+    const blob = new Blob([byteArray], { type: "application/zip" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = fileName ?? 'file.zip';
+    link.download = fileName ?? "file.zip";
     link.click();
     URL.revokeObjectURL(url);
-  }
-  
+};
 
-  window.downloadFileFromPDf = function (fileName, byteArray) {
+window.downloadFileFromPDf = function (fileName, byteArray) {
     const blob = new Blob([byteArray], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

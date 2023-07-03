@@ -10,15 +10,15 @@
 @inject IConfiguration Configuration
 
 @code {
-    public string? apiLink;
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     List<GiangvienModel>? giangviens = new List<GiangvienModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-
-    protected override void OnInitialized()
-    {
-        apiLink = Configuration["apiBackend"];
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -27,12 +27,11 @@
 
     private async Task RenderDatas()
     {
-         var result = await GetGiangvienByKhoas("CNTTKD");
+        var result = await GetGiangvienByKhoas("CNTTKD");
         if (result != null )
         {
             giangviens = result;
             StateHasChanged();
-
         }
         else
         {
@@ -41,7 +40,7 @@
     }
     private async Task<List<GiangvienModel>> GetGiangvienByKhoas(string makhoa)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/khoa/{makhoa}/giangvien");
+        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}/giangvien");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -70,7 +69,7 @@
         }
 
 
-        var apiUrl = $"https://localhost:7000/api/Giangvien/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var apiUrl = api + $"Giangvien/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {

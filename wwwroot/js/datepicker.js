@@ -1,18 +1,21 @@
 function datePicker() {
-    let selected_date_element = document.querySelector(
+    // window.onload = function () {
+    const selected_date_element = document.querySelector(
         ".date-picker .selected-date"
     );
-    let dates_element = document.querySelector(".date-picker .dates");
-    let mth_element = document.querySelector(".date-picker .dates .month .mth");
-    let next_mth_element = document.querySelector(
+    const dates_element = document.querySelector(".date-picker .dates");
+    const mth_element = document.querySelector(
+        ".date-picker .dates .month .mth"
+    );
+    const next_mth_element = document.querySelector(
         ".date-picker .dates .month .next-mth"
     );
-    let prev_mth_element = document.querySelector(
+    const prev_mth_element = document.querySelector(
         ".date-picker .dates .month .prev-mth"
     );
-    let days_element = document.querySelector(".date-picker .dates .days");
+    const days_element = document.querySelector(".date-picker .dates .days");
 
-    let months = [
+    const months = [
         "January",
         "February",
         "March",
@@ -28,20 +31,15 @@ function datePicker() {
     ];
 
     let date = new Date();
-    let day = "";
-    let month = "";
-    let year = "";
 
     if (selected_date_element && selected_date_element.value) {
         let dateArr = selected_date_element.value.split("-");
         date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
-    } else {
-        date = new Date();
     }
 
-    day = date.getDate();
-    month = date.getMonth();
-    year = date.getFullYear();
+    let day = date.getDate();
+    let month = date.getMonth();
+    let year = date.getFullYear();
 
     mth_element.textContent = months[month] + " " + year;
 
@@ -173,3 +171,4 @@ function datePicker() {
         return day + separate + month + separate + year;
     }
 }
+// }

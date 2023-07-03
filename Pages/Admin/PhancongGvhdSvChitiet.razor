@@ -1,4 +1,4 @@
-﻿@page "/sinhvien"
+﻿@page "/phancong/gvhdsv/{idGv}"
 @using UehInternFrontend.Components
 @using System.Net.Http
 @using System.Net.Http.Headers
@@ -6,24 +6,22 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
+
 @code {
-    public string? apiLink;
-    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
-    private string? magv = "";
-    private DotModel dot = new DotModel();
+    public string? api;
     protected override void OnInitialized()
     {
-        apiLink = Configuration["apiBackend"];
+        api = Configuration["apiBackend"];
     }
 
+    [Parameter] public string idGv { get; set; }
+    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            magv = await JS.InvokeAsync<string>("getUserData", "Code");
             await RenderDatas();
-
             StateHasChanged();
         }
     }
@@ -31,8 +29,7 @@
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await SinhVienByGiangVien(dot.madot,magv);
+        var result = await SinhVienByGiangVien(idGv);
         if (result != null )
         {
             sinhviens = result;
@@ -44,9 +41,9 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
+    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string idGv)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
+        var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?magv={idGv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -59,27 +56,11 @@
             return null;
         }
     }
-
-    private async Task<DotModel> KiemtraDot()
-    {
-       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
-            return null;
-        }
-    }
 }
 
 <PageTitle>Danh sách sinh viên</PageTitle>
 
-<CheckUserComponent CheckRole="giangvien">
+<CheckUserComponent CheckRole="admin">
 <ItemContent>
 
 
@@ -90,7 +71,7 @@
         <div class="mb-4">
 
             <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách sinh viên</h1>
-            <h1>Hiển thị danh sách sinh viên, nút chi tiết sinh viên, dẫn qua chi tiết: link kiểu /sinhvien/31201024451 </h1>
+            <h1>Được hướng dẫn bởi giảng viên Đặng Ngọc Hoàng Thành</h1>
         </div>
         <div class="sm:flex">
             <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0">
