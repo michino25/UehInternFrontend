@@ -97,7 +97,6 @@ namespace UehInternFrontend
         public string? loaihinh { get; set; }
         public string? macn { get; set; }
 
-
     }
     public class KhoaModel
     {
