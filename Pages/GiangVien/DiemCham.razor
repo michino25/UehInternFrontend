@@ -1,0 +1,279 @@
+﻿@page "/diem/{idSv}"
+@using UehInternFrontend.Components
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
+@using Newtonsoft.Json
+
+@code {
+    [Parameter] public string idSv { get; set; }
+
+    private SinhvienModel? sinhvien = new SinhvienModel();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) {
+            await RenderDatas();
+            StateHasChanged();
+        }
+    }
+
+    private async Task RenderDatas()
+    {
+        SinhvienModel result = await GetSinhVien(idSv);
+        if (result != null)
+        {
+            sinhvien = result;
+            StateHasChanged();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
+        }
+    }
+
+    private async Task<SinhvienModel> GetSinhVien(string mssv)
+    {
+        var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/{mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<SinhvienModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+
+}
+
+
+<PageTitle>Chấm điểm</PageTitle>
+
+<CheckUserComponent CheckRole="giangvien">
+<ItemContent>
+
+
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+    <div
+        class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
+        <div class="w-full mb-5">
+            <div class="mb-4">
+                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Chấm điểm</h1>
+                <h1>giao diện chấm điểm: chọn sinh viên, hiển thị sinh viên, chấm điểm, các tiêu chí, nút lưu điểm</h1>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-6 gap-6 mb-4">
+        <div class="col-span-6 sm:col-span-3">
+            <label for="first-name" class="block mb-2 text-sm font-medium text-gray-900">
+                Mã sinh viên
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                @sinhvien.mssv
+            </p>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+            <label for="last-name" class="block mb-2 text-sm font-medium text-gray-900">
+                Họ tên
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                @sinhvien.ho  @sinhvien.ten
+            </p>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                Lớp
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                @sinhvien.thuoclop
+
+            </p>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                Khoá
+            </label>
+            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                @sinhvien.khoagoc
+            </p>
+        </div>
+    </div>
+
+    <div class="flex flex-col">
+        <div class="overflow-x-auto">
+            <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow">
+                    <table class="min-w-full divide-y divide-gray-200 table-fixed w-100">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    STT
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Tiêu chí
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Điểm
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Điểm tối đa
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Về vấn đề được đặt ra hay mục tiêu 
+                                    (dựa trên có hay không, tính rõ ràng, tính hợp thời, tính mức độ cấp thiết, tính mức độ phức tạp,…)
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="1" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1</td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    2
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Phương pháp giải quyết vấn đề hay phương pháp để đạt mục tiêu:<br>
+                                    + Rõ ràng và hợp lý | đúng.<br>
+                                    + Mức độ áp dụng kiến thức ngành đã học | tự học.<br>
+                                    + Hợp thời đại | thiết thực.
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="1" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1.5</td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    3
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Kỹ năng giải quyết vấn đề và kết quả đạt được so với mục tiêu, gồm:<br>
+                                    + Kỹ năng phân tích nghiệp vụ<br>
+                                    + Kỹ năng phân tích mô hình | hệ thống | giải pháp.<br>
+                                    + Kỹ năng thiết kế mô hình | hệ thống | giải pháp.<br>
+                                    + Kỹ năng thiết kế dữ liệu.<br>
+                                    + Kỹ năng thu thập và phân tích dữ liệu.<br>
+                                    + Kỹ năng lập trình.<br>
+                                    + Kỹ năng sử dụng, vận dụng các công cụ công nghệ giải quyết các vấn đề.<br>
+                                    + Kỹ năng lập kế hoạch và chiến lược công nghệ.<br>
+                                    + …<br>
+                                    (Ít nhất phải thể hiện được 3 kỹ năng, mỗi kỹ năng tối đa được 3 điểm)
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="4" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1.5</td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    4
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Mức độ kết quả đạt được so với mục tiêu đã đề ra
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="1" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1</td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    5
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Cách thức trình bày nội dung
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="1" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1</td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    6
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Tuân thủ quy định làm thực tập tốt nghiệp (dựa trên thái độ, hành vi, tính chuyên cần, …)
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="1" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    1</td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    7
+                                </td>
+                                <td class="break-word p-4 text-base font-medium text-gray-900">
+                                    Điểm cộng thêm cho một số trường hợp đặc biệt:<br>
+                                    + Bài mang tính mới, giải quyết được và cho kết quả chấp nhận được.<br>
+                                    + Có bài báo được đăng trên các tạp chí khoa học.
+
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <input type="text" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                                        value="0" required>
+                                </td>
+                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    0.5</td>
+                            </tr>
+
+
+                        </tbody>
+                        <tfoot>
+                            <tr class="font-semibold text-gray-900 dark:text-white">
+                                <td class="px-6 py-3"></td>
+                                <td class="px-6 py-3">Tổng điểm</td>
+                                <td class="px-6 py-3">10</td>
+                                <td class="px-6 py-3"></td>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+                    <div class="col-span-6 mt-4 sm:col-full">
+                        <button class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
+                            Lưu điểm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</ItemContent>
+</CheckUserComponent>

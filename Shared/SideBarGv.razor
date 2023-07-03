@@ -22,38 +22,15 @@
 
         @* Đăng ký sớm *@
         <li>
-            <button type="button"
-                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100"
-                aria-controls="dropdown-sv" data-collapse-toggle="dropdown-sv">
+            <NavLink href="/dangky/danhsach"
+                class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
                 <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
                     fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
                     <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
                 </svg>
-                <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
-                    Đăng ký sớm
-                </span>
-                <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </button>
-            <ul id="dropdown-sv" class="hidden py-2 space-y-2">
-                <li>
-                    <NavLink href="dangky/them"
-                        class="nav-link flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100">
-                        Thêm
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="dangky/danhsach"
-                        class="nav-link flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100">
-                        Danh sách
-                    </NavLink>
-                </li>
-            </ul>
+                <span class="ml-3">Đăng ký sớm</span>
+            </NavLink>
         </li>
 
         @* Sinh viên *@
@@ -92,9 +69,8 @@
 
         @* Điểm *@
         <li>
-            <button type="button"
-                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100"
-                aria-controls="dropdown-dk" data-collapse-toggle="dropdown-dk">
+            <NavLink href="/diem"
+                class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
                 <svg aria-hidden="true"
                     class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
                     fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -102,30 +78,8 @@
                         d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
                     </path>
                 </svg>
-                <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>
-                    Điểm
-                </span>
-                <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </button>
-            <ul id="dropdown-dk" class="hidden py-2 space-y-2">
-                <li>
-                    <NavLink href="diem/them"
-                        class="nav-link flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100">
-                        Chấm điểm
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="diem/danhsach"
-                        class="nav-link flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100">
-                        Bảng điểm
-                    </NavLink>
-                </li>
-            </ul>
+                <span class="ml-3">Bảng điểm</span>
+            </NavLink>
         </li>
 
         @* Báo cáo *@
