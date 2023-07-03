@@ -4,15 +4,20 @@
 @inject HttpClient Http
 @inject IConfiguration Configuration
 @using Newtonsoft.Json
+@using System.Globalization
+
+@inject  NavigationManager NavigationManager
 
 @code {
     [Parameter] public string idSv { get; set; }
-    private LichsuModel lichsu = new LichsuModel();
+
 
     private SinhvienModel? sinhvien = new SinhvienModel();
-
+     private string ngayBanDau = DateTime.Today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        
+        lichsu.ngay = ngayBanDau;
         if (firstRender) {
             await RenderDatas();
             StateHasChanged();
@@ -49,22 +54,26 @@
             return null;
         }
     }
+    private LichsuModel lichsu = new LichsuModel();
     private async Task SubmitLichSu(string mssv)
     {
-        var url = $"https://localhost:7000/api/Lichsu?mssv={Uri.EscapeDataString(mssv)}";
+        var url = $"https://localhost:7000/api/Lichsu?mssv={mssv}";
         var response = await Http.PostAsJsonAsync(url, lichsu);
 
         if (response.IsSuccessStatusCode)
         {
-             @* NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); *@
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); 
 
 
         }
         else
         {
-            Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
+            Console.WriteLine("Đã xảy ra lỗi khi gửi !");
         }
     }
+
+  
+
 
 
 }
@@ -90,9 +99,9 @@
                         Ngày
                     </label>
 
-                    <input type="text" readonly id="date" name="date"
+                    <input type="text"  id="date" name="date"
                         class="selected-date shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                        placeholder="Select date" value="05-07-2023">
+                        placeholder="Select date"  @bind="ngayBanDau" >
 
                     <div class="dates rounded-lg bg-white shadow-lg p-3 absolute top-full left-0 right-0 bg-white hidden">
                         <div class="month flex justify-between items-center mb-3">
@@ -125,12 +134,12 @@
                 <label for="content" class="block mb-2 text-sm font-medium text-gray-900">
                     Nội dung
                 </label>
-                <input type="text" name="content" id="content" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                <input type="text" @bind ="@lichsu.noidung" name="content" id="content" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
             </div>
 
             <div class="col-span-6 sm:col-full">
-                <button class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
-                    Thêm giảng viên
+                <button  @onclick="() => SubmitLichSu(idSv)" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
+                    Tạo lịch sử 
                 </button>
             </div>
         </div>
@@ -139,11 +148,4 @@
 </ItemContent>
 </CheckUserComponent>
 
-@code {
-    private int currentCount = 0;
 
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}

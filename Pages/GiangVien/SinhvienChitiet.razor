@@ -12,7 +12,7 @@
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KetquaModel? ketqua = new KetquaModel();
     private List<UploadModel> files = new List<UploadModel>();
-
+    private List<LichsuModel> lichsus = new List<LichsuModel>();
     private bool kiemtra;
     private double sum = 0;
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -28,7 +28,7 @@
         kiemtra = await KiemTraLoai(idSv);
         SinhvienModel sinhvienModel = await GetSinhVien(idSv);
         files  = await GetFiles(idSv);
-
+        lichsus = await GetLichSuByMssv(idSv);
         ketqua = await GetDiemSinhVien(idSv);
         sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
 
@@ -58,6 +58,22 @@
         {
             var content = await response.Content.ReadAsStringAsync();
             var uploadModel = JsonConvert.DeserializeObject<SinhvienModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+     private async Task<List<LichsuModel>> GetLichSuByMssv(string mssv)
+    {
+        var response = await Http.GetAsync($"https://localhost:7000/api/Lichsu/lichsu/{mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<LichsuModel>>(content);
             return uploadModel;
         }
         else
@@ -246,24 +262,20 @@
         </thead>
 
         <tbody class="bg-white divide-y divide-gray-200">
-            @if (true)
+            @if (lichsus.Count > 0)
             {
-                <tr class="hover:bg-gray-100">
+                foreach (var lichsu in lichsus)
+                {
+                     <tr class="hover:bg-gray-100">
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        3/7/2023
+                        @lichsu.ngay
                     </td>
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        Thông tin về các quy định, đi trễ 15p, hẹn 10/7 demo sản phẩm
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        10/7/2023
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        Hoàn thành sản phẩm 95%, tiến độ tốt
+                        @lichsu.noidung
                     </td>
                 </tr>
+                }
+               
             } else {
                 <tr class="">
                     <td class="flex items-center p-4 mr-12 space-x-1 whitespace-nowrap">
