@@ -8,6 +8,12 @@
 @code {
     [Parameter] public string idSv { get; set; }
 
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KetquaModel? ketqua = new KetquaModel();
     private bool kiemtra;
@@ -48,7 +54,7 @@
 
     private async Task<SinhvienModel> GetSinhVien(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/{mssv}");
+        var response = await Http.GetAsync(api + $"Sinhvien/{mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -62,9 +68,9 @@
         }
     }
 
-     private async Task<KetquaModel> GetDiemSinhVien(string mssv)
+    private async Task<KetquaModel> GetDiemSinhVien(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/sinhvien?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -78,30 +84,26 @@
         }
     }
 
-     private async Task<bool> KiemTraLoai(string mssv)
+    private async Task<bool> KiemTraLoai(string mssv)
     {
-        string url = $"https://localhost:7000/api/Phancong/kiemtra/{mssv}";
+        string url = api + $"Phancong/kiemtra/{mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
         
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            
-            // Kiểm tra giá trị phản hồi
-            if (responseBody == "true")
-            {
-                return true;
-            } else {
-                return false;
-            }
+        string responseBody = await response.Content.ReadAsStringAsync();
         
-        
+        // Kiểm tra giá trị phản hồi
+        if (responseBody == "true")
+        {
+            return true;
+        } else {
+            return false;
+        }
         
     }
 
     private async Task SubmitScores(string mssv)
     {
-
-        var response = await Http.PutAsJsonAsync($"https://localhost:7000/api/Ketqua/diem?mssv={mssv}", ketqua);
+        var response = await Http.PutAsJsonAsync(api + $"Ketqua/diem?mssv={mssv}", ketqua);
 
         if (response.IsSuccessStatusCode)
         {
@@ -109,12 +111,9 @@
         }
         else
         {
-
             Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
         }
     }
-
-
 
 
 }

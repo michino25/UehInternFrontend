@@ -8,17 +8,16 @@
 @inject IConfiguration Configuration
 
 @code {
-    public string? apiLink;
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private DotModel dot = new DotModel();
 
     private string? magv = "";
-
-    protected override void OnInitialized()
-    {
-        apiLink = Configuration["apiBackend"];
-    }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -34,22 +33,22 @@
 
     private async Task RenderDatas()
     {
-         dot = await KiemtraDot();
+        dot = await KiemtraDot();
         var result = await SinhVienByGiangVien(dot.madot,magv);
         if (result != null )
         {
             sinhviens = result;
             StateHasChanged();
-
         }
         else
         {
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-     private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
+
+    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
+        var response = await Http.GetAsync(api + $"Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -65,7 +64,7 @@
 
     private async Task<DotModel> KiemtraDot()
     {
-       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
+        var response = await Http.GetAsync(api + "Dot");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -82,7 +81,7 @@
     {
         try
         {
-            var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/generatezip?giangVienId={magv}");
+            var response = await Http.GetAsync(api + $"Ketqua/generatezip?giangVienId={magv}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
@@ -99,13 +98,13 @@
             }
             else
             {
-                 await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
+                await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
 
             }
         }
         catch (Exception ex)
         {
-             await JS.InvokeVoidAsync("alert", "Đã xảy ra xự cố");
+            await JS.InvokeVoidAsync("alert", "Đã xảy ra xự cố");
 
         }
     }
@@ -114,7 +113,7 @@
     {
         try
         {
-            var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/generatepdfbysv?mssv={mssv}");
+            var response = await Http.GetAsync(api + $"Ketqua/generatepdfbysv?mssv={mssv}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
@@ -127,11 +126,10 @@
             
                 await JS.InvokeVoidAsync("window.downloadFileFromPDf", fileName, content);
                 await JS.InvokeVoidAsync("alert", "Tải thành công");
-
             }
             else
             {
-                 await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
+                await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
 
             }
         }

@@ -11,6 +11,11 @@
 @code {
     [Parameter] public string idSv { get; set; }
 
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
 
     private SinhvienModel? sinhvien = new SinhvienModel();
     private string ngayBanDau = DateTime.Today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
@@ -40,7 +45,7 @@
 
     private async Task<SinhvienModel> GetSinhVien(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/{mssv}");
+        var response = await Http.GetAsync(api + $"Sinhvien/{mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -53,27 +58,22 @@
             return null;
         }
     }
+    
     private LichsuModel lichsu = new LichsuModel();
     private async Task SubmitLichSu(string mssv)
     {
-        var url = $"https://localhost:7000/api/Lichsu?mssv={mssv}";
+        var url = api + $"Lichsu?mssv={mssv}";
         var response = await Http.PostAsJsonAsync(url, lichsu);
 
         if (response.IsSuccessStatusCode)
         {
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); 
-
-
         }
         else
         {
             Console.WriteLine("Đã xảy ra lỗi khi gửi !");
         }
     }
-
-  
-
-
 
 }
 

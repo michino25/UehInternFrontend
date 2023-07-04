@@ -6,21 +6,31 @@
 @inject IJSRuntime JSRuntime
 
 @code {
+    [CascadingParameter]
+    public string? role { get; set; }
 
     private async Task LoginStUeh(string returnUrl = "/trangchu")
     {
-        returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
+        if (role != null && role != "null"){
+            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + role);
+        }
+        else {
+            returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
+            string encodedReturnUrl = Uri.EscapeDataString(returnUrl);
+            string loginUrl = $"https://loginst.ueh.edu.vn/?returnUrl={encodedReturnUrl}";
 
-        string encodedReturnUrl = Uri.EscapeDataString(returnUrl);
+            NavigationManager.NavigateTo(loginUrl);
+        }
 
-        string loginUrl = $"https://loginst.ueh.edu.vn/?returnUrl={encodedReturnUrl}";
-
-        NavigationManager.NavigateTo(loginUrl);
     }
 
     private void LoginUeh()
     {
-        NavigationManager.NavigateTo("/uehlogin");
+        if (role != null && role != "null"){
+            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + role);
+        }
+        else
+            NavigationManager.NavigateTo("/uehlogin");
     }
 }
 

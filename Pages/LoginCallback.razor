@@ -7,12 +7,12 @@
 @using System.Text.Json;
 @using global::Login.ST.UEH;
 @code {
+    [CascadingParameter]
+    public string? role { get; set; }
 
     string jsonString = "";
 
     string plainText = "";
-    string key = "";
-    string iv = "";
     string encryptedText = "";
     string decryptedText = "";
 
@@ -23,67 +23,83 @@
         var t = queryParameters["t"];
         await JSRuntime.InvokeVoidAsync("resetCSSLogin");
         await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+        User? user;
 
-        if (t == "gv"){
+        switch (t) {
+            case "exist-admin":
+                NavigationManager.NavigateTo("/tongquan");
+                break;
 
-            User? user = new User
-            {
-                Code = "001747",
-                Email = "thinhdt@ueh.edu.vn",
-                Name = "Đặng Thái Thịnh",
-                Role = "giangvien"
-            };
-            await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
-            await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-            await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-            NavigationManager.NavigateTo("/sinhvien");
+            case "exist-giangvien":
+                NavigationManager.NavigateTo("/sinhvien");
+                break;
 
-        }
-        else if (t == "admin") {
-
-            User? user = new User
-            {
-                Code = "000688",
-                Email = "hienphan@ueh.edu.vn",
-                Name = "Phan Hiền",
-                Role = "admin"
-            };
-            await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
-            await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-            await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-            NavigationManager.NavigateTo("/tongquan");
-
-        }
-        else {
-
-            var obj = LoginStUEH.GetInfo(t);
-            if (obj != null)
-            {
-
-                Student stu = (Student) obj;
-                @* jsonString = JsonSerializer.Serialize(stu); *@
-
-                User? user = (User) stu;
-                await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+            case "exist-sinhvien":
                 NavigationManager.NavigateTo("/thongtin");
+                break;
+            
+            case "gv":
 
-                @* plainText = "Tôi là Như Trứng Here is some data to encrypt!";
+                user = new User
+                {
+                    Code = "001747",
+                    Email = "thinhdt@ueh.edu.vn",
+                    Name = "Đặng Thái Thịnh",
+                    Role = "giangvien"
+                };
+                await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+                await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+                await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+                NavigationManager.NavigateTo("/sinhvien");
 
-                // Encrypt the plain text
-                encryptedText = AES.EncryptData(plainText);
+                break;
 
-                // Decrypt the encrypted text
-                decryptedText = AES.DecryptData(encryptedText);
+            case "admin":
 
-                StateHasChanged(); *@
+                user = new User
+                {
+                    Code = "000688",
+                    Email = "hienphan@ueh.edu.vn",
+                    Name = "Phan Hiền",
+                    Role = "admin"
+                };
+                await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+                await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+                await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+                NavigationManager.NavigateTo("/tongquan");
 
-            }   
+                break;
+
+            default:
+
+                var obj = LoginStUEH.GetInfo(t);
+                if (obj != null)
+                {
+
+                    Student stu = (Student) obj;
+                    @* jsonString = JsonSerializer.Serialize(stu); *@
+
+                    user = (User) stu;
+                    await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+                    NavigationManager.NavigateTo("/thongtin");
+
+                    @* plainText = "Tôi là Như Trứng Here is some data to encrypt!";
+
+                    // Encrypt the plain text
+                    encryptedText = AES.EncryptData(plainText);
+
+                    // Decrypt the encrypted text
+                    decryptedText = AES.DecryptData(encryptedText);
+
+                    StateHasChanged(); *@
+
+                }
+                break;
+
 
         }
 
     }
-
-
 
 }
 

@@ -7,15 +7,15 @@
 @inject HttpClient Http
 @inject IConfiguration Configuration
 @code {
-    public string? apiLink;
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
     private DotModel dot = new DotModel();
-    protected override void OnInitialized()
-    {
-        apiLink = Configuration["apiBackend"];
-    }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -37,7 +37,6 @@
         {
             sinhviens = result;
             StateHasChanged();
-
         }
         else
         {
@@ -46,7 +45,7 @@
     }
     private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
+        var response = await Http.GetAsync(api + $"Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -62,7 +61,7 @@
 
     private async Task<DotModel> KiemtraDot()
     {
-       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
+        var response = await Http.GetAsync(api + "Dot");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();

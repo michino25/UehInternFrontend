@@ -7,6 +7,12 @@
 
 @code {
 
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     [Parameter] public string idSv { get; set; }
 
     private SinhvienModel? sinhvien = new SinhvienModel();
@@ -15,6 +21,7 @@
     private List<LichsuModel> lichsus = new List<LichsuModel>();
     private bool kiemtra;
     private double sum = 0;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) {
@@ -53,7 +60,7 @@
 
     private async Task<SinhvienModel> GetSinhVien(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/{mssv}");
+        var response = await Http.GetAsync(api + $"Sinhvien/{mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -67,9 +74,9 @@
         }
     }
 
-     private async Task<List<LichsuModel>> GetLichSuByMssv(string mssv)
+    private async Task<List<LichsuModel>> GetLichSuByMssv(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Lichsu/lichsu/{mssv}");
+        var response = await Http.GetAsync(api + $"Lichsu/lichsu/{mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -83,9 +90,9 @@
         }
     }
 
-     private async Task<KetquaModel> GetDiemSinhVien(string mssv)
+    private async Task<KetquaModel> GetDiemSinhVien(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/sinhvien?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -99,28 +106,26 @@
         }
     }
 
-     private async Task<bool> KiemTraLoai(string mssv)
+    private async Task<bool> KiemTraLoai(string mssv)
     {
-        string url = $"https://localhost:7000/api/Phancong/kiemtra/{mssv}";
+        string url = api + $"Phancong/kiemtra/{mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
         
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            
-            // Kiểm tra giá trị phản hồi
-            if (responseBody == "true")
-            {
-                return true;
-            } else {
-                return false;
-            }
+        string responseBody = await response.Content.ReadAsStringAsync();
         
-        
+        // Kiểm tra giá trị phản hồi
+        if (responseBody == "true")
+        {
+            return true;
+        } else {
+            return false;
+        }
         
     }
-     private async Task<List<UploadModel>> GetFiles(string mssv)
+
+    private async Task<List<UploadModel>> GetFiles(string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/File?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"File?mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -137,7 +142,7 @@
 
     private async Task DownloadFile(string storedFileName, string originalFileName, string mssv)
     {
-        var response = await Http.GetAsync($"https://localhost:7000/api/File/{storedFileName}/{mssv}");
+        var response = await Http.GetAsync(api + $"File/{storedFileName}/{mssv}");
         if (!response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "File not found.");
