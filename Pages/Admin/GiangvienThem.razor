@@ -7,27 +7,29 @@
 @using Newtonsoft.Json
 
 @code {
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     private string makhoa ="CNTTKD";
 
     private GiangvienRequest giangvien = new GiangvienRequest();
     private async Task SubmitGiangvien(string makhoa)
     {
-        var url = $"https://localhost:7000/api/Giangvien?makhoa={Uri.EscapeDataString(makhoa)}";
+        var url = api + $"Giangvien?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsJsonAsync(url, giangvien);
 
         if (response.IsSuccessStatusCode)
         {
             navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
-
-
         }
         else
         {
             Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
         }
     }
-
-
 
 }
 

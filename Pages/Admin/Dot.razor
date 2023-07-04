@@ -8,26 +8,27 @@
 @using Newtonsoft.Json
 
 @code {
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
 
     private DotModel dot = new DotModel();
     private async Task SubmitDot()
     {
-        var url = "https://localhost:7000/api/Dot/add";
+        var url = api + "Dot/add";
         var response = await Http.PostAsJsonAsync(url, dot);
 
         if (response.IsSuccessStatusCode)
         {
-          
-          await JS.InvokeVoidAsync("Tạo đọt thành công");
-
+            await JS.InvokeVoidAsync("Tạo đọt thành công");
         }
         else
         {
             Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
         }
     }
-
-
 
 }
 

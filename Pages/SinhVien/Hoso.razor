@@ -8,6 +8,79 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
+
+@code {
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
+    private SinhvienModel? sinhvien = new SinhvienModel();
+    private KhoaModel? khoa = new KhoaModel();
+
+    private string? mssv = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task RenderDatas()
+    {
+        SinhvienModel result = await GetSinhVien(mssv);
+        KhoaModel resultKhoa = await GetSinhVienByKhoa(mssv);
+        if (result != null && resultKhoa != null)
+        {
+            khoa = resultKhoa;
+            sinhvien = result;
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
+        }
+    }
+
+    private async Task<KhoaModel> GetSinhVienByKhoa(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Sinhvien/khoa/{mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<KhoaModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task<SinhvienModel> GetSinhVien(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Sinhvien/{mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<SinhvienModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+}
+
 <PageTitle>Hồ Sơ</PageTitle>
 
 <CheckUserComponent CheckRole="sinhvien">
@@ -30,7 +103,7 @@
                         Họ tên
                     </label>
                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                       @sinhvien.ho  @sinhvien.ten
+                        @sinhvien.ho  @sinhvien.ten
                     </p>
                 </div>
                 <div class="col-span-6 sm:col-span-3">
@@ -58,7 +131,7 @@
                         @sinhvien.tenhp
                     </p>
                 </div>
-               
+
                 <div class="col-span-6 sm:col-span-3">
                     <label for="email" class="block mb-2 text-sm font-medium text-gray-900">
                         Thuộc khoa
@@ -101,71 +174,3 @@
 
     </ItemContent>
 </CheckUserComponent>
-
-@code {
-    private SinhvienModel? sinhvien = new SinhvienModel();
-    private KhoaModel? khoa = new KhoaModel();
-
-
-    private string? mssv = "";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
-            await RenderDatas();
-
-            StateHasChanged();
-        }
-    }
-
-
-    private async Task RenderDatas()
-    {
-        SinhvienModel result = await GetSinhVien(mssv);
-        KhoaModel resultKhoa = await GetSinhVienByKhoa(mssv);
-        if (result != null && resultKhoa != null)
-        {
-            khoa = resultKhoa;
-            sinhvien = result;
-        }
-        else
-        {
-            await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
-        }
-    }
-    private async Task<KhoaModel> GetSinhVienByKhoa(string mssv)
-    {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/khoa/{mssv}");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<KhoaModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
-            return null;
-        }
-    }
-
-    private async Task<SinhvienModel> GetSinhVien(string mssv)
-    {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Sinhvien/{mssv}");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<SinhvienModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
-            return null;
-        }
-    }
-
-
-}

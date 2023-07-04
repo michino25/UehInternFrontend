@@ -7,17 +7,17 @@
 @inject HttpClient Http
 @inject IConfiguration Configuration
 @code {
-    public string? apiLink;
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     List<KetquaViewModed>? sinhviens = new List<KetquaViewModed>();
     private DotModel dot = new DotModel();
 
     private string? magv = "";
     private double sum = 0;
-    protected override void OnInitialized()
-    {
-        apiLink = Configuration["apiBackend"];
-    }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -41,7 +41,6 @@
         {
             sinhviens = result;
             StateHasChanged();
-
         }
         else
         {
@@ -50,7 +49,7 @@
     }
     private async Task<List<KetquaViewModed>> DanhSachDiem(string madot,string magv)
     {
-       var response = await Http.GetAsync($"https://localhost:7000/api/Giangvien/GetDanhSachDiem?madot={madot}&magv={magv}");
+        var response = await Http.GetAsync(api + $"Giangvien/GetDanhSachDiem?madot={madot}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -63,9 +62,9 @@
             return null;
         }
     }
-     private async Task<DotModel> KiemtraDot()
+    private async Task<DotModel> KiemtraDot()
     {
-       var response = await Http.GetAsync("https://localhost:7000/api/Dot");
+        var response = await Http.GetAsync(api + "Dot");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -79,11 +78,11 @@
         }
     }
 
-     private async Task DownloadPdf(string magv)
+    private async Task DownloadPdf(string magv)
     {
         try
         {
-            var response = await Http.GetAsync($"https://localhost:7000/api/Ketqua/generatepdfbygv?magv={magv}");
+            var response = await Http.GetAsync(api + $"Ketqua/generatepdfbygv?magv={magv}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
@@ -100,7 +99,7 @@
             }
             else
             {
-                 await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
+                await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
 
             }
         }
@@ -139,17 +138,17 @@
             </div>
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                    <button @onclick="() => DownloadPdf(magv)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                        <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        Tải danh sách điểm
+                <button @onclick="() => DownloadPdf(magv)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Tải danh sách điểm
 
-                    </button>
-        </div>
+                </button>
+            </div>
         </div>
         
     </div>

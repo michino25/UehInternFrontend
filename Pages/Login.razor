@@ -7,17 +7,10 @@
 @using System.Text.Json
 
 @code {
-    [CascadingParameter]
-    public string? role { get; set; }
-
-    public string? apiLink;
+    public string? api;
     protected override void OnInitialized()
     {
-        apiLink = Configuration["api"];
-
-        @* if (role != null && role != "null"){
-            NavigateTo(role);
-        } *@
+        api = Configuration["apiBackend"];
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -32,7 +25,7 @@
 
     private async Task HandleValidSubmit()
     {
-        @* var response = await HttpClient.PostAsJsonAsync( apiLink + "User/login", loginRequest);
+        @* var response = await HttpClient.PostAsJsonAsync( api + "User/login", loginRequest);
 
         if (response.IsSuccessStatusCode)
         {
