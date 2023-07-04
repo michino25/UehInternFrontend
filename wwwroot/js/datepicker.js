@@ -1,5 +1,4 @@
 function datePicker() {
-    // window.onload = function () {
     const selected_date_element = document.querySelector(
         ".date-picker .selected-date"
     );
@@ -112,6 +111,24 @@ function datePicker() {
                 break;
         }
 
+        // Determine the day of the week for the first day of the month
+        const firstDayOfMonth = new Date(year, month, 1);
+        const dayOfWeek = firstDayOfMonth.getDay();
+
+        // Add empty elements for days before the first day of the month
+        for (let i = 0; i < dayOfWeek; i++) {
+            const empty_element = document.createElement("div");
+            empty_element.classList.add(
+                "flex",
+                "justify-center",
+                "items-center",
+                "text-gray-800",
+                "rounded-lg",
+                "text-sm"
+            );
+            days_element.appendChild(empty_element);
+        }
+
         for (let i = 0; i < amount_days; i++) {
             const day_element = document.createElement("div");
             day_element.classList.add(
@@ -171,4 +188,3 @@ function datePicker() {
         return day + separate + month + separate + year;
     }
 }
-// }
