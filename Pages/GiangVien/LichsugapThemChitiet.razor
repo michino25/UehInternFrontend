@@ -13,10 +13,9 @@
 
 
     private SinhvienModel? sinhvien = new SinhvienModel();
-     private string ngayBanDau = DateTime.Today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+    private string ngayBanDau = DateTime.Today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        
         lichsu.ngay = ngayBanDau;
         if (firstRender) {
             await RenderDatas();

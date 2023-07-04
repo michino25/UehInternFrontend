@@ -7,12 +7,7 @@
 @using Newtonsoft.Json
 
 @code {
-    private int currentCount = 0;
     private string makhoa ="CNTTKD";
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
 
     private GiangvienRequest giangvien = new GiangvienRequest();
     private async Task SubmitGiangvien(string makhoa)
@@ -22,7 +17,7 @@
 
         if (response.IsSuccessStatusCode)
         {
-             navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
+            navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
 
 
         }
