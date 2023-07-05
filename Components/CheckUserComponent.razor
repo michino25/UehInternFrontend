@@ -20,8 +20,8 @@ else {
     [Parameter]
     public string? CheckRole { get; set; }
 
-    [Parameter, EditorRequired]
-    public required RenderFragment ItemContent { get; set; }
+    [Parameter]
+    public RenderFragment ItemContent { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
