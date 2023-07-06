@@ -375,3 +375,7 @@ window.downloadFileFromPDf = function (fileName, byteArray) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 };
+
+function getDeviceWidth() {
+    return window.innerWidth;
+}

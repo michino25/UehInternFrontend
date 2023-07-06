@@ -25,9 +25,9 @@
     {
         lichsu.ngay = initialDate;
         if (firstRender) {
-            await JS.InvokeVoidAsync("datePicker");
             await RenderDatas();
             StateHasChanged();
+            await JS.InvokeVoidAsync("datePicker");
         }
     }
 
