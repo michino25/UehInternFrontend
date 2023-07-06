@@ -18,15 +18,17 @@
     }
 
     private SinhvienModel? sinhvien = new SinhvienModel();
-    private string ngayBanDau = DateTime.Today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+    private LichsuModel lichsu = new LichsuModel();
+    private string initialDate = DateTime.Today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        lichsu.ngay = ngayBanDau;
+        lichsu.ngay = initialDate;
         if (firstRender) {
+            await JS.InvokeVoidAsync("datePicker");
             await RenderDatas();
             StateHasChanged();
         }
-        await JS.InvokeVoidAsync("datePicker");
     }
 
     private async Task RenderDatas()
@@ -59,7 +61,12 @@
         }
     }
     
-    private LichsuModel lichsu = new LichsuModel();
+    private async Task OnInputChange(ChangeEventArgs e)
+    {
+        initialDate = e.Value.ToString();
+        @* StateHasChanged(); *@
+    }
+
     private async Task SubmitLichSu(string mssv)
     {
         var url = api + $"Lichsu?mssv={mssv}";
@@ -67,7 +74,8 @@
 
         if (response.IsSuccessStatusCode)
         {
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); 
+            NavigationManager.NavigateTo($"/sinhvien/{mssv}"); 
+            @* NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);  *@
         }
         else
         {
@@ -98,11 +106,11 @@
                         Ngày
                     </label>
 
-                    <input type="text"  id="date" name="date"
-                        class="selected-date shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                        placeholder="Select date"  @bind="ngayBanDau" >
+                    <input type="text" readonly id="date" name="date"
+                        class="selected-date cursor-pointer shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                        placeholder="Select date" value="@initialDate" @onchange="OnInputChange" >
 
-                    <div class="dates rounded-lg bg-white shadow-lg p-3 absolute top-full left-0 right-0 bg-white hidden">
+                    <div class="dates rounded-lg bg-white shadow-lg p-3 mt-1 absolute top-full left-0 w-72 bg-white hidden">
                         <div class="month flex justify-between items-center mb-3">
                             <div
                                 class="arrows prev-mth rounded-md w-9 h-9 flex justify-center items-center text-gray-800 text-lg hover:bg-gray-100">

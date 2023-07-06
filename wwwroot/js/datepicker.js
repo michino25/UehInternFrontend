@@ -42,7 +42,8 @@ function datePicker() {
 
     mth_element.textContent = months[month] + " " + year;
 
-    selected_date_element.value = formatDate(date, "-");
+    // selected_date_element.value = formatDate(date, "-");
+    // selected_date_element.dispatchEvent(new Event("change"));
 
     let selectedDate = date;
     let selectedDay = day;
@@ -155,6 +156,8 @@ function datePicker() {
                 day_element.classList.add("bg-teal-700", "text-white");
             }
 
+            days_element.appendChild(day_element);
+
             day_element.addEventListener("click", function () {
                 selectedDate = new Date(
                     year + "-" + (month + 1) + "-" + (i + 1)
@@ -164,11 +167,10 @@ function datePicker() {
                 selectedYear = year;
 
                 selected_date_element.value = formatDate(selectedDate, "-");
+                selected_date_element.dispatchEvent(new Event("change"));
 
                 populateDates();
             });
-
-            days_element.appendChild(day_element);
         }
     }
 
