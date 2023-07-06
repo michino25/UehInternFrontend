@@ -89,11 +89,7 @@
         var response = await Http.PostAsync(api + $"File/{Uri.EscapeDataString(mssv)}", content);
         response.EnsureSuccessStatusCode();
 
-        var newUploadModels = await response.Content.ReadFromJsonAsync<List<UploadModel>>();
-        if (newUploadModels is not null)
-        {
-            UploadModels = UploadModels.Concat(newUploadModels).ToList();
-        }
+        await RenderDatas();
     }
 
     private async Task DownloadFile(string storedFileName, string originalFileName, string mssv)
