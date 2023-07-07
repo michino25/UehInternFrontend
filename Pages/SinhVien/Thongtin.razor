@@ -1,6 +1,156 @@
 ﻿@page "/thongtin"
 @using UehInternFrontend.Components
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using Newtonsoft.Json
 
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IConfiguration Configuration
+
+@code {
+    public string? api;
+    private ChitietModel? chitiet = new ChitietModel();
+    private bool kiemtra = true;
+    private KetquaModel? ketqua = new KetquaModel();
+    private double sum = 0;
+
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
+    private GiangvienModel? giangvien = new GiangvienModel();
+    private string? mssv = "";
+    private string loaihinh = "";
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await RenderDatas();
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task RenderDatas()
+    {
+        kiemtra = await KiemTraLoai(mssv);
+        chitiet = await GetChitietSinhVien(mssv);
+        loaihinh = await GetLoaiHinhThucTap(mssv);
+        giangvien = await GetGvHuongDanSv(mssv);
+
+        ketqua = await GetKetQuaSinhVien(mssv);
+        sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
+
+        if (kiemtra)
+        {
+            sum = (double)(sum * 0.6 + (ketqua.diemDN ?? 0) * 0.4);
+        }
+        if (sum >= 10)
+        {
+            sum = 10;
+        }
+
+        StateHasChanged();
+                 
+    }
+
+
+  
+
+    private async Task<GiangvienModel> GetGvHuongDanSv(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Sinhvien/GetGvHuongDanSv?mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất thông tin : {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task<string> GetLoaiHinhThucTap(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Sinhvien/GetLoaiHinhThucTap?mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            string uploadModel = content;
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất thông tin : {response.StatusCode}");
+            return null;
+        }
+    }
+
+
+    private async Task<ChitietModel> GetChitietSinhVien(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Chitiet/getchitiet?mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<ChitietModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    
+    private async Task<KetquaModel> GetKetQuaSinhVien(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<KetquaModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task<bool> KiemTraLoai(string mssv)
+    {
+        string url = api + $"Phancong/kiemtra/{mssv}";
+        HttpResponseMessage response = await Http.GetAsync(url);
+
+
+        string responseBody = await response.Content.ReadAsStringAsync();
+
+        // Kiểm tra giá trị phản hồi
+        if (responseBody == "true")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+
+
+    }
+
+
+}
 <PageTitle>Thông Tin</PageTitle>
 
 <CheckUserComponent CheckRole="sinhvien">
@@ -17,7 +167,7 @@
             </span>
         </h5>
         <p class="mb-3 font-normal text-gray-700">
-            Đặng Thái Thịnh
+            @giangvien.tengv
         </p>
     </div>
 
@@ -26,37 +176,42 @@
             Loại hình
         </h5>
         <p class="mb-3 font-normal text-gray-700">
-            Thực tập tốt nghiệp
+            @loaihinh
         </p>
     </div>
 
-    <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
-        <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
-            Đề tài đã đăng ký
-            <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
-                Đã duyệt
-            </span>
-        </h5>
-        <p class="mb-3 font-normal text-gray-700">
-            Xây dựng phần mềm hỗ trợ quản lý thực tập cho trường Đại học UEH.
-        </p>
-    </div>
-
-    <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
-            Tên công ty
-        </h5>
-        <p class="mb-3 font-normal text-gray-700">
-            Facebook Inc
-        </p>
-    </div>
+    @if(!kiemtra)
+    {
+            <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
+                <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                    Đề tài đã đăng ký
+                    <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
+                        Đã duyệt
+                    </span>
+                </h5>
+                <p class="mb-3 font-normal text-gray-700">
+                   @chitiet.tendetai
+                </p>
+            </div>
+    } else {
+            <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                    Tên công ty
+                </h5>
+                <p class="mb-3 font-normal text-gray-700">
+                    @chitiet.tencty
+                </p>
+            </div>
+    }
+    
+    
 
     <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
             Kết quả thực tập
         </h5>
         <p class="mb-3 font-normal text-gray-700">
-            8.0
+            @sum
         </p>
     </div>
 
