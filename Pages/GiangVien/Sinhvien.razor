@@ -15,6 +15,8 @@
 
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
+    private string? madot = "DOT001";
+
     private DotModel dot = new DotModel();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -31,8 +33,8 @@
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await SinhVienByGiangVien(dot.madot,magv);
+        @* dot = await KiemtraDot(); *@
+        var result = await SinhVienByGiangVien(madot,magv);
         if (result != null )
         {
             sinhviens = result;
@@ -59,7 +61,7 @@
         }
     }
 
-    private async Task<DotModel> KiemtraDot()
+    @* private async Task<DotModel> KiemtraDot()
     {
         var response = await Http.GetAsync(api + "Dot");
         if (response.IsSuccessStatusCode)
@@ -73,7 +75,7 @@
             Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
             return null;
         }
-    }
+    } *@
 }
 
 <PageTitle>Danh sách sinh viên</PageTitle>

@@ -19,6 +19,7 @@
     private int maxAllowedFiles = int.MaxValue;
     private string? magv = "";
     private string? makhoa = "CNTTKD";
+    private string? madot = "DOT001";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -33,7 +34,7 @@
 
     private async Task RenderDatas()
     {
-        var result = await GetSinhVienByGiaoVien(magv);
+        var result = await GetSinhVienByGiaoVien(madot,makhoa,magv);
         if (result != null )
         {
             sinhviens = result;
@@ -44,9 +45,10 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<DangkyModel>> GetSinhVienByGiaoVien(string magv)
+
+    private async Task<List<DangkyModel>> GetSinhVienByGiaoVien(string madot,string makhoa,string magv)
     {
-        var response = await Http.GetAsync(api + $"DangkyContronller/GetSinhVienByGiaoVien?magv={magv}");
+        var response = await Http.GetAsync(api + $"Dangky/GetSinhVienByGiaoVien?madot={madot}&makhoa={makhoa}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -63,7 +65,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
 
         using var content = new MultipartFormDataContent();
 
@@ -75,7 +76,7 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-        var apiUrl = api + $"DangkyContronller/formFile?makhoa={Uri.EscapeDataString(makhoa)}&magv={Uri.EscapeDataString(magv)}";
+        var apiUrl = api + $"Dangky/formFile?madot={madot}&makhoa={makhoa}&magv={magv}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {

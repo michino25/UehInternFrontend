@@ -14,9 +14,11 @@
     }
 
     List<KetquaViewModed>? sinhviens = new List<KetquaViewModed>();
-    private DotModel dot = new DotModel();
+    @* private DotModel dot = new DotModel(); *@
 
     private string? magv = "";
+    private string? madot = "DOT001";
+
     private double sum = 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -33,9 +35,9 @@
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
+        @* dot = await KiemtraDot(); *@
 
-        var result = await DanhSachDiem(dot.madot,magv);
+        var result = await DanhSachDiem(madot,magv);
         
         if (result != null )
         {
@@ -62,7 +64,7 @@
             return null;
         }
     }
-    private async Task<DotModel> KiemtraDot()
+    @* private async Task<DotModel> KiemtraDot()
     {
         var response = await Http.GetAsync(api + "Dot");
         if (response.IsSuccessStatusCode)
@@ -76,7 +78,7 @@
             Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
             return null;
         }
-    }
+    } *@
 
     private async Task DownloadPdf(string magv)
     {
