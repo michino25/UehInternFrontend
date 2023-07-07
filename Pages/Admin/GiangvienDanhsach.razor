@@ -38,6 +38,7 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
+
     private async Task<List<GiangvienModel>> GetGiangvienByKhoas(string makhoa)
     {
         var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}/giangvien");
@@ -53,6 +54,7 @@
             return null;
         }
     }
+
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
@@ -68,7 +70,6 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-
         var apiUrl = api + $"Giangvien/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
@@ -76,9 +77,60 @@
             await JS.InvokeVoidAsync("alert", "File not found.");
         }
         response.EnsureSuccessStatusCode();
-        
     }
 
+    private bool addBtn = false;
+    private bool editBtn = false;
+    private bool cmBtn = false;
+    private bool deleteBtn = false;
+
+    private void modelBtnClick(int btn, string data = "")
+    {
+        switch (btn)
+        {
+            case 1:
+                addBtn = true;
+                break;
+            case 2:
+                editBtn = true;
+                break;
+            case 3:
+                cmBtn = true;
+                break;
+            case 4:
+                deleteBtn = true;
+                break;
+        }
+        StateHasChanged();
+    }
+
+    private async Task closeBtn()
+    {
+        addBtn = false;
+        editBtn = false;
+        cmBtn = false;
+        deleteBtn = false;
+        StateHasChanged();
+    }
+
+    private string makhoa ="CNTTKD";
+    private GiangvienRequest giangvien = new GiangvienRequest();
+    private async Task SubmitGiangvien(string makhoa)
+    {
+        var url = api + $"Giangvien?makhoa={Uri.EscapeDataString(makhoa)}";
+        var response = await Http.PostAsJsonAsync(url, giangvien);
+        closeBtn();
+
+        if (response.IsSuccessStatusCode)
+        {
+            await RenderDatas();
+            await JS.InvokeVoidAsync("alert", "Thêm giảng viên thành công");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Thêm giảng viên thất bại");
+        }
+    }
 
 }
 
@@ -121,7 +173,7 @@
                     </svg>
                     Xóa tất cả
                 </button> *@
-                <a href="giangvien/them"
+                <button @onclick="() => modelBtnClick(1)"
                     class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
@@ -130,8 +182,8 @@
                             clip-rule="evenodd"></path>
                     </svg>
                     Thêm giảng viên
-                </a>
-                <button type="button" data-modal-toggle="add-user-modal"
+                </button>
+                <button type="button"
                     class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
@@ -139,14 +191,9 @@
                             d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                             clip-rule="evenodd"></path>
                     </svg>
-
                     <label for="actual-btn">Nhập file</label>
                     <InputFile id="actual-btn" class="hidden" OnChange="@OnInputFileChange" multiple />
                 </button>
-                    
-
-
-
 
             </div>
         </div>
@@ -199,8 +246,8 @@
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                         @giangvien.sdt</td>
                                     <td class="p-4 space-x-2 whitespace-nowrap">
-                                        <button type="button" data-modal-toggle="edit-user-modal"
-                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-800 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-800 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300"
+                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -212,26 +259,21 @@
                                             </svg>
                                             Sửa
                                         </button>
-                                        <button type="button" data-modal-toggle="chuyenmon-user-modal"
-                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-teal-700 rounded-lg hover:bg-teal-800 focus:ring-4 focus:ring-teal-500">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 -0.5 21 21" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                fill="currentColor">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-teal-700 rounded-lg hover:bg-teal-800 focus:ring-4 focus:ring-teal-500"
+                                            @onclick="() => modelBtnClick(3, giangvien.magv)">
+                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <g stroke-width="1"></g>
+                                                <g stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="4.8"></g>
                                                 <g id="SVGRepo_iconCarrier">
-                                                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                        <g id="Dribbble-Light-Preview" transform="translate(-139.000000, -320.000000)" fill="currentColor">
-                                                            <g id="icons" transform="translate(56.000000, 160.000000)">
-                                                                <path
-                                                                    d="M98.7860271,170.404 C97.7402268,171.416 97.2624767,172.872 97.5102768,174.301 L97.9691269,176.957 L95.5646263,175.703 C94.9304261,175.372 94.216426,175.197 93.5003258,175.197 C92.7831756,175.197 92.0691754,175.372 91.4349753,175.703 L89.0304747,176.957 L89.4903748,174.301 C89.7371249,172.872 89.2593748,171.416 88.2135745,170.404 L86.268974,168.523 L88.9569747,168.135 C90.402825,167.927 91.6512753,167.027 92.2980755,165.727 L93.5003258,163.31 L94.7025761,165.727 C95.3483262,167.027 96.5978265,167.927 98.0426269,168.135 L100.731678,168.523 L98.7860271,170.404 Z M103.423878,169.433 C104.551578,168.342 103.929978,166.441 102.370728,166.216 L98.408027,165.645 C97.7885268,165.556 97.2530267,165.17 96.9768766,164.613 L95.2044762,161.051 C94.8558761,160.35 94.1775759,160 93.5003258,160 C92.8220256,160 92.1437255,160.35 91.7951254,161.051 L90.0237749,164.613 C89.7465749,165.17 89.2110747,165.556 88.5926246,165.645 L84.6299236,166.216 C83.0706733,166.441 82.4480231,168.342 83.5757234,169.433 L86.4432741,172.206 C86.8916242,172.639 87.0963742,173.263 86.9903242,173.875 L86.313074,177.791 C86.102024,179.01 87.0785242,180 88.1862745,180 C88.4781746,180 88.7805746,179.931 89.0714247,179.779 L92.6151756,177.93 C92.8923756,177.786 93.1958257,177.713 93.5003258,177.713 C93.8037759,177.713 94.1072259,177.786 94.384426,177.93 L97.9292269,179.779 C98.2200769,179.931 98.521427,180 98.8133271,180 C99.9210773,180 100.897578,179.01 100.686528,177.791 L100.010327,173.875 C99.9042773,173.263 100.107977,172.639 100.556327,172.206 L103.423878,169.433 Z"
-                                                                    id="star_favorite-[#1498]"> </path>
-                                                            </g>
-                                                        </g>
-                                                    </g>
+                                                    <path
+                                                        d="M11.0489 4.92705C11.3483 4.00574 12.6517 4.00574 12.9511 4.92705L14.2451 8.90983C14.379 9.32185 14.763 9.60081 15.1962 9.60081H19.3839C20.3527 9.60081 20.7554 10.8404 19.9717 11.4098L16.5838 13.8713C16.2333 14.126 16.0866 14.5773 16.2205 14.9894L17.5146 18.9721C17.8139 19.8934 16.7595 20.6596 15.9757 20.0902L12.5878 17.6287C12.2373 17.374 11.7627 17.374 11.4122 17.6287L8.02426 20.0902C7.24054 20.6596 6.18607 19.8934 6.48542 18.9721L7.7795 14.9894C7.91338 14.5773 7.76672 14.126 7.41623 13.8713L4.02827 11.4098C3.24456 10.8404 3.64734 9.60081 4.61606 9.60081H8.8038C9.23703 9.60081 9.62099 9.32185 9.75486 8.90983L11.0489 4.92705Z"
+                                                        stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
                                                 </g>
                                             </svg>
                                             Chuyên môn
                                         </button>
-                                        <button type="button" data-modal-toggle="delete-user-modal"
-                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300"
+                                            @onclick="() => modelBtnClick(4, giangvien.magv)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd"
@@ -246,15 +288,14 @@
                             }   
                         }
 
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-<div
-    class="sticky bottom-0 right-0 items-center w-full pt-4 bg-white border-t border-gray-200 sm:flex sm:justify-between">
+
+<div class="sticky bottom-0 right-0 items-center w-full pt-4 bg-white border-t border-gray-200 sm:flex sm:justify-between">
     <div class="flex items-center mb-4 sm:mb-0">
         <a href="#"
             class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
@@ -278,214 +319,296 @@
     </div>
 </div>
 
-<!-- Edit User Modal -->
-<div class="fixed left-0 right-0 z-50 items-center justify-center hidden overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full"
-    id="edit-user-modal">
-    <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
-        <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow">
-            <!-- Modal header -->
-            <div class="flex items-start justify-between p-5 border-b rounded-t">
-                <h3 class="text-xl font-semibold">
-                    Edit user
-                </h3>
-                <button type="button"
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                    data-modal-toggle="edit-user-modal">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </button>
+<!-- Modal -->
+<div class="flex items-center justify-center fixed w-screen h-screen z-30">
+    @if (addBtn || editBtn || cmBtn || deleteBtn)
+    {
+        <div class="fixed inset-0 bg-gray-900/50"></div>
+    }
+
+    <!-- Edit User Modal -->
+    @if (editBtn)
+    {
+        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full"
+            id="edit-user-modal">
+            <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Chỉnh sửa thông tin giảng viên
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <form action="#">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="first-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
+                                    <input type="text" name="first-name" id="first-name"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="last-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
+                                    <input type="text" name="last-name" id="last-name"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="email"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                    <input type="email" name="email" id="email"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="position"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
+                                    <input type="text" name="position" id="position"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit">Lưu giảng viên</button>
+                    </div>
+
+                </div>
             </div>
-            <!-- Modal body -->
-            <div class="p-6 space-y-6">
-                <form action="#">
-                    <div class="grid grid-cols-6 gap-6">
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="first-name"
-                                class="block mb-2 text-sm font-medium text-gray-900">First
-                                Name</label>
-                            <input type="text" name="first-name" value="Bonnie" id="first-name"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="Bonnie" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="last-name"
-                                class="block mb-2 text-sm font-medium text-gray-900">Last
-                                Name</label>
-                            <input type="text" name="last-name" value="Green" id="last-name"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="Green" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="email"
-                                class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                            <input type="email" name="email" value="bonnie@aflowbite.com" id="email"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="example@company.com" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="position"
-                                class="block mb-2 text-sm font-medium text-gray-900">Position</label>
-                            <input type="text" name="position" value="React Developer" id="position"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="e.g. React developer" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="current-password"
-                                class="block mb-2 text-sm font-medium text-gray-900">Current
-                                Password</label>
-                            <input type="password" name="current-password" value="••••••••" id="current-password"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="••••••••" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="new-password"
-                                class="block mb-2 text-sm font-medium text-gray-900">New
-                                Password</label>
-                            <input type="password" name="new-password" value="••••••••" id="new-password"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="••••••••" requiorange="">
-                        </div>
-                        <div class="col-span-6">
-                            <label for="biography"
-                                class="block mb-2 text-sm font-medium text-gray-900">Biography</label>
-                            <textarea id="biography" rows="4"
-                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"
-                                placeholder="👨‍💻Full-stack web developer. Open-source contributor.">👨‍💻Full-stack web developer. Open-source contributor.</textarea>
+        </div>
+    }
+
+    <!-- Chuyenmon User Modal -->
+    @if (cmBtn)
+    {
+        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full scrollbar-hide"
+            id="edit-user-modal">
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Chỉnh sửa chuyên môn
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <form action="#">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="first-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
+                                    <input readonly type="text" name="first-name" value="Đặng Ngọc Hoàng Thành" id="first-name"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="email"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                    <input readonly type="email" name="email" value="thanhdnh@ueh.edu.vn" id="email"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6">
+                                    <label for="biography"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Chuyên môn</label>
+                                    <ul class="grid w-full gap-2 grid-3">
+                                        <li>
+                                            <input type="checkbox" id="st-option" value="" class="hidden peer" required="">
+                                            <label for="st-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">ST</div>
+                                                    <div class="w-full text-xs">Chuyên ngành Kỹ thuật phần mềm.</div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <input type="checkbox" id="ds-option" value="" class="hidden peer" required="">
+                                            <label for="ds-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">DS</div>
+                                                    <div class="w-full text-xs">Chuyên ngành Khoa học dữ liệu.</div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <input type="checkbox" id="bi-option" value="" class="hidden peer" required="">
+                                            <label for="bi-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">BI</div>
+                                                    <div class="w-full text-xs">Chuyên ngành Hệ thống thông tin kinh doanh.</div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <input type="checkbox" id="ec-option" value="" class="hidden peer" required="">
+                                            <label for="ec-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">EC</div>
+                                                    <div class="w-full text-xs">Chuyên ngành Thương mại điện tử.</div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <input type="checkbox" id="er-option" value="" class="hidden peer" required="">
+                                            <label for="er-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">ER</div>
+                                                    <div class="w-full text-xs">Chuyên ngành Hoạch định nguồn lực doanh nghiệp.</div>
+                                                </div>
+                                            </label>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit">Lưu</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Add User Modal -->
+    @if (addBtn)
+    {
+        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full">
+            <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Thêm giảng viên
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="magv"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
+                                <input type="text" @bind="@giangvien.magv" name="magv" id="magv" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="name"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
+                                <input type="text" @bind="@giangvien.tengv" name="name" id="name" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="email"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                <input type="email" @bind="@giangvien.email" name="email" id="email" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="phone"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
+                                <input type="text" @bind="@giangvien.sdt" name="phone" id="phone" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <!-- Modal footer -->
-            <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                <button
-                    class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                    type="submit">Save all</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- Add User Modal -->
-<div class="fixed left-0 right-0 z-50 items-center justify-center hidden overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full"
-    id="add-user-modal">
-    <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
-        <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow">
-            <!-- Modal header -->
-            <div class="flex items-start justify-between p-5 border-b rounded-t">
-                <h3 class="text-xl font-semibold">
-                    Add new user
-                </h3>
-                <button type="button"
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                    data-modal-toggle="add-user-modal">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-            <!-- Modal body -->
-            <div class="p-6 space-y-6">
-                <form action="#">
-                    <div class="grid grid-cols-6 gap-6">
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="first-name"
-                                class="block mb-2 text-sm font-medium text-gray-900">First
-                                Name</label>
-                            <input type="text" name="first-name" id="first-name"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="Bonnie" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="last-name"
-                                class="block mb-2 text-sm font-medium text-gray-900">Last
-                                Name</label>
-                            <input type="text" name="last-name" id="last-name"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="Green" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="email"
-                                class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                            <input type="email" name="email" id="email"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="example@company.com" requiorange="">
-                        </div>
-                        <div class="col-span-6 sm:col-span-3">
-                            <label for="position"
-                                class="block mb-2 text-sm font-medium text-gray-900">Position</label>
-                            <input type="text" name="position" id="position"
-                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="e.g. React developer" requiorange="">
-                        </div>
-                        <div class="col-span-6">
-                            <label for="biography"
-                                class="block mb-2 text-sm font-medium text-gray-900">Biography</label>
-                            <textarea id="biography" rows="4"
-                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"
-                                placeholder="👨‍💻Full-stack web developer. Open-source contributor."></textarea>
-                        </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit"
+                            @onclick="() => SubmitGiangvien(makhoa)">
+                            Thêm giảng viên
+                        </button>
                     </div>
-                </form>
-            </div>
-            <!-- Modal footer -->
-            <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                <button
-                    class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                    type="submit">Add user</button>
-            </div>
 
-        </div>
-    </div>
-</div>
-
-<!-- Delete User Modal -->
-<div class="fixed left-0 right-0 z-50 items-center justify-center hidden overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full"
-    id="delete-user-modal">
-    <div class="relative w-full h-full max-w-md px-4 md:h-auto">
-        <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow">
-            <!-- Modal header -->
-            <div class="flex justify-end p-2">
-                <button type="button"
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                    data-modal-toggle="delete-user-modal">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-            <!-- Modal body -->
-            <div class="p-6 pt-0 text-center">
-                <svg class="w-16 h-16 mx-auto text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <h3 class="mt-5 mb-6 text-lg text-gray-500">Are you sure you want to delete this
-                    user?</h3>
-                <a href="#"
-                    class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2">
-                    Yes, I'm sure
-                </a>
-                <a href="#"
-                    class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-base px-3 py-2.5 text-center"
-                    data-modal-toggle="delete-user-modal">
-                    No, cancel
-                </a>
+                </div>
             </div>
         </div>
-    </div>
+    }
+
+    <!-- Delete User Modal -->
+    @if (deleteBtn)
+    {
+        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full"
+            id="delete-user-modal">
+            <div class="relative w-full h-full max-w-md px-4 md:h-auto">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex justify-end p-2">
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 pt-0 text-center">
+                        <svg class="w-16 h-16 mx-auto text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa giảng viên này ?</h3>
+                        <a href="#"
+                            class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3">
+                            Xóa
+                        </a>
+                        <button
+                            class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 border border-gray-300 font-medium inline-flex items-center rounded-lg text-base px-6 py-2.5 text-center"
+                            @onclick="() => closeBtn()">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
 </div>
+
 </div>
 
 </ItemContent>
