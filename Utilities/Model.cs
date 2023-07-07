@@ -60,7 +60,7 @@ namespace UehInternFrontend
 
     }
 
-     public class LichsuModel
+    public class LichsuModel
     {
         public string noidung { get; set; }
         public string ngay { get; set; }
@@ -118,7 +118,7 @@ namespace UehInternFrontend
 
     }
 
-     public class GiangvienkhoaModel
+    public class GiangvienkhoaModel
     {
         public string? makhoa { get; set; }
         public string? magv { get; set; }
@@ -133,7 +133,7 @@ namespace UehInternFrontend
 
     }
 
-     public class GiangvienModel
+    public class GiangvienModel
     {
         public string? magv { get; set; }
         public string? tengv { get; set; }
@@ -143,13 +143,13 @@ namespace UehInternFrontend
         public string? chuyenmon { get; set; }
     }
 
-     public class GiangvienRequest
+    public class GiangvienRequest
     {
         public string? magv { get; set; }
         public string? tengv { get; set; }
         public string? email { get; set; }
         public string? sdt { get; set; }
-        public string? status { get; set; } ="true";
+        public string? status { get; set; } = "true";
         public string? chuyenmon { get; set; }
     }
 
@@ -172,7 +172,7 @@ namespace UehInternFrontend
         public string? email2 { get; set; }
     }
 
-    
+
     public class DangkyModel
     {
         public string mssv { get; set; }
@@ -185,7 +185,7 @@ namespace UehInternFrontend
         public string status { get; set; }
     }
 
-     public class KetquaViewModed
+    public class KetquaViewModed
     {
         public string TenSinhVien { get; set; }
         public string MaSinhVien { get; set; }
@@ -194,7 +194,7 @@ namespace UehInternFrontend
         public double Diem { get; set; }
     }
 
-     public class KetquaModel
+    public class KetquaModel
     {
 
         public float? tieuchi1 { get; set; }
@@ -213,25 +213,31 @@ namespace UehInternFrontend
         public string madot { get; set; }
         public string name { get; set; }
         public DateTime ngaybatdau { get; set; } = DateTime.Now;
-        public DateTime ngayketthuc { get; set; }= DateTime.Now;
+        public DateTime ngayketthuc { get; set; } = DateTime.Now;
         public string status { get; set; } = "true";
 
 
     }
 
-     public class ChitietModel
+    public class ChitietModel
     {
         public string? emailsv { get; set; }
         public string? tencty { get; set; }
         public string? vitri { get; set; }
-        public string? sdt { get; set; }
+        public string? sdtsv { get; set; }
         public string? website { get; set; }
         public string? huongdan { get; set; }
         public string? chucvu { get; set; }
-        public string? email { get; set; }
+        public string? emailhd { get; set; }
         public string? stdhd { get; set; }
         public string? tendetai { get; set; }
-        public string? status { get; set; }
     }
 
+
+    public class UserModel
+    {
+
+        public string email { get; set; }
+        public string sdt { get; set; }
+    }
 }

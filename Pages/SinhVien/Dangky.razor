@@ -21,7 +21,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) {
-             mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
             await RenderDatas();
             StateHasChanged();
         }
@@ -37,7 +37,7 @@
 
 
 
-     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
+    private async Task<ChitietModel> GetChitietSinhVien(string mssv)
     {
         var response = await Http.GetAsync(api + $"Chitiet/getchitiet?mssv={mssv}");
         if (response.IsSuccessStatusCode)
@@ -52,24 +52,24 @@
             return null;
         }
     }
-        private async Task<bool> KiemTraLoai(string mssv)
+    private async Task<bool> KiemTraLoai(string mssv)
     {
         string url = api + $"Phancong/kiemtra/{mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
-        
 
-            string responseBody = await response.Content.ReadAsStringAsync();
-            
-            // Kiểm tra giá trị phản hồi
-            if (responseBody == "true")
-            {
-                return true;
-            } else {
-                return false;
-            }
-        
-        
-        
+
+        string responseBody = await response.Content.ReadAsStringAsync();
+
+        // Kiểm tra giá trị phản hồi
+        if (responseBody == "true")
+        {
+            return true;
+        } else {
+            return false;
+        }
+
+
+
     }
 
     private async Task SubmitChitiet(string mssv)
@@ -115,7 +115,7 @@
                     <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">
                         Số điện thoại
                     </label>
-                    <input type="text" @bind="@chitiet.sdt" name="phone" id="phone" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                    <input type="text" @bind="@chitiet.sdtsv" name="phone" id="phone" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
             @if (kiemtra) {
@@ -159,7 +159,7 @@
                     <label for="email-hd" class="block mb-2 text-sm font-medium text-gray-900">
                         Email người hướng dẫn
                     </label>
-                    <input type="email" @bind="@chitiet.email"  name="email-hd" id="email-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                    <input type="email" @bind="@chitiet.emailhd"  name="email-hd" id="email-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
                 <div class="col-span-6 sm:col-span-3">

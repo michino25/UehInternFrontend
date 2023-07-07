@@ -16,10 +16,12 @@
         api = Configuration["apiBackend"];
     }
 
+    private string? makhoa = "CNTTKD";
+    private string? madot = "DOT001";
+
     List<GiangvienViewModel>? giangviens = new List<GiangvienViewModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-
     protected override async Task OnInitializedAsync()
     {
         await RenderDatas();
@@ -27,7 +29,7 @@
 
     private async Task RenderDatas()
     {
-        var result = await GetGiangVienAndSinhVienHuongDan("CNTTKD");
+        var result = await GetGiangVienAndSinhVienHuongDan(madot,makhoa);
         if (result != null )
         {
             giangviens = result;
@@ -39,9 +41,9 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<GiangvienViewModel>> GetGiangVienAndSinhVienHuongDan(string makhoa)
+    private async Task<List<GiangvienViewModel>> GetGiangVienAndSinhVienHuongDan(string madot,string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Giangvien/sinhvientotal?makhoa={makhoa}");
+        var response = await Http.GetAsync(api + $"Giangvien/sinhvientotal?madot={madot}&makhoa={makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
