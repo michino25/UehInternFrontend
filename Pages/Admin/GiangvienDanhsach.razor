@@ -11,14 +11,18 @@
 
 @code {
     public string? api;
+    private string makhoa ="CNTTKD";
+    private GiangvienRequest giangvien = new GiangvienRequest();
+    private List<GiangvienModel>? giangviens = new List<GiangvienModel>();
+
+    private long maxFileSize = long.MaxValue;
+    private int maxAllowedFiles = int.MaxValue;
+
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
-
-    List<GiangvienModel>? giangviens = new List<GiangvienModel>();
-    private long maxFileSize = long.MaxValue;
-    private int maxAllowedFiles = int.MaxValue;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,12 +83,29 @@
         response.EnsureSuccessStatusCode();
     }
 
+    private async Task<GiangvienRequest> GetThongTinGiangvien(string magv)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienRequest>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
+            return null;
+        }
+    }
+
     private bool addBtn = false;
     private bool editBtn = false;
     private bool cmBtn = false;
     private bool deleteBtn = false;
+    private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
 
-    private void modelBtnClick(int btn, string data = "")
+    private async void modelBtnClick(int btn, string data = "")
     {
         switch (btn)
         {
@@ -93,9 +114,12 @@
                 break;
             case 2:
                 editBtn = true;
+                thongtinchitietgv  = await GetThongTinGiangvien(data);
                 break;
             case 3:
                 cmBtn = true;
+                thongtinchitietgv  = await GetThongTinGiangvien(data);
+                chuyennganhs = await GetChuyennganhsByKhoa(makhoa);
                 break;
             case 4:
                 deleteBtn = true;
@@ -113,10 +137,10 @@
         StateHasChanged();
     }
 
-    private string makhoa ="CNTTKD";
-    private GiangvienRequest giangvien = new GiangvienRequest();
+
     private async Task SubmitGiangvien(string makhoa)
     {
+        giangvien.status = "true";
         var url = api + $"Giangvien?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsJsonAsync(url, giangvien);
         closeBtn();
@@ -129,6 +153,39 @@
         else
         {
             await JS.InvokeVoidAsync("alert", "Thêm giảng viên thất bại");
+        }
+    }
+
+    private async Task UpdateGiangVien(string magv )
+    {
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={magv}", thongtinchitietgv);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật giảng viên thành công");
+            StateHasChanged();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
+
+     private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
+
+     private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<ChuyennganhModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
         }
     }
 
@@ -356,33 +413,37 @@
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
-                                    <input type="text" name="first-name" id="first-name"
+                                    <input type="text" @bind =@thongtinchitietgv.magv  name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="last-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input type="text" name="last-name" id="last-name"
+                                    <input type="text" @bind =@thongtinchitietgv.tengv name="last-name" id="last-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label for="email"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                    <input type="email" name="email" id="email"
-                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                </div>
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label for="position"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
-                                    <input type="text" name="position" id="position"
-                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                </div>
+                                 @if (thongtinchitietgv.email != null)
+                                {
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="email"
+                                            class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                        <input type="email" @bind =@thongtinchitietgv.email name="email" id="email"
+                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    </div>
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="position"
+                                            class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
+                                        <input type="text" @bind =@thongtinchitietgv.sdt name="position" id="position"
+                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    </div>
+                                }
+                               
                             </div>
                         </form>
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                        <button
+                        <button @onclick="() => UpdateGiangVien(thongtinchitietgv.magv)"
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit">Lưu giảng viên</button>
                     </div>
@@ -417,74 +478,44 @@
                     </div>
                     @* <!-- Modal body --> *@
                     <div class="p-6 space-y-6">
-                        <form action="#">
                             <div class="grid grid-cols-6 gap-6">
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input readonly type="text" name="first-name" value="Đặng Ngọc Hoàng Thành" id="first-name"
+                                    <input @bind ="thongtinchitietgv.tengv" readonly type="text" name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="email"
                                         class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                    <input readonly type="email" name="email" value="thanhdnh@ueh.edu.vn" id="email"
+                                    <input @bind ="thongtinchitietgv.email" readonly type="email" name="email" id="email"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6">
                                     <label for="biography"
                                         class="block mb-2 text-sm font-medium text-gray-900">Chuyên môn</label>
                                     <ul class="grid w-full gap-2 grid-3">
-                                        <li>
-                                            <input type="checkbox" id="st-option" value="" class="hidden peer" required="">
-                                            <label for="st-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
-                                                <div class="block">
-                                                    <div class="w-full text-sm font-semibold">ST</div>
-                                                    <div class="w-full text-xs">Chuyên ngành Kỹ thuật phần mềm.</div>
-                                                </div>
-                                            </label>
-                                        </li>
-                                        <li>
-                                            <input type="checkbox" id="ds-option" value="" class="hidden peer" required="">
-                                            <label for="ds-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
-                                                <div class="block">
-                                                    <div class="w-full text-sm font-semibold">DS</div>
-                                                    <div class="w-full text-xs">Chuyên ngành Khoa học dữ liệu.</div>
-                                                </div>
-                                            </label>
-                                        </li>
-                                        <li>
-                                            <input type="checkbox" id="bi-option" value="" class="hidden peer" required="">
-                                            <label for="bi-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
-                                                <div class="block">
-                                                    <div class="w-full text-sm font-semibold">BI</div>
-                                                    <div class="w-full text-xs">Chuyên ngành Hệ thống thông tin kinh doanh.</div>
-                                                </div>
-                                            </label>
-                                        </li>
-                                        <li>
-                                            <input type="checkbox" id="ec-option" value="" class="hidden peer" required="">
-                                            <label for="ec-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
-                                                <div class="block">
-                                                    <div class="w-full text-sm font-semibold">EC</div>
-                                                    <div class="w-full text-xs">Chuyên ngành Thương mại điện tử.</div>
-                                                </div>
-                                            </label>
-                                        </li>
-                                        <li>
-                                            <input type="checkbox" id="er-option" value="" class="hidden peer" required="">
-                                            <label for="er-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">                           
-                                                <div class="block">
-                                                    <div class="w-full text-sm font-semibold">ER</div>
-                                                    <div class="w-full text-xs">Chuyên ngành Hoạch định nguồn lực doanh nghiệp.</div>
-                                                </div>
-                                            </label>
-                                        </li>
+                                        @if(chuyennganhs.Count > 0)
+                                        {
+                                            foreach (var chuyenganh in chuyennganhs)
+                                            {
+                                                <li>
+                                                    <input type="checkbox" id="@chuyenganh.macn.ToLower()-option" value="" class="hidden peer" required="">
+                                                            <label for="@chuyenganh.macn.ToLower()-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">
+                                                                <div class="block">
+                                                            <div class="w-full text-sm font-semibold">@chuyenganh.macn</div>
+                                                            <div class="w-full text-xs">@chuyenganh.tencn</div>
+                                                        </div>
+                                                    </label>
+                                                </li>
+                                            }
+                                        }
+                                        
+
 
                                     </ul>
                                 </div>
                             </div>
-                        </form>
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">

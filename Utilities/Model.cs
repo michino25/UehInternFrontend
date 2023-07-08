@@ -149,7 +149,7 @@ namespace UehInternFrontend
         public string? tengv { get; set; }
         public string? email { get; set; }
         public string? sdt { get; set; }
-        public string? status { get; set; } = "true";
+        public string? status { get; set; }
         public string? chuyenmon { get; set; }
     }
 
@@ -212,12 +212,14 @@ namespace UehInternFrontend
     {
         public string madot { get; set; }
         public string name { get; set; }
-        public DateTime ngaybatdau { get; set; } = DateTime.Now;
-        public DateTime ngayketthuc { get; set; } = DateTime.Now;
-        public string status { get; set; } = "true";
-
+        public DateTime? ngaybatdau { get; set; }
+        public DateTime? ngayketthuc { get; set; }
+        public string status { get; set; }
 
     }
+
+
+
 
     public class ChitietModel
     {
