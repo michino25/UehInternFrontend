@@ -1,8 +1,9 @@
 ﻿@page "/baocao"
 @using UehInternFrontend.Components
-@using System.Net.Http
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
+@using UehInternFrontend
+
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
@@ -14,6 +15,8 @@
         api = Configuration["apiBackend"];
     }
 
+    protected string? Code = "";
+
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private DotModel dot = new DotModel();
 
@@ -23,13 +26,27 @@
     {
         if (firstRender)
         {
-            magv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await GetData();
+
+            magv = Code;
             await RenderDatas();
 
             StateHasChanged();
         }
     }
 
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Code = user.Code;
+            StateHasChanged();
+        }
+    }
 
     private async Task RenderDatas()
     {

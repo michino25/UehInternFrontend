@@ -1,8 +1,8 @@
 ﻿@page "/lichsugap/them"
 @using UehInternFrontend.Components
-@using System.Net.Http
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
+
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
@@ -15,8 +15,7 @@
         api = Configuration["apiBackend"];
     }
     
-    [CascadingParameter(Name = "Code")]
-    protected string? Code { get; set; }
+    protected string? Code = "";
 
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
@@ -33,6 +32,8 @@
     {
         if (firstRender)
         {
+            await GetData();
+
             magv = Code;
             await RenderDatas();
 
@@ -40,6 +41,18 @@
         }
     }
 
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Code = user.Code;
+            StateHasChanged();
+        }
+    }
 
     private async Task RenderDatas()
     {
