@@ -13,7 +13,7 @@
     public string? api;
     private string makhoa ="CNTTKD";
     private GiangvienRequest giangvien = new GiangvienRequest();
-    private List<GiangvienModel>? giangviens = new List<GiangvienModel>();
+    private List<GiangvienRequest>? giangviens = new List<GiangvienRequest>();
 
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
@@ -31,10 +31,9 @@
 
     private async Task RenderDatas()
     {
-        var result = await GetGiangvienByKhoas("CNTTKD");
-        if (result != null )
+        giangviens = await GetGiangvienByKhoas("CNTTKD");
+        if (giangviens.Count > 0 )
         {
-            giangviens = result;
             StateHasChanged();
         }
         else
@@ -43,13 +42,13 @@
         }
     }
 
-    private async Task<List<GiangvienModel>> GetGiangvienByKhoas(string makhoa)
+    private async Task<List<GiangvienRequest>> GetGiangvienByKhoas(string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}/giangvien");
+        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienModel>>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienRequest>>(content);
             return uploadModel;
         }
         else
@@ -123,6 +122,7 @@
                 break;
             case 4:
                 deleteBtn = true;
+
                 break;
         }
         StateHasChanged();
@@ -170,6 +170,23 @@
             await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
         }
     }
+
+
+    private async Task DeleteGiangVien(string magv)
+    {
+        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?magv={magv}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa giảng viên thành công");
+            RenderDatas();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa giảng viên thất bại");
+        }
+   }
+
 
      private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
 
@@ -330,7 +347,7 @@
                                             Chuyên môn
                                         </button>
                                         <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300"
-                                            @onclick="() => modelBtnClick(4, giangvien.magv)">
+                                                    @onclick="() =>  DeleteGiangVien(giangvien.magv)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd"
