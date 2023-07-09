@@ -231,7 +231,7 @@ namespace UehInternFrontend
         public string? huongdan { get; set; }
         public string? chucvu { get; set; }
         public string? emailhd { get; set; }
-        public string? stdhd { get; set; }
+        public string? sdthd { get; set; }
         public string? tendetai { get; set; }
     }
 

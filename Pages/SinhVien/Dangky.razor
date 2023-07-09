@@ -95,6 +95,7 @@
         if (response.IsSuccessStatusCode)
         {
             await RenderDatas();
+            JS.InvokeVoidAsync("alert", "Cập nhật thành công");
         }
         else
         {
@@ -181,7 +182,7 @@
                     <label for="phone-hd" class="block mb-2 text-sm font-medium text-gray-900">
                         Số điện thoại người hướng dẫn
                     </label>
-                    <input type="text" @bind="@chitiet.stdhd"  name="phone-hd" id="phone-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                        <input type="text" @bind="@chitiet.sdthd" name="phone-hd" id="phone-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
             } else {

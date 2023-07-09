@@ -9,15 +9,21 @@
 
 @code {
     [Parameter] public string? idGv { get; set; }
+    private string makhoa = "CNTTKD";
+    private string madot = "DOT001";
 
     public string? api;
+   
+
+    private List<DangkyModel>? sinhviens = new List<DangkyModel>();
+    private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
+
+
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
-
-    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
-    private DotModel dot = new DotModel();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -30,8 +36,9 @@
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await SinhVienByGiangVien(dot.madot,idGv);
+        thongtinchitietgv = await GetThongTinGiangvien(idGv);
+
+        var result = await GetSinhVienByGiaoVien(madot,makhoa,idGv);
         if (result != null )
         {
             sinhviens = result;
@@ -42,13 +49,13 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
+    private async Task<List<DangkyModel>> GetSinhVienByGiaoVien(string madot,string makhoa, string magv)
     {
-        var response = await Http.GetAsync(api + $"Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
+        var response = await Http.GetAsync(api + $"Dangky/GetSinhVienByGiaoVien?madot={madot}&makhoa={makhoa}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<DangkyModel>>(content);
             return uploadModel;
         }
         else
@@ -58,21 +65,22 @@
         }
     }
 
-    private async Task<DotModel> KiemtraDot()
+    private async Task<GiangvienRequest> GetThongTinGiangvien(string magv)
     {
-        var response = await Http.GetAsync(api + "Dot");
+        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienRequest>(content);
             return uploadModel;
         }
         else
         {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
             return null;
         }
     }
+
 }
 
 <PageTitle>Danh sách sinh viên</PageTitle>
@@ -88,7 +96,7 @@
         <div class="mb-4">
 
             <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách sinh viên</h1>
-            <h1>Được giảng viên Đặng Ngọc Hoàng Thành đăng ký hướng dẫn</h1>
+            <h1>Được giảng viên @thongtinchitietgv.tengv đăng ký hướng dẫn</h1>
         </div>
         <div class="sm:flex">
             <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0">
@@ -123,10 +131,7 @@
                                 class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
                                 Lớp
                             </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Khóa
-                            </th>
+
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -140,17 +145,15 @@
                                         <div class="text-base font-semibold text-gray-900">@sinhvien.ho @sinhvien.ten
                                         </div>
                                         <div class="text-sm font-normal text-gray-500">
-                                            anh@st.ueh.edu.vn</div>
+                                           @sinhvien.email</div>
                                     </div>
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                     @sinhvien.mssv
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    @sinhvien.thuoclop</td>
-                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    K@(sinhvien.khoagoc.Substring(5,2))
-                                </td>
+                                    @sinhvien.lop</td>
+
                             </tr>
                         }
                     }
