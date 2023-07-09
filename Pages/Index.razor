@@ -2,17 +2,17 @@
 @layout EmptyLayout
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
-@using System.Text.Json
 @inject IJSRuntime JSRuntime
+@using UehInternFrontend
 
 @code {
-    [CascadingParameter]
-    public string? role { get; set; }
+    [CascadingParameter(Name = "Role")]
+    protected string? Role { get; set; }
 
     private async Task LoginStUeh(string returnUrl = "/trangchu")
     {
-        if (role != null && role != "null"){
-            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + role);
+        if (Role != null && Role != ""){
+            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + Role);
         }
         else {
             returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
@@ -21,13 +21,12 @@
 
             NavigationManager.NavigateTo(loginUrl);
         }
-
     }
 
     private void LoginUeh()
     {
-        if (role != null && role != "null"){
-            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + role);
+        if (Role != null && Role != ""){
+            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + Role);
         }
         else
             NavigationManager.NavigateTo("/uehlogin");

@@ -1,16 +1,15 @@
-﻿@page "/sinhvien"
+﻿@page "/phancong/dangkysom/{idGv}"
 @using UehInternFrontend.Components
 @using System.Net.Http
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
-@using UehInternFrontend
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
+
 @code {
-    [CascadingParameter(Name = "Code")]
-    protected string? Code { get; set; }
-    
+    [Parameter] public string? idGv { get; set; }
+
     public string? api;
     protected override void OnInitialized()
     {
@@ -18,27 +17,21 @@
     }
 
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
-    private string? magv = "";
-    private string? madot = "DOT001";
-
     private DotModel dot = new DotModel();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            magv = Code;
-            @* await JS.InvokeVoidAsync("alert", Code); *@
+            await RenderDatas();
             StateHasChanged();
-            @* await RenderDatas(); *@
         }
     }
 
-
     private async Task RenderDatas()
     {
-        @* dot = await KiemtraDot(); *@
-        var result = await SinhVienByGiangVien(madot,magv);
+        dot = await KiemtraDot();
+        var result = await SinhVienByGiangVien(dot.madot,idGv);
         if (result != null )
         {
             sinhviens = result;
@@ -46,7 +39,7 @@
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Không tìm thấy sinh viên.");
+            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
     private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
@@ -65,7 +58,7 @@
         }
     }
 
-    @* private async Task<DotModel> KiemtraDot()
+    private async Task<DotModel> KiemtraDot()
     {
         var response = await Http.GetAsync(api + "Dot");
         if (response.IsSuccessStatusCode)
@@ -79,12 +72,12 @@
             Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
             return null;
         }
-    } *@
+    }
 }
 
 <PageTitle>Danh sách sinh viên</PageTitle>
 
-<CheckUserComponent CheckRole="giangvien">
+<CheckUserComponent CheckRole="admin">
 <ItemContent>
 
 
@@ -95,7 +88,7 @@
         <div class="mb-4">
 
             <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách sinh viên</h1>
-            <h1>Hiển thị danh sách sinh viên, nút chi tiết sinh viên, dẫn qua chi tiết: link kiểu /sinhvien/31201024451 </h1>
+            <h1>Được giảng viên Đặng Ngọc Hoàng Thành đăng ký hướng dẫn</h1>
         </div>
         <div class="sm:flex">
             <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0">
@@ -134,14 +127,10 @@
                                 class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
                                 Khóa
                             </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Hành động
-                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    @if (sinhviens != null)
+                    @if (sinhviens.Count > 0 )
                     { 
                         @foreach (var sinhvien in sinhviens)
                         {
@@ -160,19 +149,7 @@
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                     @sinhvien.thuoclop</td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    K@(sinhvien.khoagoc.Substring(5, 2))</td>
-                                <td class="p-4 space-x-2 whitespace-nowrap">
-                                    <a href="/sinhvien/@sinhvien.mssv"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z">
-                                            </path>
-                                            <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
-                                        </svg>
-                                        Chi tiết
-                                    </a>
+                                    K@(sinhvien.khoagoc.Substring(5,2))
                                 </td>
                             </tr>
                         }

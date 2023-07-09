@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
+@using UehInternFrontend
+@using Newtonsoft.Json
 
 <PageTitle>UEH Intern</PageTitle>
 
@@ -9,17 +11,16 @@
 </div>
 
 <div class="flex pt-20 overflow-hidden bg-gray-50">
-    <aside id="sidebar" class="fixed top-16 left-0 z-20 flex flex-col flex-shrink-0 hidden transition-width 
-    bg-white border-r border-gray-200 w-64 h-full pt-4 font-normal duration-75 lg:flex">
+    <aside id="sidebar" class="fixed top-16 left-0 z-20 flex flex-col flex-shrink-0 hidden transition-width bg-white border-r border-gray-200 w-64 h-full pt-4 font-normal duration-75 lg:flex">
 
-        @if (role == "load"){      }
-        else if (role == "admin"){
+        @if (Role == "load"){      }
+        else if (Role == "admin"){
             <SideBarAdmin />
         }
-        else if (role == "giangvien"){
+        else if (Role == "giangvien"){
             <SideBarGv />
         }    
-        else if (role == "sinhvien"){
+        else if (Role == "sinhvien"){
             <SideBarSv />
         }    
         else {
@@ -29,23 +30,42 @@
 
     <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64">
         <main class="px-4 pt-2">
-            <CascadingValue Value="@role">
+            @* <CascadingValue Value="@Role"> *@
                 @Body
-            </CascadingValue>
+            @* </CascadingValue> *@
         </main>
     </div>
 </div>
 
 @code {
-    private string? role = "load";
+    protected string? Role = "load";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            role = await JSRuntime.InvokeAsync<string>("getUserData", "Role");
-            StateHasChanged();
-            await JSRuntime.InvokeVoidAsync("executeScript");
+            await GetData();
+            await JS.InvokeVoidAsync("executeScript");
         }
     }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Role = user.Role;
+            StateHasChanged();
+        }
+        else 
+        {
+            // Chưa có cookie đăng nhập
+            NavigationManager.NavigateTo("/loginsessionexpired");
+        }
+    }
+
+
 }

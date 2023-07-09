@@ -4,6 +4,7 @@ using global::Login.ST.UEH;
 
 namespace UehInternFrontend
 {
+    // user ---------------------------------------------------------------
     public class Student
     {
         public string? mssv { get; set; }
@@ -60,11 +61,7 @@ namespace UehInternFrontend
 
     }
 
-    public class LichsuModel
-    {
-        public string noidung { get; set; }
-        public string ngay { get; set; }
-    }
+    // ---------------------------------------------------------------
 
     public class LoginRequest
     {
@@ -72,9 +69,14 @@ namespace UehInternFrontend
         public string? Password { get; set; }
     }
 
+    public class LichsuModel
+    {
+        public string noidung { get; set; }
+        public string ngay { get; set; }
+    }
+
     public class UploadModel
     {
-
         public Guid Id { get; set; }
         public string? Mssv { get; set; }
         public string? FileType { get; set; }
@@ -115,14 +117,12 @@ namespace UehInternFrontend
     {
         public string? makhoa { get; set; }
         public string? mssv { get; set; }
-
     }
 
     public class GiangvienkhoaModel
     {
         public string? makhoa { get; set; }
         public string? magv { get; set; }
-
     }
 
     public class ChuyennganhModel
@@ -215,8 +215,6 @@ namespace UehInternFrontend
         public DateTime ngaybatdau { get; set; } = DateTime.Now;
         public DateTime ngayketthuc { get; set; } = DateTime.Now;
         public string status { get; set; } = "true";
-
-
     }
 
     public class ChitietModel
@@ -236,7 +234,6 @@ namespace UehInternFrontend
 
     public class UserModel
     {
-
         public string email { get; set; }
         public string sdt { get; set; }
     }

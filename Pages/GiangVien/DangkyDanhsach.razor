@@ -1,4 +1,4 @@
-﻿@page "/dangky/danhsach"
+﻿@page "/dangkysom"
 @using System.Net.Http
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
@@ -14,6 +14,9 @@
         api = Configuration["apiBackend"];
     }
 
+    [CascadingParameter(Name = "Code")]
+    protected string? Code { get; set; }
+
     List<DangkyModel>? sinhviens = new List<DangkyModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
@@ -25,7 +28,7 @@
     {
         if (firstRender)
         {
-            magv = await JS.InvokeAsync<string>("getUserData", "Code");
+            magv = Code;
             await RenderDatas();
 
             StateHasChanged();

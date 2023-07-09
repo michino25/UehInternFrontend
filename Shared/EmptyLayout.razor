@@ -1,26 +1,50 @@
 @inherits LayoutComponentBase
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
+@using UehInternFrontend
+@using Newtonsoft.Json
 
 <PageTitle>UEH Intern</PageTitle>
 
 <div class="main">
     <div class="content">
-        <CascadingValue Value="@role">
-            @Body
-        </CascadingValue>
+        <CascadingValue Value="@Code" Name="Code">
+            <CascadingValue Value="@Name" Name="Name">
+                <CascadingValue Value="@Email" Name="Email">
+                    <CascadingValue Value="@Role" Name="Role">
+                        @Body
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>        
     </div>
 </div>
 
 @code {
-    private string? role = "load";
+    private string? Code = "";
+    private string? Name = "";
+    private string? Email = "";
+    private string? Role = "load";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            role = await JSRuntime.InvokeAsync<string>("getUserData", "Role");
-            StateHasChanged();
+            string token = await JS.InvokeAsync<string>("userInfo");
+            string json = AES.DecryptData(token);
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                User? user = JsonConvert.DeserializeObject<User>(json);
+                Code = user.Code;
+                Name = user.Name;
+                Email = user.Email;
+                Role = user.Role;
+                StateHasChanged();
+            } else 
+            {
+                Role = "";
+                StateHasChanged();
+            }
         }
     }
-
 }

@@ -14,6 +14,9 @@
     {
         api = Configuration["apiBackend"];
     }
+    
+    [CascadingParameter(Name = "Code")]
+    protected string? Code { get; set; }
 
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
@@ -30,7 +33,7 @@
     {
         if (firstRender)
         {
-            magv = await JS.InvokeAsync<string>("getUserData", "Code");
+            magv = Code;
             await RenderDatas();
 
             StateHasChanged();

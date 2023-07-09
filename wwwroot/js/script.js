@@ -258,54 +258,53 @@ function toggleNavClick(id) {
     }
 }
 
-function checkRole(role) {
-    let result = getUserData("Role") === role;
-    if (result === true) {
-        return "true";
-    } else {
-        if (getCookie("data-user") !== null) return "false";
-        else return "null";
-    }
+// authenticate
+
+function userLogin(token, minutes) {
+    token = encodeMessage(token);
+    updateCookie("data-user", token, minutes);
 }
 
-function userLogin(json) {
-    json = encodeMessage(json);
-    createCookie("data-user", json, 2);
+function userInfo() {
+    token = getCookie("data-user");
+    if (token !== null) {
+        token = decodeMessage(token);
+        return token;
+    } else return null;
+}
+
+function userExtend(minutes) {
+    token = getCookie("data-user");
+    if (token !== null) {
+        updateCookie("data-user", token, minutes);
+    }
 }
 
 function userLogout() {
     deleteCookie("data-user");
 }
 
-function getUserData(value) {
-    json = getCookie("data-user");
-    if (json !== null) {
-        json = decodeMessage(json);
-        json = JSON.parse(json);
-        return json[value];
-    } else return null;
-}
+// base function login
 
 function getCookie(name) {
-    const cookieName = name + "=";
-    const cookies = document.cookie.split(";");
+    const cookieName = name + "="; // The name of the cookie to search for
+    const cookies = document.cookie.split(";"); // Splitting all the cookies into an array
     for (let i = 0; i < cookies.length; i++) {
-        let cookie = cookies[i].trim();
+        let cookie = cookies[i].trim(); // Trim any whitespace from the cookie string
         if (cookie.indexOf(cookieName) == 0) {
-            return cookie.substring(cookieName.length);
+            // Check if the cookie starts with the desired name
+            return cookie.substring(cookieName.length); // Extract and return the value of the cookie
         }
     }
-    return null;
+    return null; // Return null if the cookie is not found
 }
 
-function createCookie(name, value, hours) {
-    var expires;
-    if (hours) {
+function updateCookie(name, value, minutes) {
+    var expires = "";
+    if (minutes) {
         var date = new Date();
-        date.setTime(date.getTime() + hours * 60 * 60 * 1000);
+        date.setTime(date.getTime() + minutes * 60 * 1000);
         expires = "; expires=" + date.toGMTString();
-    } else {
-        expires = "";
     }
     document.cookie = name + "=" + value + expires + "; path=/";
 }
@@ -321,6 +320,8 @@ function encodeMessage(message) {
 function decodeMessage(encodedMessage) {
     return atob(encodedMessage);
 }
+
+//
 
 function showElement(selector) {
     const element = $(selector);

@@ -1,22 +1,20 @@
 @inject IJSRuntime JS
 @inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager NavigationManager
+@using UehInternFrontend
+@using Newtonsoft.Json
 
-@if (role == "load"){      }
-else if (role == "null"){
-    NavigationManager.NavigateTo("/loginsessionexpired");
-}
-else if (role != CheckRole){
+@if (Role == "load"){      }
+else if (Role != CheckRole){
     <Error Type="NoRole" />
 }    
 else {
-    @* <h1>@role Page</h1> *@
+    @* <h1>@Role Page</h1> *@
     @ItemContent
 }
 
 @code {
-    [CascadingParameter]
-    public string? role { get; set; }
+    protected string? Role = "load";
 
     [Parameter]
     public string? CheckRole { get; set; }
@@ -26,9 +24,23 @@ else {
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JS.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+        if (firstRender)
+        {
+            await GetData();
 
-        // Check thiết bị người dùng
+            if (Role == CheckRole) {
+                await JS.InvokeVoidAsync("userExtend", 30);
+            }
+
+            await JS.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+
+            // Check thiết bị người dùng
+            CheckUserDevice();
+        }
+    }
+
+    private async Task CheckUserDevice()
+    {
         string userAgent = HttpContextAccessor.HttpContext.Request.Headers["User-Agent"].ToString();
         int deviceWidth = await JS.InvokeAsync<int>("getDeviceWidth");
 
@@ -36,10 +48,6 @@ else {
         {
             @* await JS.InvokeVoidAsync("console.log", userAgent); *@
             NavigationManager.NavigateTo("/mobiledevice");
-        }
-
-        if (firstRender)
-        {
         }
     }
 
@@ -52,5 +60,17 @@ else {
                 userAgent.Contains("Windows Phone", StringComparison.OrdinalIgnoreCase);
     }
 
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Role = user.Role;
+            StateHasChanged();
+        }
+    }
 
 }

@@ -4,23 +4,18 @@
 @inject IJSRuntime JSRuntime
 @using Microsoft.AspNetCore.WebUtilities
 @using UehInternFrontend
-@using System.Text.Json;
-@using global::Login.ST.UEH;
+@using System.Text.Json
+@using global::Login.ST.UEH
 @code {
-    [CascadingParameter]
-    public string? role { get; set; }
 
-    string jsonString = "";
-
-    string plainText = "";
-    string encryptedText = "";
-    string decryptedText = "";
+    string token = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var uri = new Uri(NavigationManager.Uri);
         var queryParameters = QueryHelpers.ParseQuery(uri.Query);
         var t = queryParameters["t"];
+
         await JSRuntime.InvokeVoidAsync("resetCSSLogin");
         await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
         User? user;
@@ -47,7 +42,11 @@
                     Name = "Đặng Thái Thịnh",
                     Role = "giangvien"
                 };
-                await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+
+                token = JsonSerializer.Serialize(user);
+                token = AES.EncryptData(token);
+
+                await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
                 await JSRuntime.InvokeVoidAsync("resetCSSLogin");
                 await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
                 NavigationManager.NavigateTo("/sinhvien");
@@ -63,7 +62,11 @@
                     Name = "Phan Hiền",
                     Role = "admin"
                 };
-                await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+
+                token = JsonSerializer.Serialize(user);
+                token = AES.EncryptData(token);
+
+                await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
                 await JSRuntime.InvokeVoidAsync("resetCSSLogin");
                 await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
                 NavigationManager.NavigateTo("/tongquan");
@@ -75,24 +78,14 @@
                 var obj = LoginStUEH.GetInfo(t);
                 if (obj != null)
                 {
-
                     Student stu = (Student) obj;
-                    @* jsonString = JsonSerializer.Serialize(stu); *@
-
                     user = (User) stu;
-                    await JSRuntime.InvokeVoidAsync("userLogin", JsonSerializer.Serialize(user));
+
+                    token = JsonSerializer.Serialize(user);
+                    token = AES.EncryptData(token);
+
+                    await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
                     NavigationManager.NavigateTo("/thongtin");
-
-                    @* plainText = "Tôi là Như Trứng Here is some data to encrypt!";
-
-                    // Encrypt the plain text
-                    encryptedText = AES.EncryptData(plainText);
-
-                    // Decrypt the encrypted text
-                    decryptedText = AES.DecryptData(encryptedText);
-
-                    StateHasChanged(); *@
-
                 }
                 break;
 
@@ -102,7 +95,3 @@
     }
 
 }
-
-@* <p>Plaintext: @plainText</p>
-<p>Encrypted Text: @encryptedText</p>
-<p>Decrypted Text: @decryptedText</p> *@
