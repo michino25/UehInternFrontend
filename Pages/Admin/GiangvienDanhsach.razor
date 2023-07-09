@@ -122,7 +122,7 @@
                 break;
             case 4:
                 deleteBtn = true;
-
+                thongtinchitietgv  = await GetThongTinGiangvien(data);
                 break;
         }
         StateHasChanged();
@@ -163,7 +163,7 @@
         if (response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật giảng viên thành công");
-            StateHasChanged();
+            RenderDatas();
         }
         else
         {
@@ -180,6 +180,7 @@
         {
             await JS.InvokeVoidAsync("alert", "Xóa giảng viên thành công");
             RenderDatas();
+            closeBtn();
         }
         else
         {
@@ -347,7 +348,7 @@
                                             Chuyên môn
                                         </button>
                                         <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300"
-                                                    @onclick="() =>  DeleteGiangVien(giangvien.magv)">
+                                                    @onclick="() => modelBtnClick(4, giangvien.magv)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd"
@@ -640,10 +641,10 @@
                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa giảng viên này ?</h3>
-                        <a href="#"
+                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)" 
                             class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3">
                             Xóa
-                        </a>
+                        </button>
                         <button
                             class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 border border-gray-300 font-medium inline-flex items-center rounded-lg text-base px-6 py-2.5 text-center"
                             @onclick="() => closeBtn()">
