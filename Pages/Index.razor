@@ -1,13 +1,35 @@
 ﻿@page "/"
 @layout EmptyLayout
-@inject NavigationManager NavigationManager
-@inject HttpClient HttpClient
-@inject IJSRuntime JSRuntime
+@using Newtonsoft.Json
 @using UehInternFrontend
 
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject IJSRuntime JS
+
 @code {
-    [CascadingParameter(Name = "Role")]
-    protected string? Role { get; set; }
+    protected string? Role = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetData();
+        }
+    }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Role = user.Role;
+            StateHasChanged();
+        }
+    }
 
     private async Task LoginStUeh(string returnUrl = "/trangchu")
     {

@@ -1,7 +1,7 @@
 ﻿@page "/dangkysom"
-@using System.Net.Http
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
+
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
@@ -14,8 +14,7 @@
         api = Configuration["apiBackend"];
     }
 
-    [CascadingParameter(Name = "Code")]
-    protected string? Code { get; set; }
+    protected string? Code = "";
 
     List<DangkyModel>? sinhviens = new List<DangkyModel>();
     private long maxFileSize = long.MaxValue;
@@ -28,9 +27,24 @@
     {
         if (firstRender)
         {
+            await GetData();
+
             magv = Code;
             await RenderDatas();
 
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Code = user.Code;
             StateHasChanged();
         }
     }

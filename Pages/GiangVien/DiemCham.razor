@@ -1,9 +1,10 @@
 ﻿@page "/diem/{idSv}"
 @using UehInternFrontend.Components
+@using Newtonsoft.Json
+
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
-@using Newtonsoft.Json
 
 @code {
     [Parameter] public string idSv { get; set; }

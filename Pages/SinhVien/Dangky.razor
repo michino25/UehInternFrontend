@@ -1,9 +1,11 @@
 ﻿@page "/dangky"
 @using UehInternFrontend.Components
+@using Newtonsoft.Json
+@using UehInternFrontend
+
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
-@using Newtonsoft.Json
 
 @code {
 
@@ -14,15 +16,30 @@
     }
 
     private string? mssv = "";
-
+    protected string? Code = "";
 
     private ChitietModel? chitiet = new ChitietModel();
     private bool kiemtra =true;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) {
-            mssv = await JS.InvokeAsync<string>("getUserData", "Code");
+            await GetData();
+
+            mssv = Code;
             await RenderDatas();
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Code = user.Code;
             StateHasChanged();
         }
     }
@@ -34,8 +51,6 @@
         StateHasChanged();
 
     }
-
-
 
     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
     {
