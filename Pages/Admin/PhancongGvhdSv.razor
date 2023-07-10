@@ -59,7 +59,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
 
         using var content = new MultipartFormDataContent();
 
@@ -71,15 +70,38 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-        var apiUrl = api + $"Phancong/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var apiUrl = api + $"Phancong/formFile?madot={Uri.EscapeDataString(madot)}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
         }
-        RenderDatas();
+        else {
+            RenderDatas();
+            await JS.InvokeVoidAsync("alert", "Cập nhật thành công");
+
+        }
+
         response.EnsureSuccessStatusCode();
         
+    }
+
+    private async Task DownloadExcelFile(string madot, string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Phancong/generate?madot={madot}&makhoa={makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var fileName = response.Content.Headers.ContentDisposition.FileName;
+            var contentType = response.Content.Headers.ContentType.MediaType;
+            var content = await response.Content.ReadAsByteArrayAsync();
+
+            await JS.InvokeVoidAsync("downloadFileExcel", fileName, content, contentType);
+
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp tin.");
+        }
     }
 
 }
@@ -99,6 +121,16 @@
         </div>
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                            <button @onclick="() => DownloadExcelFile(madot,makhoa) "
+                                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
+                                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                                          clip-rule="evenodd"></path>
+                                </svg>
+                                Tải danh sách chính thức
+                            </button>
             <button 
                 class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
