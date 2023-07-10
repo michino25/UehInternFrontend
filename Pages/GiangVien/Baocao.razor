@@ -167,37 +167,24 @@
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
     <div
         class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
-        <div class="w-full mb-5">
-            <div class="mb-4">
-
+        <div class="w-full mb-5 sm:flex">
+            <div class="mb-3 flex flex-col divide-x divide-gray-100">
                 <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách sinh viên</h1>
                 <h1>Hiển thị bảng sinh viên, tùy chọn tải báo cáo của từng sinh viên, tải toàn bộ</h1>
             </div>
-            <div class="sm:flex">
-                <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0">
-                    <form class="lg:pr-3" action="#" method="GET">
-                        <label for="users-search" class="sr-only">Search</label>
-                        <div class="relative mt-1 lg:w-64 xl:w-96">
-                            <input type="text" name="email" id="users-search"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                                placeholder="Tìm kiếm">
-                        </div>
-                    </form>
-                </div>
 
-                <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                    <button @onclick="() => DownloadZipFile(magv)"
-                        class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                        <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        Tải toàn bộ 
+            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                <button @onclick="() => DownloadZipFile(magv)"
+                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Tải toàn bộ 
 
-                    </button>
-                </div>
+                </button>
             </div>
         </div>
     </div>

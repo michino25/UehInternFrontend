@@ -6,6 +6,7 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
 
 @code {
 
@@ -41,6 +42,11 @@
             User? user = JsonConvert.DeserializeObject<User>(json);
             Code = user.Code;
             StateHasChanged();
+        }
+        else 
+        {
+            // Chưa có cookie đăng nhập
+            NavigationManager.NavigateTo("/loginsessionexpired");
         }
     }
 

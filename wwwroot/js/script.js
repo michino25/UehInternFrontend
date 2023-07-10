@@ -112,7 +112,7 @@ function executeLoginScript() {
 }
 
 function toggleSidebarMobile() {
-    $("#toggleSidebarMobile, #sidebarBackdrop, #toggleSidebarMobileSearch").on(
+    $("#toggleSidebarMobile, #sidebarBackdrop").on(
         "click",
         handleSidebarToggle
     );
@@ -255,6 +255,22 @@ function toggleNavClick(id) {
 
     if (!button.isNull()) {
         button.on("click", () => $("#" + id).toggleClass("hidden"));
+
+        // Hide popup if we ain`t clicking on
+        document.addEventListener("click", (event) => {
+            if (
+                !event.target.closest("#" + id) &&
+                !event.target.closest(selector)
+            ) {
+                $("#" + id).addClass("hidden");
+            }
+        });
+
+        // To prevent hiding parrent element when clicking to child
+        // $("#" + id).on("click", (event) => {
+        // event.stopPropagation();
+        // event.preventDefault();
+        // });
     }
 }
 
