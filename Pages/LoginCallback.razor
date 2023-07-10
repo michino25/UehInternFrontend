@@ -84,6 +84,12 @@
                     token = JsonSerializer.Serialize(user);
                     token = AES.EncryptData(token);
 
+                    UserDemo userDemo = (UserDemo) stu;
+                    string tokenDemo = JsonSerializer.Serialize(userDemo);
+                    tokenDemo = AES.EncryptData(tokenDemo);
+                    await JSRuntime.InvokeVoidAsync("console.log", tokenDemo);
+
+
                     await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
                     NavigationManager.NavigateTo("/thongtin");
                 }

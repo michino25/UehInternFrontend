@@ -61,6 +61,28 @@ namespace UehInternFrontend
 
     }
 
+    public class UserDemo
+    {
+        public string? UserId { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Sdt { get; set; }
+        public string? Role { get; set; }
+
+        public static explicit operator UserDemo(Student student)
+        {
+            return new UserDemo
+            {
+                UserId = student.mssv,
+                Name = student.hoten,
+                Email = student.email,
+                Sdt = student.phone,
+                Role = "sinhvien"
+            };
+        }
+
+    }
+
     // ---------------------------------------------------------------
 
     public class LoginRequest
