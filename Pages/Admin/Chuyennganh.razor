@@ -11,15 +11,18 @@
 
 @code {
     public string? api;
+    private long maxFileSize = long.MaxValue;
+    private int maxAllowedFiles = int.MaxValue;
+    private string makhoa ="CNTTKD";
+    private ChuyennganhModel chuyennganh = new ChuyennganhModel();
+
+    private List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
-    private long maxFileSize = long.MaxValue;
-    private int maxAllowedFiles = int.MaxValue;
-
-    List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,10 +84,77 @@
         response.EnsureSuccessStatusCode();
     }
 
+
+    private async Task SubmitChuyenNganh(string makhoa)
+    {
+        chuyennganh.makhoa = makhoa;
+        var url = api + $"Chuyennganh/CreateChuyennganh";
+        var response = await Http.PostAsJsonAsync(url, chuyennganh);
+        closeBtn();
+
+        if (response.IsSuccessStatusCode)
+        {
+            await RenderDatas();
+            await JS.InvokeVoidAsync("alert", "Thêm chuyên ngành  thành công");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Thêm chuyên ngành thất bại");
+        }
+    }
+
+    private async Task UpdateChuyenNganh(string macn )
+    {
+        var response = await Http.PutAsJsonAsync(api + $"Chuyennganh/UpdateChuyennganh?macn={macn}", thongtinchitietcn);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên ngành thành công");
+            RenderDatas();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
+
+
+    private async Task DeleteChuyenNganh(string macn)
+    {
+        var response = await Http.DeleteAsync(api + $"Chuyennganh/DeleteChuyennganh?macn={macn}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa chuyên ngành thành công");
+            RenderDatas();
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa chuyên ngành thất bại");
+        }
+   }
+
+
+    private async Task<ChuyennganhModel> GetThongTinChuyenNganh(string macn)
+    {
+        var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhById?macn={macn}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<ChuyennganhModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
+            return null;
+        }
+    }
     private bool addBtn = false;
     private bool editBtn = false;
     private bool deleteBtn = false;
-    @* private GiangvienRequest thongtinchitietgv = new GiangvienRequest(); *@
+    private ChuyennganhModel thongtinchitietcn = new ChuyennganhModel();
 
     private async void modelBtnClick(int btn, string data = "")
     {
@@ -95,11 +165,11 @@
                 break;
             case 2:
                 editBtn = true;
-                @* thongtinchitietgv  = await GetThongTinGiangvien(data); *@
+                 thongtinchitietcn  = await GetThongTinChuyenNganh(data); 
                 break;
             case 3:
                 deleteBtn = true;
-                @* thongtinchitietgv  = await GetThongTinGiangvien(data); *@
+                 thongtinchitietcn  = await GetThongTinChuyenNganh(data); 
                 break;
         }
         StateHasChanged();
@@ -128,15 +198,7 @@
         </div>
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-            @* <button type="button"
-                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
-                <svg class="w-4 h-4 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                Xóa tất cả
-            </button> *@
+
             <button type="button" @onclick="() => modelBtnClick(1)"
                 class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
@@ -290,13 +352,13 @@
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Mã chuyên ngành</label>
-                                    <input type="text" name="first-name" id="first-name"
+                                    <input @bind ="@thongtinchitietcn.macn" type="text" name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="last-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên chuyên ngành</label>
-                                    <input type="text" name="last-name" id="last-name"
+                                    <input @bind ="@thongtinchitietcn.tencn" type="text" name="last-name" id="last-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>                                
                             </div>
@@ -307,8 +369,7 @@
                         <button 
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit"
-                            @* @onclick="() => UpdateGiangVien(thongtinchitietgv.magv)" *@
-                            >
+                                        @onclick="() => UpdateChuyenNganh(thongtinchitietcn.macn)">
                             Lưu chuyên ngành
                             </button>
                     </div>
@@ -346,13 +407,13 @@
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="magv"
                                     class="block mb-2 text-sm font-medium text-gray-900">Mã chuyên ngành</label>
-                                <input type="text" name="magv" id="magv" required
+                                <input @bind ="@chuyennganh.macn" type="text" name="magv" id="magv" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="name"
                                     class="block mb-2 text-sm font-medium text-gray-900">Tên chuyên ngành</label>
-                                <input type="text" name="name" id="name" required
+                                <input  @bind ="@chuyennganh.tencn" type="text" name="name" id="name" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -362,7 +423,7 @@
                         <button
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit"
-                            @* @onclick="() => SubmitGiangvien(makhoa)" *@
+                             @onclick="() => SubmitChuyenNganh(makhoa)" 
                             >
                             Thêm chuyên ngành
                         </button>
@@ -403,8 +464,7 @@
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa chuyên ngành này ?</h3>
                         <button 
                             class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3"
-                            @* @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)"  *@
-                            >
+                                        @onclick="() =>  DeleteChuyenNganh(thongtinchitietcn.macn)">
                             Xóa
                         </button>
                         <button

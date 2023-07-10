@@ -13,7 +13,7 @@
     private string makhoa ="CNTTKD";
     private GiangvienRequest giangvien = new GiangvienRequest();
     private List<GiangvienRequest>? giangviens = new List<GiangvienRequest>();
-
+    private List<string> selectedValues = new List<string>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
 
@@ -185,12 +185,12 @@
         {
             await JS.InvokeVoidAsync("alert", "Xóa giảng viên thất bại");
         }
-   }
+    }
 
 
-     private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
+    private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
 
-     private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
+    private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
     {
         var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
         if (response.IsSuccessStatusCode)
@@ -205,6 +205,36 @@
             return null;
         }
     }
+
+    private async Task UpdateChuyenMon(string magv)
+    {
+        string json = JsonConvert.SerializeObject(selectedValues);
+        thongtinchitietgv.chuyenmon = json;
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={magv}", thongtinchitietgv);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thành công");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thất bại");
+        }
+  }
+
+    private void UpdateCheckboxState(string value, string isChecked)
+    {
+        if (isChecked == "True")
+        {
+            selectedValues.Add(value);
+        }
+        else
+        {
+            selectedValues.Remove(value);
+        }
+    }
+
+
 
 }
 
@@ -224,15 +254,7 @@
         </div>
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-            @* <button type="button"
-                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
-                <svg class="w-4 h-4 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                Xóa tất cả
-            </button> *@
+
             <button @onclick="() => modelBtnClick(1)"
                 class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
@@ -501,9 +523,11 @@
                                         {
                                             foreach (var chuyenganh in chuyennganhs)
                                             {
+                                               bool isChecked = selectedValues.Contains(chuyenganh.macn);
                                                 <li>
-                                                    <input type="checkbox" id="@chuyenganh.macn.ToLower()-option" value="" class="hidden peer" required="">
-                                                    <label for="@chuyenganh.macn.ToLower()-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
+                                                            <input type="checkbox" id="@chuyenganh.macn.ToLower()-option" value="@chuyenganh.macn" class="hidden peer" checked="@isChecked" @onchange="e => UpdateCheckboxState(chuyenganh.macn, e.Value.ToString())" />
+                                                            
+                                                            <label for="@chuyenganh.macn.ToLower()-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
                                                         <div class="block">
                                                             <div class="w-full text-sm font-semibold">@chuyenganh.macn</div>
                                                             <div class="w-full text-xs">@chuyenganh.tencn</div>
@@ -521,7 +545,7 @@
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                        <button
+                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.magv)"
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit">Lưu</button>
                     </div>
