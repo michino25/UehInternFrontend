@@ -29,7 +29,7 @@
 
     private async Task RenderDatas()
     {
-        var result = await GetGiangVienAndSinhVienHuongDan(madot,makhoa);
+        var result = await GetGiangvienListFromDangky(madot, makhoa);
         if (result != null )
         {
             giangviens = result;
@@ -41,9 +41,9 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<GiangvienViewModel>> GetGiangVienAndSinhVienHuongDan(string madot,string makhoa)
+    private async Task<List<GiangvienViewModel>> GetGiangvienListFromDangky(string madot,string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Giangvien/sinhvientotal?madot={madot}&makhoa={makhoa}");
+        var response = await Http.GetAsync(api + $"Dangky/GetGiangvienListFromDangky?madot={madot}&makhoa={makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -84,7 +84,7 @@
     }
      private async Task DownloadExcelFile(string madot,string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Ketqua/ExportToExcelByKhoa?makhoa={Uri.EscapeDataString(makhoa)}");
+        var response = await Http.GetAsync(api + $"Dangky/generate?madot={madot}&makhoa={makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var fileName = response.Content.Headers.ContentDisposition.FileName;
