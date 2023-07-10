@@ -107,6 +107,23 @@
         StateHasChanged();
     }
 
+
+    private async Task<GiangvienRequest> GetThongTinSinhVien(string magv)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienRequest>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
+            return null;
+        }
+    }
+
     private bool addBtn = false;
     private bool deleteBtn = false;
     @* private GiangvienRequest thongtinchitietgv = new GiangvienRequest(); *@
@@ -133,6 +150,25 @@
         StateHasChanged();
     }
 
+    private string keyword;
+
+    private async Task SubmitSearch()
+    {
+        var response = await Http.GetAsync(api + $"Sinhvien/Search?keyword={keyword}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            sinhviens = uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
+        }
+        
+
+    }
+
 }
 
 <PageTitle>Danh sách sinh viên</PageTitle>
@@ -150,15 +186,16 @@
         </div>
         <div class="sm:flex">
             <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0">
-                <form class="lg:pr-3" action="#" method="GET">
+                <form class="lg:pr-3" @onsubmit="SubmitSearch">
                     <label for="users-search" class="sr-only">Search</label>
                     <div class="relative mt-1 lg:w-64 xl:w-96">
-                        <input type="text" name="email" id="users-search"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
-                            placeholder="Tìm kiếm">
+                        <input type="text" name="email" id="search-input"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
+                               placeholder="Tìm kiếm" @bind="keyword">
                     </div>
                 </form>
             </div>
+
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
                 <button 
