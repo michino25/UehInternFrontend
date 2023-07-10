@@ -109,131 +109,132 @@
 
 
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
-<div
-    class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
-    <div class="w-full mb-5 sm:flex">
-        <div class="mb-3 flex flex-col divide-x divide-gray-100">
-            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách giảng viên chấm chéo</h1>
-            <h1>Nút import, bảng các giáo viên chấm chéo với nhau</h1>
-        </div>
+    <div
+        class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
+        <div class="w-full mb-5 sm:flex">
+            <div class="mb-3 flex flex-col divide-x divide-gray-100">
+                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách giảng viên chấm chéo</h1>
+                <h1>Nút import, bảng các giáo viên chấm chéo với nhau</h1>
+            </div>
 
-        <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-            <button  @onclick = "() => DownloadExcelFile(madot,makhoa) "
-                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
-                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                Tải danh sách chấm chéo
-            </button>
-            <button 
-                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                <label for="actual-btn">Nhập file</label>
-                <InputFile id="actual-btn" class="hidden" OnChange="@OnInputFileChange" multiple />
+            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                <button  @onclick = "() => DownloadExcelFile(madot,makhoa) "
+                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Tải danh sách chấm chéo
+                </button>
+                <button 
+                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <label for="actual-btn">Nhập file</label>
+                    <InputFile id="actual-btn" class="hidden" OnChange="@OnInputFileChange" multiple />
                 </button>
             </div>
         </div>
     </div>
-</div>
-<div class="flex flex-col">
-    <div class="overflow-x-auto">
-        <div class="inline-block min-w-full align-middle">
-            <div class="overflow-hidden shadow">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Mã giảng viên
-                            </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Giảng viên
-                            </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Mã giảng viên
-                            </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Giảng viên
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
 
-                        @if (chamcheos != null)
-                        { 
-                            @foreach (var chamcheo in chamcheos)
-                            {
+    <div class="flex flex-col">
+        <div class="overflow-x-auto">
+            <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow">
+                    <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Mã giảng viên
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Giảng viên
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Mã giảng viên
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Giảng viên
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
 
-                                <tr class="hover:bg-gray-100">
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        @chamcheo.magv1
-                                    </td>
-                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                        <div class="text-sm font-normal text-gray-500">
-                                            <div class="text-base font-semibold text-gray-900">@chamcheo.tengv1
-                                            </div>
+                            @if (chamcheos != null)
+                            { 
+                                @foreach (var chamcheo in chamcheos)
+                                {
+
+                                    <tr class="hover:bg-gray-100">
+                                        <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                            @chamcheo.magv1
+                                        </td>
+                                        <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                             <div class="text-sm font-normal text-gray-500">
-                                            @chamcheo.email1</div>
-                                        </div>
-                                    </td>
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        @chamcheo.magv2
-                                    </td>
-                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                        <div class="text-sm font-normal text-gray-500">
-                                            <div class="text-base font-semibold text-gray-900">@chamcheo.tengv2
+                                                <div class="text-base font-semibold text-gray-900">@chamcheo.tengv1
+                                                </div>
+                                                <div class="text-sm font-normal text-gray-500">
+                                                @chamcheo.email1</div>
                                             </div>
+                                        </td>
+                                        <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                            @chamcheo.magv2
+                                        </td>
+                                        <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                             <div class="text-sm font-normal text-gray-500">
-                                                @chamcheo.email2</div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                                <div class="text-base font-semibold text-gray-900">@chamcheo.tengv2
+                                                </div>
+                                                <div class="text-sm font-normal text-gray-500">
+                                                    @chamcheo.email2</div>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                            }   
-                        }
+                                }   
+                            }
 
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div
-    class="sticky bottom-0 right-0 items-center w-full pt-4 bg-white border-t border-gray-200 sm:flex sm:justify-between">
-    <div class="flex items-center mb-4 sm:mb-0">
-        <a href="#"
-            class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
-            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd"
-                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                    clip-rule="evenodd"></path>
-            </svg>
-        </a>
-        <a href="#"
-            class="inline-flex justify-center p-1 mr-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
-            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clip-rule="evenodd"></path>
-            </svg>
-        </a>
-        <span class="text-sm font-normal text-gray-500">Hiển thị <span
-                class="font-semibold text-gray-900">1-10</span> trong số <span
-                class="font-semibold text-gray-900">234</span> giảng viên</span>
+
+    <div
+        class="sticky bottom-0 right-0 items-center w-full pt-4 bg-white border-t border-gray-200 sm:flex sm:justify-between">
+        <div class="flex items-center mb-4 sm:mb-0">
+            <a href="#"
+                class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
+                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clip-rule="evenodd"></path>
+                </svg>
+            </a>
+            <a href="#"
+                class="inline-flex justify-center p-1 mr-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
+                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clip-rule="evenodd"></path>
+                </svg>
+            </a>
+            <span class="text-sm font-normal text-gray-500">Hiển thị <span
+                    class="font-semibold text-gray-900">1-10</span> trong số <span
+                    class="font-semibold text-gray-900">234</span> giảng viên</span>
+        </div>
     </div>
-</div>
 
 </div>
 
