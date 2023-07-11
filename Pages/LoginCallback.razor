@@ -41,21 +41,6 @@
                 await NavigateTo("/thongtin");
                 break;
             
-            case "gv":
-
-                user = new UserLogin
-                {
-                    UserId = "001747",
-                    Name = "Đặng Thái Thịnh",
-                    Email = "thinhdt@ueh.edu.vn",
-                    Sdt = "0905553609",
-                    Role = "teacher"
-                };
-
-                await LoginRequest(user);
-                await NavigateTo("/tongquan");
-                break;
-
             case "admin":
 
                 user = new UserLogin
@@ -64,6 +49,21 @@
                     Name = "Phan Hiền",
                     Email = "hienphan@ueh.edu.vn",
                     Sdt = "0909259404",
+                    Role = "teacher"
+                };
+
+                await LoginRequest(user);
+                await NavigateTo("/tongquan");
+                break;
+
+            case "gv":
+
+                user = new UserLogin
+                {
+                    UserId = "001747",
+                    Name = "Đặng Thái Thịnh",
+                    Email = "thinhdt@ueh.edu.vn",
+                    Sdt = "0905553609",
                     Role = "teacher"
                 };
 
