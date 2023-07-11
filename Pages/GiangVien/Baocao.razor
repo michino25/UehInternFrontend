@@ -10,17 +10,16 @@
 
 @code {
     public string? api;
+    protected string? Code = "";
+    private List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+    private DotModel dot = new DotModel();
+    private string? magv = "";
+    private string? madot = "DOT001";
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
-
-    protected string? Code = "";
-
-    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
-    private DotModel dot = new DotModel();
-
-    private string? magv = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -94,11 +93,11 @@
             return null;
         }
     }
-    private async Task DownloadZipFile(string magv)
+    private async Task DownloadZipFile(string madot,string magv)
     {
         try
         {
-            var response = await Http.GetAsync(api + $"Ketqua/generatezip?giangVienId={magv}");
+            var response = await Http.GetAsync(api + $"Ketqua/generatezip?madot={madot}&giangVienId={magv}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
@@ -174,7 +173,7 @@
             </div>
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                <button @onclick="() => DownloadZipFile(magv)"
+                <button @onclick="() => DownloadZipFile(madot,magv)"
                     class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">

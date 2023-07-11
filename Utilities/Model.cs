@@ -197,6 +197,8 @@ namespace UehInternFrontend
         public string email { get; set; }
         public string magv { get; set; }
         public string makhoa { get; set; }
+        public string madot { get; set; }
+
         public string status { get; set; }
     }
 

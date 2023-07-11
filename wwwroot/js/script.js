@@ -347,6 +347,8 @@ function showElement(selector) {
     }
 }
 
+
+
 window.downloadFileFromStream = async (fileName, contentStreamReference) => {
     const arrayBuffer = await contentStreamReference.arrayBuffer();
     const blob = new Blob([arrayBuffer]);
