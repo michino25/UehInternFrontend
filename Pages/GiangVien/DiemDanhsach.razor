@@ -20,6 +20,8 @@
 
     private string? magv = "";
     private string? madot = "DOT001";
+    private string? hkdn = "HKDN";
+    private string? kltn = "KLTN";
 
     private double sum = 0;
 
@@ -80,27 +82,13 @@
             return null;
         }
     }
-    @* private async Task<DotModel> KiemtraDot()
-    {
-        var response = await Http.GetAsync(api + "Dot");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
-            return null;
-        }
-    } *@
 
-    private async Task DownloadPdf(string magv)
+
+    private async Task DownloadPdf(string madot,string maloai,string magv)
     {
         try
         {
-            var response = await Http.GetAsync(api + $"Ketqua/generatepdfbygv?magv={magv}");
+            var response = await Http.GetAsync(api + $"Ketqua/generatepdfbygv?madot={madot}&maloai={maloai}&magv={magv}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
@@ -144,14 +132,26 @@
         </div>
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-            <button @onclick="() => DownloadPdf(magv)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+            <button @onclick="() => DownloadPdf(madot,hkdn,magv)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd"
                         d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                         clip-rule="evenodd"></path>
                 </svg>
-                Tải danh sách điểm
+                Tải danh sách điểm HKDN
+
+            </button>
+        </div>
+         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+            <button @onclick="() => DownloadPdf(madot,kltn,magv)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Tải danh sách điểm KLTN
 
             </button>
         </div>
