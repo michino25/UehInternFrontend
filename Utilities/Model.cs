@@ -46,16 +46,31 @@ namespace UehInternFrontend
         public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
+        public string? Sdt { get; set; }
+        public string? Role { get; set; }
+        public int? DotInfo { get; set; }
+        public string? MaLoai { get; set; }
+        public string? MaDot { get; set; }
+        public string? MaKhoa { get; set; }
+    }
+
+    public class UserLogin
+    {
+        public string? UserId { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Sdt { get; set; }
         public string? Role { get; set; }
 
-        public static explicit operator User(Student student)
+        public static explicit operator UserLogin(Student student)
         {
-            return new User
+            return new UserLogin
             {
-                Code = student.mssv,
-                Email = student.email,
+                UserId = student.mssv,
                 Name = student.hoten,
-                Role = "sinhvien"
+                Email = student.email,
+                Sdt = student.phone,
+                Role = "student"
             };
         }
 

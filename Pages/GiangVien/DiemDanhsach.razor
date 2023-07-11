@@ -64,7 +64,7 @@
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
+            await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
         }
     }
     private async Task<List<KetquaViewModed>> DanhSachDiem(string madot,string magv)
@@ -118,7 +118,7 @@
 
 <PageTitle>Danh sách điểm</PageTitle>
 
-<CheckUserComponent CheckRole="giangvien">
+<CheckUserComponent CheckRole="teacher">
 <ItemContent>
 
 

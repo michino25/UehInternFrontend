@@ -71,6 +71,11 @@ else {
             Role = user.Role;
             StateHasChanged();
         }
+        else 
+        {
+            // Chưa có cookie đăng nhập
+            NavigationManager.NavigateTo("/loginsessionexpired");
+        }
     }
 
 }

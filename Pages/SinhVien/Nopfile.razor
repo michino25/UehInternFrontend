@@ -148,7 +148,7 @@
         }
     }
 
-     private async Task DeleteFile(string filename)
+    private async Task DeleteFile(string filename)
     {
         var response = await Http.DeleteAsync(api + $"File/DeleteFile?fileName={filename}");
 
@@ -165,7 +165,7 @@
 
 <PageTitle>Nộp file</PageTitle>
 
-<CheckUserComponent CheckRole="sinhvien">
+<CheckUserComponent CheckRole="student">
     <ItemContent>
 
     <div class="col-span-2">

@@ -1,76 +1,74 @@
 ﻿@page "/LoginCallback/"
 @layout EmptyLayout
 @inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
 @inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
 @using Microsoft.AspNetCore.WebUtilities
 @using UehInternFrontend
+@using Newtonsoft.Json
 @using System.Text.Json
 @using global::Login.ST.UEH
-@code {
 
-    string token = "";
+@code {
+    public string? api;
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var uri = new Uri(NavigationManager.Uri);
         var queryParameters = QueryHelpers.ParseQuery(uri.Query);
         var t = queryParameters["t"];
+        UserLogin? user;
 
-        await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-        await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-        User? user;
+        @* await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+        await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js"); *@
 
         switch (t) {
             case "exist-admin":
-                NavigationManager.NavigateTo("/tongquan");
+                await NavigateTo("/tongquan");
                 break;
 
-            case "exist-giangvien":
-                NavigationManager.NavigateTo("/sinhvien");
+            case "exist-teacher":
+                await NavigateTo("/sinhvien");
                 break;
 
-            case "exist-sinhvien":
-                NavigationManager.NavigateTo("/thongtin");
+            case "exist-student":
+                await NavigateTo("/thongtin");
                 break;
             
-            case "gv":
-
-                user = new User
-                {
-                    Code = "001747",
-                    Email = "thinhdt@ueh.edu.vn",
-                    Name = "Đặng Thái Thịnh",
-                    Role = "giangvien"
-                };
-
-                token = JsonSerializer.Serialize(user);
-                token = AES.EncryptData(token);
-
-                await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
-                await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-                await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-                NavigationManager.NavigateTo("/sinhvien");
-
-                break;
-
             case "admin":
 
-                user = new User
+                user = new UserLogin
                 {
-                    Code = "000688",
-                    Email = "hienphan@ueh.edu.vn",
+                    UserId = "000688",
                     Name = "Phan Hiền",
-                    Role = "admin"
+                    Email = "hienphan@ueh.edu.vn",
+                    Sdt = "0909259404",
+                    Role = "teacher"
                 };
 
-                token = JsonSerializer.Serialize(user);
-                token = AES.EncryptData(token);
+                await LoginRequest(user);
+                await NavigateTo("/tongquan");
+                break;
 
-                await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
-                await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-                await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-                NavigationManager.NavigateTo("/tongquan");
+            case "gv":
 
+                user = new UserLogin
+                {
+                    UserId = "001747",
+                    Name = "Đặng Thái Thịnh",
+                    Email = "thinhdt@ueh.edu.vn",
+                    Sdt = "0905553609",
+                    Role = "teacher"
+                };
+
+                await LoginRequest(user);
+                await NavigateTo("/sinhvien");
                 break;
 
             default:
@@ -79,19 +77,48 @@
                 if (obj != null)
                 {
                     Student stu = (Student) obj;
-                    user = (User) stu;
+                    user = (UserLogin) stu;
 
-                    token = JsonSerializer.Serialize(user);
-                    token = AES.EncryptData(token);
-
-                    await JSRuntime.InvokeVoidAsync("userLogin", token, 30);
-                    NavigationManager.NavigateTo("/thongtin");
+                    await LoginRequest(user);
+                    await NavigateTo("/thongtin");
                 }
                 break;
-
 
         }
 
     }
 
+    private async Task LoginRequest(UserLogin user)
+    {
+        if (user != null)
+        {
+            string token = System.Text.Json.JsonSerializer.Serialize(user);
+            token = AES.EncryptData(token);
+
+            var url = api + $"User/CreateUser?encryptedJson={token}";
+            var response = await Http.PostAsJsonAsync(url, "");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                User? getUser = JsonConvert.DeserializeObject<User>(content);
+
+                string tokenUser = System.Text.Json.JsonSerializer.Serialize(getUser);
+                tokenUser = AES.EncryptData(tokenUser);
+                await JSRuntime.InvokeVoidAsync("userLogin", tokenUser, 30);
+            }
+            else
+            {
+                Console.WriteLine("Đã xảy ra lỗi khi gửi !");
+            }
+        }
+    }
+
+    private async Task NavigateTo(string RedirectTo)
+    {
+        await JSRuntime.InvokeVoidAsync("resetCSSLogin");
+        await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+
+        NavigationManager.NavigateTo(RedirectTo);
+    }
 }
