@@ -25,9 +25,6 @@
         var t = queryParameters["t"];
         UserLogin? user;
 
-        @* await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-        await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js"); *@
-
         switch (t) {
             case "exist-admin":
                 await NavigateTo("/tongquan");
@@ -95,8 +92,12 @@
             string token = System.Text.Json.JsonSerializer.Serialize(user);
             token = AES.EncryptData(token);
 
-            var url = api + $"User/CreateUser?encryptedJson={token}";
-            var response = await Http.PostAsJsonAsync(url, "");
+            await JSRuntime.InvokeVoidAsync("console.log", token);
+
+            token = Uri.EscapeDataString(token);
+
+            var url = api + $"User/LoginUser?encryptedJson={token}";
+            var response = await Http.PostAsync(url, new StringContent(""));
 
             if (response.IsSuccessStatusCode)
             {
