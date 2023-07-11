@@ -16,12 +16,13 @@
 
     protected string? Code = "";
 
-    List<DangkyModel>? sinhviens = new List<DangkyModel>();
+    private List<DangkyModel>? sinhviens = new List<DangkyModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
     private string? magv = "";
     private string? makhoa = "CNTTKD";
     private string? madot = "DOT001";
+    private DangkyModel dangky = new DangkyModel();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -104,13 +105,72 @@
 
         }
         response.EnsureSuccessStatusCode();
-        
+
+    }
+
+
+    private async Task SubmitDangky()
+    {
+        dangky.makhoa = makhoa;
+        dangky.magv = magv;
+        dangky.madot = madot;
+        dangky.status = "true";
+
+        var url = api + $"Dangky/CreateDangky";
+        var response = await Http.PostAsJsonAsync(url, dangky);
+        closeBtn();
+
+        if (response.IsSuccessStatusCode)
+        {
+            await RenderDatas();
+            await JS.InvokeVoidAsync("alert", "Thêm đăng ký  thành công");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Thêm đăng ký thất bại");
+        }
+    }
+
+   
+
+
+    private async Task DeleteDangKy(string mssv)
+    {
+        var response = await Http.DeleteAsync(api + $"Dangky/DeleteDangky?mssv={mssv}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa đăng ký thành công");
+            RenderDatas();
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa đăng ký thất bại");
+        }
+    }
+
+
+    private async Task<DangkyModel> GetThongTinDangKy(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Dangky/GetDangky?mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<DangkyModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
+            return null;
+        }
     }
 
     private bool addBtn = false;
     private bool deleteBtn = false;
     private bool deleteAllBtn = false;
-    @* private GiangvienRequest thongtinchitietgv = new GiangvienRequest(); *@
+    private DangkyModel thongtinchitietdk = new DangkyModel(); 
 
     private async void modelBtnClick(int btn, string data = "")
     {
@@ -121,7 +181,7 @@
                 break;
             case 2:
                 deleteBtn = true;
-                @* thongtinchitietgv  = await GetThongTinGiangvien(data); *@
+                thongtinchitietdk = await GetThongTinDangKy(data);
                 break;
             case 3:
                 deleteAllBtn = true;
@@ -157,8 +217,7 @@
         </div>
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-            <button 
-                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto"
+            <button class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-teal-300 sm:w-auto"
                 @onclick="() => modelBtnClick(1)"
                 >
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
@@ -169,7 +228,7 @@
                 </svg>
                 Thêm sinh viên
             </button>
-            <button
+           @* <button
                 class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300"
                 @onclick="() => modelBtnClick(3)"
                 >
@@ -179,7 +238,7 @@
                         clip-rule="evenodd"></path>
                 </svg>
                 Xóa tất cả
-            </button>
+            </button>*@
             <button
                 class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
@@ -323,25 +382,31 @@
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="magv"
                                     class="block mb-2 text-sm font-medium text-gray-900">Mã sinh viên</label>
-                                <input type="text" name="magv" id="magv" required
+                                <input @bind ="dangky.mssv" type="text" name="magv" id="magv" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                             <div class="col-span-6 sm:col-span-3">
+                                <label for="name"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Họ sinh viên</label>
+                                <input @bind ="dangky.ho" type="text" name="name" id="name" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="name"
                                     class="block mb-2 text-sm font-medium text-gray-900">Tên sinh viên</label>
-                                <input type="text" name="name" id="name" required
+                                <input @bind ="dangky.ten" type="text" name="name" id="name" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="email"
                                     class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                <input type="email" name="email" id="email" required
+                                <input @bind ="dangky.email" type="email" name="email" id="email" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="phone"
-                                    class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
-                                <input type="text" name="phone" id="phone" required
+                                    class="block mb-2 text-sm font-medium text-gray-900">Lớp</label>
+                                <input @bind ="dangky.lop" type="text" name="phone" id="phone" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -351,7 +416,7 @@
                         <button
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit"
-                            @* @onclick="() => SubmitGiangvien(makhoa)" *@
+                             @onclick="() => SubmitDangky()" 
                             >
                             Thêm sinh viên
                         </button>
@@ -391,7 +456,7 @@
                         </svg>
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa sinh viên này ?</h3>
                         <button class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3"
-                            @* @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)"  *@
+                            @onclick = "() =>  DeleteDangKy(thongtinchitietdk.mssv)"  
                             >
                             Xóa
                         </button>
@@ -434,7 +499,7 @@
                         </svg>
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa tất cả sinh viên ?</h3>
                         <button class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3"
-                            @* @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)"  *@
+                            @* @onclick = "() =>  DeleteGiangVien(thongtinchitietdk.magv)"  *@
                             >
                             Xóa
                         </button>
