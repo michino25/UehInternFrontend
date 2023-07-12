@@ -1,4 +1,39 @@
-﻿<div class="h-full px-3 py-3 overflow-y-auto">
+﻿@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@using UehInternFrontend
+@using Newtonsoft.Json
+
+@code {
+    protected int? DotInfo = -1;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetData();
+        }
+    }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            DotInfo = user.DotInfo;
+            StateHasChanged();
+        }
+        else 
+        {
+            // Chưa có cookie đăng nhập
+            NavigationManager.NavigateTo("/loginsessionexpired");
+        }
+    }
+}
+
+<div class="h-full px-3 py-3 overflow-y-auto">
     <ul class="space-y-2 font-medium">
         @* Info *@
         <li>
@@ -11,68 +46,100 @@
             </div>
         </li>
 
-        @* Thông tin *@
-        <li>
-            <NavLink href="/thongtin"
-                class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
-                    fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                    <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-                </svg>
-                <span class="ml-3">Thông tin</span>
-            </NavLink>
-        </li>
+        @if (DotInfo >= 0)
+        {
+            @* Thông tin *@
+            <li>
+                <NavLink href="/thongtin"
+                    class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                        fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                    </svg>
+                    <span class="ml-3">Thông tin</span>
+                </NavLink>
+            </li>
+        }
 
-        @* File *@
-        <li>
-            <NavLink href="/nopfile"
-                class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
-                    viewBox="-2 -2 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V10C2 6.22876 2 4.34315 3.17157 3.17157C4.34315 2 6.23869 2 10.0298 2C10.6358 2 11.1214 2 11.53 2.01666C11.5166 2.09659 11.5095 2.17813 11.5092 2.26057L11.5 5.09497C11.4999 6.19207 11.4998 7.16164 11.6049 7.94316C11.7188 8.79028 11.9803 9.63726 12.6716 10.3285C13.3628 11.0198 14.2098 11.2813 15.0569 11.3952C15.8385 11.5003 16.808 11.5002 17.9051 11.5001L18 11.5001H21.9574C22 12.0344 22 12.6901 22 13.5629V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22ZM5.25 14.5C5.25 14.0858 5.58579 13.75 6 13.75H14C14.4142 13.75 14.75 14.0858 14.75 14.5C14.75 14.9142 14.4142 15.25 14 15.25H6C5.58579 15.25 5.25 14.9142 5.25 14.5ZM5.25 18C5.25 17.5858 5.58579 17.25 6 17.25H11.5C11.9142 17.25 12.25 17.5858 12.25 18C12.25 18.4142 11.9142 18.75 11.5 18.75H6C5.58579 18.75 5.25 18.4142 5.25 18Z"
-                            fill="currentColor"></path>
-                        <path
-                            d="M19.3517 7.61665L15.3929 4.05375C14.2651 3.03868 13.7012 2.53114 13.0092 2.26562L13 5.00011C13 7.35713 13 8.53564 13.7322 9.26787C14.4645 10.0001 15.643 10.0001 18 10.0001H21.5801C21.2175 9.29588 20.5684 8.71164 19.3517 7.61665Z"
-                            fill="currentColor"></path>
-                    </g>
-                </svg>
-                <span class="ml-3">Nộp file</span>
-            </NavLink>
-        </li>
+        @if (DotInfo >= 2)
+        {
+            @* File *@
+            <li>
+                <NavLink href="/nopfile"
+                    class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                        viewBox="-2 -2 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g>
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V10C2 6.22876 2 4.34315 3.17157 3.17157C4.34315 2 6.23869 2 10.0298 2C10.6358 2 11.1214 2 11.53 2.01666C11.5166 2.09659 11.5095 2.17813 11.5092 2.26057L11.5 5.09497C11.4999 6.19207 11.4998 7.16164 11.6049 7.94316C11.7188 8.79028 11.9803 9.63726 12.6716 10.3285C13.3628 11.0198 14.2098 11.2813 15.0569 11.3952C15.8385 11.5003 16.808 11.5002 17.9051 11.5001L18 11.5001H21.9574C22 12.0344 22 12.6901 22 13.5629V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22ZM5.25 14.5C5.25 14.0858 5.58579 13.75 6 13.75H14C14.4142 13.75 14.75 14.0858 14.75 14.5C14.75 14.9142 14.4142 15.25 14 15.25H6C5.58579 15.25 5.25 14.9142 5.25 14.5ZM5.25 18C5.25 17.5858 5.58579 17.25 6 17.25H11.5C11.9142 17.25 12.25 17.5858 12.25 18C12.25 18.4142 11.9142 18.75 11.5 18.75H6C5.58579 18.75 5.25 18.4142 5.25 18Z"
+                                fill="currentColor"></path>
+                            <path
+                                d="M19.3517 7.61665L15.3929 4.05375C14.2651 3.03868 13.7012 2.53114 13.0092 2.26562L13 5.00011C13 7.35713 13 8.53564 13.7322 9.26787C14.4645 10.0001 15.643 10.0001 18 10.0001H21.5801C21.2175 9.29588 20.5684 8.71164 19.3517 7.61665Z"
+                                fill="currentColor"></path>
+                        </g>
+                    </svg>
+                    <span class="ml-3">Nộp file</span>
+                </NavLink>
+            </li>
 
-        @* Hồ sơ *@
-        <li>
-            <NavLink href="hoso" class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                <svg aria-hidden="true"
-                    class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
-                    fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                <span class="flex-1 ml-3 whitespace-nowrap">Hồ sơ</span>
-            </NavLink>
-        </li>
+            @* Hồ sơ *@
+            <li>
+                <NavLink href="hoso" class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <svg aria-hidden="true"
+                        class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                        fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="flex-1 ml-3 whitespace-nowrap">Hồ sơ</span>
+                </NavLink>
+            </li>
 
-        @* Đăng ký *@
-        <li>
-            <NavLink href="dangky" class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                <svg aria-hidden="true"
-                    class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
-                    fill="currentColor" viewBox="-2 -2 28 28" xmlns="http://www.w3.org/2000/svg">
-                    <g id="SVGRepo_iconCarrier">
-                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="ic_fluent_class_24_filled" fill="currentColor" fill-rule="nonzero">
-                                <path
-                                    d="M17.25,2.00051727 C18.7687831,2.00051727 20,3.2317342 20,4.75051727 L20,19.2487649 C20,20.767548 18.7687831,21.9987649 17.25,21.9987649 L6.74990198,21.9987649 C5.23111892,21.9987649 3.99990198,20.767548 3.99990198,19.2487649 L3.99990198,4.75051727 C3.99990198,3.2317342 5.23111892,2.00051727 6.74990198,2.00051727 L7.04132159,2 L7.04132159,10.1671486 C7.04132159,10.9151997 7.83169503,11.1811926 8.35990618,10.9064659 L8.45018427,10.8523597 L10.5431597,9.65511263 L12.6836301,10.8844881 C13.129045,11.192691 13.9441479,10.9853672 14.0333402,10.2941456 L14.0413216,10.1671486 L14.0413216,2 L17.25,2.00051727 Z M12.5413216,2 L12.5413216,9.07569648 L10.9197216,8.14379282 C10.6929803,8.03527051 10.3846103,8.03773853 10.1269219,8.16631351 L10.0199727,8.22918197 L8.54132159,9.07501642 L8.54132159,2 L12.5413216,2 Z">
-                                </path>
+            @* Đăng ký *@
+            <li>
+                <NavLink href="dangky" class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <svg aria-hidden="true"
+                        class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                        fill="currentColor" viewBox="-2 -2 28 28" xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_iconCarrier">
+                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g id="ic_fluent_class_24_filled" fill="currentColor" fill-rule="nonzero">
+                                    <path
+                                        d="M17.25,2.00051727 C18.7687831,2.00051727 20,3.2317342 20,4.75051727 L20,19.2487649 C20,20.767548 18.7687831,21.9987649 17.25,21.9987649 L6.74990198,21.9987649 C5.23111892,21.9987649 3.99990198,20.767548 3.99990198,19.2487649 L3.99990198,4.75051727 C3.99990198,3.2317342 5.23111892,2.00051727 6.74990198,2.00051727 L7.04132159,2 L7.04132159,10.1671486 C7.04132159,10.9151997 7.83169503,11.1811926 8.35990618,10.9064659 L8.45018427,10.8523597 L10.5431597,9.65511263 L12.6836301,10.8844881 C13.129045,11.192691 13.9441479,10.9853672 14.0333402,10.2941456 L14.0413216,10.1671486 L14.0413216,2 L17.25,2.00051727 Z M12.5413216,2 L12.5413216,9.07569648 L10.9197216,8.14379282 C10.6929803,8.03527051 10.3846103,8.03773853 10.1269219,8.16631351 L10.0199727,8.22918197 L8.54132159,9.07501642 L8.54132159,2 L12.5413216,2 Z">
+                                    </path>
+                                </g>
                             </g>
                         </g>
+                    </svg>
+                    <span class="flex-1 ml-3 whitespace-nowrap">Đăng ký </span>
+                </NavLink>
+            </li>
+        }
+
+    </ul>
+
+    <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
+        <li>
+            <NavLink href="trogiup/giangvien" class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <path
+                            d="M19.5816 18.5209C21.0889 16.7701 22 14.4915 22 12C22 9.50853 21.0889 7.22987 19.5816 5.47906L15.3089 9.75178C15.745 10.3925 16 11.1665 16 12C16 12.8335 15.745 13.6075 15.3089 14.2482L19.5816 18.5209Z"
+                            fill="currentColor"></path>
+                        <path
+                            d="M18.5209 19.5816C16.7701 21.0889 14.4915 22 12 22C9.50853 22 7.22987 21.0889 5.47906 19.5816L9.75178 15.3089C10.3925 15.745 11.1665 16 12 16C12.8335 16 13.6075 15.745 14.2482 15.3089L18.5209 19.5816Z"
+                            fill="currentColor"></path>
+                        <path
+                            d="M4.4184 18.5209L8.69112 14.2482C8.25495 13.6075 8 12.8335 8 12C8 11.1665 8.25495 10.3925 8.69112 9.75178L4.4184 5.47906C2.91114 7.22987 2 9.50853 2 12C2 14.4915 2.91114 16.7701 4.4184 18.5209Z"
+                            fill="currentColor"></path>
+                        <path
+                            d="M12 8C11.1665 8 10.3925 8.25495 9.75178 8.69112L5.47906 4.4184C7.22987 2.91114 9.50853 2 12 2C14.4915 2 16.7701 2.91114 18.5209 4.4184L14.2482 8.69112C13.6075 8.25495 12.8335 8 12 8Z"
+                            fill="currentColor"></path>
                     </g>
                 </svg>
-                <span class="flex-1 ml-3 whitespace-nowrap">Đăng ký </span>
+                <span class="flex-1 ml-3 whitespace-nowrap">Trợ giúp</span>
             </NavLink>
         </li>
     </ul>

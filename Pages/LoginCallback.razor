@@ -92,7 +92,7 @@
             string token = System.Text.Json.JsonSerializer.Serialize(user);
             token = AES.EncryptData(token);
 
-            await JSRuntime.InvokeVoidAsync("console.log", token);
+            @* await JSRuntime.InvokeVoidAsync("console.log", token); *@
 
             token = Uri.EscapeDataString(token);
 

@@ -177,8 +177,14 @@
 
                 <button @onclick ="() =>LoaiHinhXacNhan()"
                     class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                        <InputFile OnChange="@LoadFiles" class="btn-primary " />
-
+                    <InputFile id="xacnhan-btn" OnChange="@LoadFiles" class="hidden btn-primary " />
+                    <svg class="w-5 h-5 mr-2 ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <label class="cursor-pointer" for="xacnhan-btn">Nhập file</label>
                 </button>
 
             </div>
@@ -265,7 +271,15 @@
 
                 <button @onclick="() => LoaiHinhBaoCaoTuan()"
                         class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                    <InputFile OnChange="@LoadFiles" class="btn-primary" />
+                    <InputFile id="tuan-btn" OnChange="@LoadFiles" class="hidden btn-primary" />
+
+                    <svg class="w-5 h-5 mr-2 ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <label class="cursor-pointer" for="tuan-btn">Nhập file</label>
                 </button>
 
 
@@ -348,15 +362,18 @@
 
             <h3 class="mb-4 text-xl font-semibold">Nộp báo cáo cuối kì</h3>
             <div class="flex flex-col items-start pb-4 space-x-2">
-
-
-
-                    <button @onclick="() =>LoaiHinhBaoCaoCuoiKi()"
+                <button @onclick="() =>LoaiHinhBaoCaoCuoiKi()"
                             class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                        <InputFile OnChange="@LoadFiles" class="btn-primary " />
+                    <InputFile id="cuoiky-btn" OnChange="@LoadFiles" class="hidden btn-primary " />
 
-                    </button>
-
+                    <svg class="w-5 h-5 mr-2 ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <label class="cursor-pointer" for="cuoiky-btn">Nhập file</label>
+                </button>
             </div>
 
             <table class="min-w-full divide-y divide-gray-200 table-fixed">
@@ -382,9 +399,9 @@
                 {
                 @foreach (var file in files)
                     {
-                       if(file.FileType == "Báo cáo cuối kì")
-                       {
-                                <tr class="hover:bg-gray-100">
+                        if(file.FileType == "Báo cáo cuối kì")
+                        {
+                            <tr class="hover:bg-gray-100">
                                 <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                     <div class="text-sm font-normal text-gray-500">
                                         <div class="text-base font-semibold text-gray-900">@file.FileName</div>
@@ -413,7 +430,7 @@
                                     </button>
                                 </td>
                             </tr>
-                       }
+                        }
                     }
                     } else {
                         <tr class="">

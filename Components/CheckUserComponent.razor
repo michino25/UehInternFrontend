@@ -64,7 +64,7 @@ else {
     {
         string token = await JS.InvokeAsync<string>("userInfo");
         string json = AES.DecryptData(token);
-        await JS.InvokeVoidAsync("console.log", json);
+        @* await JS.InvokeVoidAsync("console.log", json); *@
 
         if (!string.IsNullOrEmpty(json))
         {

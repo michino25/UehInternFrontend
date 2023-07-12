@@ -2,7 +2,9 @@
 @using UehInternFrontend.Components
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
+@using UehInternFrontend
 
+@inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
@@ -15,6 +17,33 @@
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
+    }
+
+    protected int? DotInfo = -1;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetData();
+        }
+    }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            DotInfo = user.DotInfo;
+            StateHasChanged();
+        }
+        else 
+        {
+            // Chưa có cookie đăng nhập
+            NavigationManager.NavigateTo("/loginsessionexpired");
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -94,67 +123,85 @@
 <CheckUserComponent CheckRole="admin">
 <ItemContent>
 
-<div class="grid grid-cols-1 mb-5 xl:grid-cols-2 xl:gap-4">
+@if (DotInfo >= 1)
+{
+    <div class="grid grid-cols-1 mb-5 xl:grid-cols-2 xl:gap-4">
 
-    <!-- Activity Card -->
-    <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm  sm:p-6  xl:mb-0">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Đợt tháng 8/2023</h3>
-            <a href="dot" class="inline-flex items-center p-2 text-sm font-semibold rounded-lg text-teal-800 hover:bg-gray-100">
-                Chi tiết
+        @* <!-- Activity Card --> *@
+        <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm  sm:p-6  xl:mb-0">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Đợt tháng 8/2023</h3>
+                <a href="dot" class="inline-flex items-center p-2 text-sm font-semibold rounded-lg text-teal-800 hover:bg-gray-100">
+                    Chi tiết
+                </a>
+
+            </div>
+            <ol class="relative border-l border-gray-200">                  
+                <li class="mb-10 ml-4">
+                    <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white"></div>
+                    <time class="mb-1 text-sm font-normal leading-none text-teal-800 font-semibold">Tháng 11 2023</time>
+                    <h3 class="text-lg font-semibold text-gray-900">Kết thúc đợt thực tập</h3>
+                    <p class="mb-4 text-base font-normal text-gray-500">Chấm điểm, xuất các báo cáo cần thiết và kết thúc đợt thực tập tháng 8/2023.</p>
+                </li>
+                <li class="mb-10 ml-4">
+                    <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white"></div>
+                    <time class="mb-1 text-sm font-normal leading-none text-teal-800 font-semibold">Tháng 8 2023</time>
+                    <h3 class="text-lg font-semibold text-gray-900">Chốt danh sách thực tập chính thức</h3>
+                    <p class="mb-4 text-base font-normal text-gray-500">Danh sách thực tập chính thức được đưa ra và thực hiện theo các phân công.</p>
+                </li>
+                <li class="mb-10 ml-4">
+                    <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white"></div>
+                    <time class="mb-1 text-sm font-normal leading-none text-teal-800 font-semibold">Tháng 6 2023</time>
+                    <h3 class="text-lg font-semibold text-gray-900">Mở đợt thực tập</h3>
+                    <p class="text-base font-normal text-gray-500">Bắt đầu đợt thực tập doanh nghiệp và khóa luận tốt nghiệp.</p>
+                </li>
+            </ol>
+        </div>
+
+        <div>
+            <a href="giangvien/danhsach" 
+                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                <div class="w-full">
+                    <h3 class="text-base font-normal text-gray-500">Giảng viên</h3>
+                    <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumgv</span>
+                </div>
             </a>
 
+            <a href="sinhvien/danhsach" 
+                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                <div class="w-full">
+                    <h3 class="text-base font-normal text-gray-500">Sinh viên</h3>
+                    <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumsv</span>
+                </div>
+            </a>
+
+            <a href="chuyennganh" 
+                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                <div class="w-full">
+                    <h3 class="text-base font-normal text-gray-500">Chuyên ngành</h3>
+                    <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumcn</span>
+                </div>
+            </a>
         </div>
-        <ol class="relative border-l border-gray-200">                  
-            <li class="mb-10 ml-4">
-                <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white"></div>
-                <time class="mb-1 text-sm font-normal leading-none text-teal-800 font-semibold">Tháng 11 2023</time>
-                <h3 class="text-lg font-semibold text-gray-900">Kết thúc đợt thực tập</h3>
-                <p class="mb-4 text-base font-normal text-gray-500">Chấm điểm, xuất các báo cáo cần thiết và kết thúc đợt thực tập tháng 8/2023.</p>
-            </li>
-            <li class="mb-10 ml-4">
-                <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white"></div>
-                <time class="mb-1 text-sm font-normal leading-none text-teal-800 font-semibold">Tháng 8 2023</time>
-                <h3 class="text-lg font-semibold text-gray-900">Chốt danh sách thực tập chính thức</h3>
-                <p class="mb-4 text-base font-normal text-gray-500">Danh sách thực tập chính thức được đưa ra và thực hiện theo các phân công.</p>
-            </li>
-            <li class="mb-10 ml-4">
-                <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white"></div>
-                <time class="mb-1 text-sm font-normal leading-none text-teal-800 font-semibold">Tháng 6 2023</time>
-                <h3 class="text-lg font-semibold text-gray-900">Mở đợt thực tập</h3>
-                <p class="text-base font-normal text-gray-500">Bắt đầu đợt thực tập doanh nghiệp và khóa luận tốt nghiệp.</p>
-            </li>
-        </ol>
+
     </div>
-
-    <div>
-        <a href="giangvien/danhsach" 
-            class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
-            <div class="w-full">
-                <h3 class="text-base font-normal text-gray-500">Giảng viên</h3>
-                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumgv</span>
-            </div>
-        </a>
-
-        <a href="sinhvien/danhsach" 
-            class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
-            <div class="w-full">
-                <h3 class="text-base font-normal text-gray-500">Sinh viên</h3>
-                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumsv</span>
-            </div>
-        </a>
-
-        <a href="chuyennganh" 
-            class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
-            <div class="w-full">
-                <h3 class="text-base font-normal text-gray-500">Chuyên ngành</h3>
-                <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumcn</span>
-            </div>
+}
+else
+{
+    <div class="p-6 bg-white border border-gray-200 rounded-lg">
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+            Chưa mở đợt
+        </h5>
+        <p class="mb-3 font-normal text-gray-700">
+            Không có đợt nào đang diễn ra
+        </p>
+        <a href="dot"
+            type="button" class="inline-flex items-center text-teal-700 hover:text-white border border-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+            Mở đợt
+            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
         </a>
     </div>
-
-</div>
-
+}
 </ItemContent>
 </CheckUserComponent>
 

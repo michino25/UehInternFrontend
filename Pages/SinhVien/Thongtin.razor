@@ -6,11 +6,15 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
 
 @code {
     public string? api;
-    private ChitietModel? chitiet = new ChitietModel();
+    protected int? DotInfo = -1;
+    protected string? Code = "";
+
     private bool kiemtra = true;
+    private ChitietModel? chitiet = new ChitietModel();
     private KetquaModel? ketqua = new KetquaModel();
     private double sum = 0;
 
@@ -21,7 +25,6 @@
 
     private GiangvienModel? giangvien = new GiangvienModel();
     private string? mssv = "";
-    protected string? Code = "";
     private string loaihinh = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -30,8 +33,10 @@
         {
             await GetData();
 
-            mssv = Code;
-            await RenderDatas();
+            if (DotInfo == 2) {
+                mssv = Code;
+                await RenderDatas();
+            }
 
             StateHasChanged();
         }
@@ -46,7 +51,13 @@
         {
             User? user = JsonConvert.DeserializeObject<User>(json);
             Code = user.Code;
+            DotInfo = user.DotInfo;
             StateHasChanged();
+        }
+        else 
+        {
+            // Chưa có cookie đăng nhập
+            NavigationManager.NavigateTo("/loginsessionexpired");
         }
     }
 
@@ -71,7 +82,6 @@
 
         StateHasChanged();
     }
-
 
     private async Task<GiangvienModel> GetGvHuongDanSv(string mssv)
     {
@@ -105,7 +115,6 @@
         }
     }
 
-
     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
     {
         var response = await Http.GetAsync(api + $"Chitiet/getchitiet?mssv={mssv}");
@@ -121,7 +130,6 @@
             return null;
         }
     }
-
     
     private async Task<KetquaModel> GetKetQuaSinhVien(string mssv)
     {
@@ -144,21 +152,8 @@
         string url = api + $"Phancong/kiemtra/{mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
 
-
         string responseBody = await response.Content.ReadAsStringAsync();
-
-        // Kiểm tra giá trị phản hồi
-        if (responseBody == "true")
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-
-
-
+        return responseBody == "true" ? true : false;
     }
 
 
@@ -168,12 +163,11 @@
 <CheckUserComponent CheckRole="student">
 <ItemContent>
 
+@if (DotInfo == 2)
+{
     <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
         <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
             Giảng viên hướng dẫn
-            <span class="inline-flex justify-center items-center bg-yellow-100 text-orange-700 text-sm font-medium ml-5 px-4 py-1 rounded-full">
-                Đăng ký sớm
-            </span>
             <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
                 Chính thức
             </span>
@@ -194,30 +188,30 @@
 
     @if(!kiemtra)
     {
-            <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
-                <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
-                    Đề tài đã đăng ký
-                    <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
-                        Đã duyệt
-                    </span>
-                </h5>
-                <p class="mb-3 font-normal text-gray-700">
-                   @chitiet.tendetai
-                </p>
-            </div>
-    } else {
-            <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
-                    Tên công ty
-                </h5>
-                <p class="mb-3 font-normal text-gray-700">
-                    @chitiet.tencty
-                </p>
-            </div>
+        <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
+            <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                Đề tài đã đăng ký
+                <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
+                    Đã duyệt
+                </span>
+            </h5>
+            <p class="mb-3 font-normal text-gray-700">
+                @chitiet.tendetai
+            </p>
+        </div>
+    } 
+    else
+    {
+        <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                Tên công ty
+            </h5>
+            <p class="mb-3 font-normal text-gray-700">
+                @chitiet.tencty
+            </p>
+        </div>
     }
     
-    
-
     <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
             Kết quả thực tập
@@ -226,6 +220,28 @@
             @sum
         </p>
     </div>
+}
+
+@if (DotInfo == 1)
+{
+    <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
+        <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
+            Giảng viên hướng dẫn
+            <span class="inline-flex justify-center items-center bg-yellow-100 text-orange-700 text-sm font-medium ml-5 px-4 py-1 rounded-full">
+                Đăng ký sớm
+            </span>
+        </h5>
+        <p class="mb-3 font-normal text-gray-700">
+            Chưa có thông tin
+        </p>
+    </div>
+
+}
+
+@if (DotInfo == 0)
+{
+    <Error Type="PeriodNotOpen" />
+}
 
 </ItemContent>
 </CheckUserComponent>

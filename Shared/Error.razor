@@ -1,6 +1,10 @@
-﻿<div class="flex flex-col justify-center items-center px-6 mx-auto h-full xl:px-0">
+﻿@inject IJSRuntime JS
+@using UehInternFrontend
+@using Newtonsoft.Json
+
+<div class="flex flex-col justify-center items-center px-6 mx-auto h-full xl:px-0">
     <div class="block md:max-w-lg">
-        <img src="@img" width="500px" height="500px" alt="">
+        <img src="@img" width="440px" height="440px" alt="">
     </div>
     <div class="text-center xl:max-w-4xl mb-5">
         <h1 class="mb-3 text-2xl font-bold leading-tight text-gray-900 sm:text-4xl lg:text-5xl">
@@ -62,4 +66,39 @@
                 break;
         }
     }
+
+    protected string? Role = "load";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetData();
+
+            if (Role == "admin"){
+                btnlink = "/tongquan";
+            }
+            if (Role == "teacher"){
+                btnlink = "/sinhvien";
+            }    
+            if (Role == "student"){
+                btnlink = "/thongtin";
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetData()
+    {
+        string token = await JS.InvokeAsync<string>("userInfo");
+        string json = AES.DecryptData(token);
+
+        if (!string.IsNullOrEmpty(json))
+        {
+            User? user = JsonConvert.DeserializeObject<User>(json);
+            Role = user.Role;
+            StateHasChanged();
+        }
+    }
+
 }
