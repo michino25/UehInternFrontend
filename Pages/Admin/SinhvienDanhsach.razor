@@ -10,17 +10,21 @@
 @code{
 
     public string? api;
-    protected override void OnInitialized()
-    {
-        api = Configuration["apiBackend"];
-    }
+
     private DotModel dot = new DotModel();
     private int page = 1;
     private int itemsPerPage = 15;
-
+    private string madot ="DOT001";
+    private string makhoa = "CNTTKD";
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+    private List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+
+
+     protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,7 +34,7 @@
     private async Task RenderDatas()
     {
         dot = await KiemtraDot();
-        var result = await GetDssvByKhoa("CNTTKD");
+        var result = await GetDssvByKhoa(madot,makhoa);
         if (result != null )
         {
             sinhviens = result;
@@ -41,9 +45,9 @@
             await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
         }
     }
-    private async Task<List<SinhvienModel>> GetDssvByKhoa(string makhoa)
+    private async Task<List<SinhvienModel>> GetDssvByKhoa(string madot,string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Sinhvien/dssv?makhoa={makhoa}");
+        var response = await Http.GetAsync(api + $"Sinhvien/dssv?madot={madot}&makhoa={makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -212,7 +216,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @if (sinhviens != null)
+                        @if (sinhviens.Count > 0)
                         { 
                             @for (int i = (page - 1) * itemsPerPage; i < page * itemsPerPage && i < sinhviens.Count; i++)
                             {
