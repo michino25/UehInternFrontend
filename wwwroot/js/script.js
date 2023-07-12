@@ -95,7 +95,6 @@ function $(selector) {
 function executeScript() {
     navLinksActive();
     toggleSidebarMobile();
-    navLinksClick();
 }
 
 function resetCSSLogin() {
@@ -346,8 +345,6 @@ function showElement(selector) {
         element.removeClass("hidden");
     }
 }
-
-
 
 window.downloadFileFromStream = async (fileName, contentStreamReference) => {
     const arrayBuffer = await contentStreamReference.arrayBuffer();
