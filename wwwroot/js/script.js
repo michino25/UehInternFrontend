@@ -142,12 +142,14 @@ function navLinksActive() {
     }
 }
 
-function navLinksClick() {
+function sidebarClick() {
     const button = $('button[type="button"][aria-controls^="dropdown-"]');
     if (!button.isNull() && button.next().tagName() === "ul") {
         button.on("click-single", navLinkClickHandler);
     }
+}
 
+function navLinksClick() {
     toggleNavClick("apps-dropdown");
     toggleNavClick("notification-dropdown");
 }
