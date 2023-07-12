@@ -45,6 +45,8 @@
                 @* roleScreen = "Không xác định"; *@
 
             StateHasChanged();
+            await JS.InvokeVoidAsync("executeScript");
+
         }
     }
 
