@@ -74,6 +74,18 @@ namespace UehInternFrontend
             };
         }
 
+        public static explicit operator UserLogin(User user)
+        {
+            return new UserLogin
+            {
+                UserId = user.Code,
+                Name = user.Name,
+                Email = user.Email,
+                Sdt = user.Sdt,
+                Role = "teacher"
+            };
+        }
+
     }
 
     // ---------------------------------------------------------------

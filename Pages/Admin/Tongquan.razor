@@ -25,7 +25,10 @@
             madot = currentUser.MaDot;
             StateHasChanged();
 
-            await RenderDatas();
+            if (DotInfo > 0) {
+                await RenderDatas();
+            }
+
             StateHasChanged();
         }
     }

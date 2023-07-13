@@ -10,10 +10,14 @@
     private int checkDot;
     private DotModel dot = new DotModel();
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            StateHasChanged();
+
             await RenderDatas();
             StateHasChanged();
         }
@@ -21,7 +25,6 @@
 
     private async Task RenderDatas()
     {
-
         var result = await GetDot();
 
         if (result != null)
@@ -52,21 +55,16 @@
         }
     }
 
-    private async Task UpdateDotKetthuc(int value)
+    private async Task ChangeStateDot(int value)
     {
-        dot.ngayketthuc = DateTime.Today;
-        dot.status = "false";
-        var response = await Http.PutAsJsonAsync(api + $"Dot/{dot.madot}",dot);
+        @* 
+        -1: Create
+        0: Edit
+        1: Read
+         *@
 
-        if (response.IsSuccessStatusCode)
-        {
-            checkDot = value;
-            StateHasChanged();
-        }
-        else
-        {
-            Console.WriteLine("Đã xảy ra lỗi khi cập nhật!");
-        }
+        checkDot = value;
+        StateHasChanged();
     }
 
     private async Task UpdateDot(int value)
@@ -84,7 +82,24 @@
         }
     }
 
-    private async Task ChangeDot(int value)
+    private async Task UpdateDotKetthuc()
+    {
+        dot.ngayketthuc = DateTime.Today;
+        dot.status = "false";
+        var response = await Http.PutAsJsonAsync(api + $"Dot/{dot.madot}",dot);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Kết thúc đợt thành công.");
+            await Relogin();
+        }
+        else
+        {
+            Console.WriteLine("Đã xảy ra lỗi khi cập nhật!");
+        }
+    }
+
+    private async Task AddDot()
     {
         dot.ngaybatdau = DateTime.Today;
         dot.status = "true";
@@ -93,15 +108,60 @@
 
         if (response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("Tạo đợt thành công");
+            await JS.InvokeVoidAsync("alert", "Tạo đợt thành công.");
+            await Relogin();
         }
         else
         {
-            Console.WriteLine("Đã xảy ra lỗi khi gửi điểm!");
+            Console.WriteLine("Đã xảy ra lỗi!");
         }
-        checkDot = value;
+    }
+
+    private async Task Relogin()
+    {
+        UserLogin userLogin = (UserLogin) currentUser;
+        if (userLogin != null)
+        {
+            string token = System.Text.Json.JsonSerializer.Serialize(userLogin);
+            token = AES.EncryptData(token);
+            token = Uri.EscapeDataString(token);
+
+            var url = api + $"User/LoginUser?encryptedJson={token}";
+            var response = await Http.PostAsync(url, new StringContent(""));
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                User? getUser = JsonConvert.DeserializeObject<User>(content);
+
+                string tokenUser = System.Text.Json.JsonSerializer.Serialize(getUser);
+                tokenUser = AES.EncryptData(tokenUser);
+                await JS.InvokeVoidAsync("userLogin", tokenUser, 30);
+
+                NavigationManager.NavigateTo("/tongquan", forceLoad: true);
+            }
+            else
+            {
+                Console.WriteLine("Đã xảy ra lỗi!");
+            }
+        }
+    }
+
+    @* model *@
+    private bool endBtn = false;
+    private async void modelBtnClick()
+    {
+        endBtn = true;
         StateHasChanged();
     }
+
+    private async Task closeBtn()
+    {
+        endBtn = false;
+        StateHasChanged();
+    }
+
+
 }
 
 <PageTitle>Đợt</PageTitle>
@@ -131,7 +191,9 @@
                 </div>
 
                 <div class="col-span-6 sm:col-full">
-                    <button @onclick="() => ChangeDot(1)" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
+                    <button class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit"
+                        @onclick="() => AddDot()"
+                        >
                         Tạo đợt
                     </button>
                 </div>
@@ -148,7 +210,7 @@
                     <label for="magv" class="block mb-2 text-sm font-medium text-gray-900">
                         Mã đợt
                     </label>
-                    <input type="text" @bind="@dot.madot" name="magv" id="magv" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                    <input readonly type="text" @bind="@dot.madot" name="magv" id="magv" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
                 </div>
 
                 <div class="col-span-6 sm:col-span-3">
@@ -159,7 +221,7 @@
                 </div>
 
                 <div class="col-span-6 sm:col-full flex justify-between">
-                    <button @onclick="() => ChangeDot(1)"
+                    <button @onclick="() => ChangeStateDot(1)"
                         class="text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
                         Hủy
                     </button>
@@ -196,17 +258,73 @@
                 </div>
 
                 <div class="col-span-6 sm:col-full flex justify-between">
-                    <button @onclick="() => ChangeDot(0)"
+                    <button @onclick="() => ChangeStateDot(0)"
                         class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
                         Chỉnh sửa đợt
                     </button>
-                        <button @onclick="() => UpdateDotKetthuc(-1)"
-                        class="text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">
+                        <button class="text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit"
+                        @onclick="() => modelBtnClick()"
+                        >
                         Kết thúc đợt
                     </button>
                 </div>
             </div>
         </div>
+
+        @* <!-- Modal --> *@
+        <div class="flex items-center justify-center fixed w-screen h-screen z-30">
+            @if (endBtn)
+            {
+                <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
+            }
+
+            @* <!-- End Modal --> *@
+            @if (endBtn)
+            {
+                <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-fit"
+                    id="end-user-modal">
+                    <div class="relative w-full h-full max-w-md px-4 md:h-auto">
+                        @* <!-- Modal content --> *@
+                        <div class="relative bg-white rounded-lg shadow">
+                            @* <!-- Modal header --> *@
+                            <div class="flex justify-end p-2">
+                                <button type="button"
+                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                                    @onclick="() => closeBtn()">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            @* <!-- Modal body --> *@
+                            <div class="p-6 pt-0 text-center">
+                                <svg class="w-16 h-16 mx-auto text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <h3 class="mt-5 mb-6 text-lg text-gray-500">
+                                    Bạn có chắc muốn kết thúc đợt? Thao tác này sẽ không thể hoàn tác
+                                </h3>
+                                <button class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3"
+                                    @onclick="() => UpdateDotKetthuc()"
+                                    >
+                                    Xóa
+                                </button>
+                                <button
+                                    class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 border border-gray-300 font-medium inline-flex items-center rounded-lg text-base px-6 py-2.5 text-center"
+                                    @onclick="() => closeBtn()">
+                                    Hủy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
     }
 
 </ItemContent>
