@@ -1,14 +1,5 @@
 ﻿@page "/phancong/dangkysom"
 
-@using UehInternFrontend.Components
-@using Microsoft.AspNetCore.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
-
 @code {
     public string? api;
     protected override void OnInitialized()
@@ -16,15 +7,26 @@
         api = Configuration["apiBackend"];
     }
 
-    private string? makhoa = "CNTTKD";
-    private string? madot = "DOT001";
+    private string? makhoa = "";
+    private string? madot = "";
 
     List<GiangvienViewModel>? giangviens = new List<GiangvienViewModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-    protected override async Task OnInitializedAsync()
+
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            madot = currentUser.MaDot;
+            
+            StateHasChanged();
+
+            await RenderDatas();
+        }
     }
 
     private async Task RenderDatas()
@@ -41,6 +43,7 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
+
     private async Task<List<GiangvienViewModel>> GetGiangvienListFromDangky(string madot,string makhoa)
     {
         var response = await Http.GetAsync(api + $"Dangky/GetGiangvienListFromDangky?madot={madot}&makhoa={makhoa}");
@@ -60,7 +63,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
 
         using var content = new MultipartFormDataContent();
 
@@ -82,7 +84,8 @@
         response.EnsureSuccessStatusCode();
         
     }
-     private async Task DownloadExcelFile(string madot,string makhoa)
+
+    private async Task DownloadExcelFile(string madot,string makhoa)
     {
         var response = await Http.GetAsync(api + $"Dangky/generate?madot={madot}&makhoa={makhoa}");
         if (response.IsSuccessStatusCode)

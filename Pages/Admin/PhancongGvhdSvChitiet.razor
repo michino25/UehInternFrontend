@@ -1,11 +1,4 @@
 ﻿@page "/phancong/gvhdsv/{idGv}"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     [Parameter] public string? idGv { get; set; }
@@ -17,21 +10,25 @@
     }
 
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
-    private DotModel dot = new DotModel();
+    private string? madot = "";
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await RenderDatas();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            
             StateHasChanged();
+
+            await RenderDatas();
         }
     }
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await SinhVienByGiangVien(dot.madot,idGv);
+        var result = await SinhVienByGiangVien(madot, idGv);
         if (result != null )
         {
             sinhviens = result;
@@ -54,22 +51,6 @@
         else
         {
             Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
-            return null;
-        }
-    }
-
-    private async Task<DotModel> KiemtraDot()
-    {
-        var response = await Http.GetAsync(api + "Dot");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
             return null;
         }
     }

@@ -1,21 +1,25 @@
 ﻿@page "/bangdiem"
-@using UehInternFrontend.Components
-@using UehInternFrontend
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
 @using System.IO
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
-    private string makhoa ="CNTTKD";
-    private string madot = "DOT001";
+    private string makhoa ="";
+    private string madot = "";
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
+    }
+
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            makhoa = currentUser.MaKhoa;
+            StateHasChanged();
+        }
     }
 
     private async Task DownloadExcelFile(string madot,string makhoa)

@@ -1,12 +1,4 @@
 ﻿@page "/phancong/gvhdsv"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-@using Microsoft.AspNetCore.Components
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
@@ -15,15 +7,26 @@
         api = Configuration["apiBackend"];
     }
 
-    private string? makhoa = "CNTTKD";
-    private string? madot = "DOT001";
+    private string? makhoa = "";
+    private string? madot = "";
 
     List<GiangvienViewModel>? giangviens = new List<GiangvienViewModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-    protected override async Task OnInitializedAsync()
+
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            madot = currentUser.MaDot;
+            
+            StateHasChanged();
+
+            await RenderDatas();
+        }
     }
 
     private async Task RenderDatas()
@@ -40,6 +43,7 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
+
     private async Task<List<GiangvienViewModel>> GetGiangVienAndSinhVienHuongDan(string madot,string makhoa)
     {
         var response = await Http.GetAsync(api + $"Giangvien/sinhvientotal?madot={madot}&makhoa={makhoa}");

@@ -1,11 +1,4 @@
 ﻿@page "/sinhvien/danhsach"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code{
 
@@ -14,8 +7,8 @@
     private DotModel dot = new DotModel();
     private int page = 1;
     private int itemsPerPage = 15;
-    private string madot ="DOT001";
-    private string makhoa = "CNTTKD";
+    private string madot ="";
+    private string makhoa = "";
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
     private List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
@@ -26,15 +19,24 @@
         api = Configuration["apiBackend"];
     }
 
-    protected override async Task OnInitializedAsync()
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            madot = currentUser.MaDot;
+            
+            StateHasChanged();
+
+            await RenderDatas();
+        }
     }
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await GetDssvByKhoa(madot,makhoa);
+        var result = await GetDssvByKhoa(madot, makhoa);
         if (result != null )
         {
             sinhviens = result;
@@ -61,26 +63,9 @@
         }
     }
 
-    private async Task<DotModel> KiemtraDot()
-    {
-        var response = await Http.GetAsync(api + $"Dot");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
-            return null;
-        }
-    }
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        string makhoa = "CNTTKD";
-        string madot = "DOT001";
         using var content = new MultipartFormDataContent();
 
         foreach (var file in files)
@@ -129,7 +114,6 @@
     }
 
     private string keyword;
-
     private async Task SubmitSearch()
     {
         var response = await Http.GetAsync(api + $"Sinhvien/Search?keyword={keyword}");
@@ -143,8 +127,6 @@
         {
             Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
         }
-        
-
     }
 
 }

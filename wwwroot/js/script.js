@@ -93,7 +93,7 @@ function $(selector) {
 }
 
 function executeScript() {
-    navLinksActive();
+    sidebarActive();
     toggleSidebarMobile();
 }
 
@@ -128,11 +128,11 @@ function handleSidebarToggle() {
     }
 }
 
-function navLinksActive() {
-    const navLinksActive = $(".nav-link.active");
+function sidebarActive() {
+    const sidebarActive = $(".nav-link.active");
 
-    if (!navLinksActive.isNull()) {
-        var parentUI = navLinksActive.closest("ul");
+    if (!sidebarActive.isNull()) {
+        var parentUI = sidebarActive.closest("ul");
         if (
             parentUI.next().tagName() === "button" ||
             parentUI.prev().tagName() === "button"

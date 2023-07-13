@@ -1,0 +1,29 @@
+
+@code {
+    private string? strValue;
+    private int? intValue;
+
+
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+
+            strValue = currentUser.Code;
+            strValue = currentUser.Name;
+            strValue = currentUser.Email;
+            strValue = currentUser.Sdt;
+            strValue = currentUser.Role;
+            intValue = currentUser.DotInfo;
+            strValue = currentUser.MaLoai;
+            strValue = currentUser.MaDot;
+            strValue = currentUser.MaKhoa;
+
+            StateHasChanged();
+        }
+    }
+
+
+}

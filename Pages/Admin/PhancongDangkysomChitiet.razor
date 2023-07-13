@@ -1,33 +1,31 @@
 ﻿@page "/phancong/dangkysom/{idGv}"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     [Parameter] public string? idGv { get; set; }
-    private string makhoa = "CNTTKD";
-    private string madot = "DOT001";
+    private string makhoa = "";
+    private string madot = "";
 
     public string? api;
 
     private List<DangkyModel>? sinhviens = new List<DangkyModel>();
     private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
 
-
-
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            madot = currentUser.MaDot;
+            
+            StateHasChanged();
+
             await RenderDatas();
             StateHasChanged();
         }

@@ -1,17 +1,9 @@
 ﻿@page "/phancong/chamcheo"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-@using Microsoft.AspNetCore.Components
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
-    private string? makhoa = "CNTTKD";
-    private string? madot = "DOT001";
+    private string? makhoa = "";
+    private string? madot = "";
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
     private List<ChamcheoViewModel>? chamcheos = new List<ChamcheoViewModel>();
@@ -21,9 +13,19 @@
         api = Configuration["apiBackend"];
     }
 
-    protected override async Task OnInitializedAsync()
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            madot = currentUser.MaDot;
+            
+            StateHasChanged();
+
+            await RenderDatas();
+        }
     }
 
     private async Task RenderDatas()
@@ -58,8 +60,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
-        string madot = "DOT001";
         using var content = new MultipartFormDataContent();
 
         foreach (var file in files)

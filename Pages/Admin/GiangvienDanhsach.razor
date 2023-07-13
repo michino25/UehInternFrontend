@@ -1,36 +1,36 @@
 ﻿@page "/giangvien/danhsach"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-@using Microsoft.AspNetCore.Components
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
-    private string makhoa ="CNTTKD";
+    private string makhoa ="";
     private GiangvienRequest giangvien = new GiangvienRequest();
     private List<GiangvienRequest>? giangviens = new List<GiangvienRequest>();
     private List<string> selectedValues = new List<string>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
 
-
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
-    protected override async Task OnInitializedAsync()
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            
+            StateHasChanged();
+
+            await RenderDatas();
+        }
     }
 
     private async Task RenderDatas()
     {
-        giangviens = await GetGiangvienByKhoas("CNTTKD");
+        giangviens = await GetGiangvienByKhoas(makhoa);
         if (giangviens.Count > 0 )
         {
             StateHasChanged();
@@ -60,7 +60,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
 
         using var content = new MultipartFormDataContent();
 
@@ -170,7 +169,6 @@
         }
     }
 
-
     private async Task DeleteGiangVien(string magv)
     {
         var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?magv={magv}");
@@ -186,7 +184,6 @@
             await JS.InvokeVoidAsync("alert", "Xóa giảng viên thất bại");
         }
     }
-
 
     private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
 
@@ -220,7 +217,7 @@
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thất bại");
         }
-  }
+    }
 
     private void UpdateCheckboxState(string value, string isChecked)
     {
@@ -233,7 +230,6 @@
             selectedValues.Remove(value);
         }
     }
-
 
 
 }

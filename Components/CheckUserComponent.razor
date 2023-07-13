@@ -1,8 +1,4 @@
-@inject IJSRuntime JS
 @inject IHttpContextAccessor HttpContextAccessor
-@inject NavigationManager NavigationManager
-@using UehInternFrontend
-@using Newtonsoft.Json
 
 @if (Role == "load"){      }
 else if (Role != CheckRole){
@@ -15,6 +11,7 @@ else {
 
 @code {
     protected string? Role = "load";
+    private User? currentUser;
 
     [Parameter]
     public string? CheckRole { get; set; }
@@ -26,7 +23,9 @@ else {
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager, false);
+            Role = currentUser.Role;
+            StateHasChanged();
 
             if (Role == CheckRole) {
                 await JS.InvokeVoidAsync("userExtend", 30);
@@ -58,25 +57,6 @@ else {
                 (userAgent.Contains("Android", StringComparison.OrdinalIgnoreCase) && userAgent.Contains("Mobile", StringComparison.OrdinalIgnoreCase)) ||
                 userAgent.Contains("BlackBerry", StringComparison.OrdinalIgnoreCase) ||
                 userAgent.Contains("Windows Phone", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-        @* await JS.InvokeVoidAsync("console.log", json); *@
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Role = user.Role;
-            StateHasChanged();
-        }
-        else 
-        {
-            // Chưa có cookie đăng nhập
-            NavigationManager.NavigateTo("/loginsessionexpired");
-        }
     }
 
 }

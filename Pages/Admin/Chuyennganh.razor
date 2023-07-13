@@ -1,21 +1,15 @@
 ﻿@page "/chuyennganh"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-@using Microsoft.AspNetCore.Components
 
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 <PageTitle>Chuyên ngành</PageTitle>
 
 @code {
     public string? api;
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-    private string makhoa ="CNTTKD";
-    private ChuyennganhModel chuyennganh = new ChuyennganhModel();
 
+    private string makhoa ="";
+
+    private ChuyennganhModel chuyennganh = new ChuyennganhModel();
     private List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
 
     protected override void OnInitialized()
@@ -23,15 +17,23 @@
         api = Configuration["apiBackend"];
     }
 
-
-    protected override async Task OnInitializedAsync()
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await RenderDatas();
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            
+            StateHasChanged();
+
+            await RenderDatas();
+        }
     }
 
     private async Task RenderDatas()
     {
-        var result = await GetChuyennganhsByKhoa("CNTTKD");
+        var result = await GetChuyennganhsByKhoa(makhoa);
         if (result != null )
         {
             chuyennganhs = result;
@@ -61,7 +63,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(maxAllowedFiles);
-        var makhoa = "CNTTKD";
 
         using var content = new MultipartFormDataContent();
 
@@ -118,7 +119,6 @@
         }
     }
 
-
     private async Task DeleteChuyenNganh(string macn)
     {
         var response = await Http.DeleteAsync(api + $"Chuyennganh/DeleteChuyennganh?macn={macn}");
@@ -133,8 +133,7 @@
         {
             await JS.InvokeVoidAsync("alert", "Xóa chuyên ngành thất bại");
         }
-   }
-
+    }
 
     private async Task<ChuyennganhModel> GetThongTinChuyenNganh(string macn)
     {
@@ -151,6 +150,7 @@
             return null;
         }
     }
+
     private bool addBtn = false;
     private bool editBtn = false;
     private bool deleteBtn = false;
@@ -165,11 +165,11 @@
                 break;
             case 2:
                 editBtn = true;
-                 thongtinchitietcn  = await GetThongTinChuyenNganh(data); 
+                thongtinchitietcn  = await GetThongTinChuyenNganh(data); 
                 break;
             case 3:
                 deleteBtn = true;
-                 thongtinchitietcn  = await GetThongTinChuyenNganh(data); 
+                thongtinchitietcn  = await GetThongTinChuyenNganh(data); 
                 break;
         }
         StateHasChanged();
