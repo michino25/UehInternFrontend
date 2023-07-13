@@ -21,7 +21,6 @@
         {
             currentUser = await Service.GetUser(JS, NavigationManager);
             makhoa = currentUser.MaKhoa;
-            
             StateHasChanged();
 
             await RenderDatas();

@@ -19,7 +19,6 @@
         {
             currentUser = await Service.GetUser(JS, NavigationManager);
             madot = currentUser.MaDot;
-            
             StateHasChanged();
 
             await RenderDatas();

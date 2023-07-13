@@ -25,11 +25,9 @@
             currentUser = await Service.GetUser(JS, NavigationManager);
             madot = currentUser.MaDot;
             magv = currentUser.Code;
-            
             StateHasChanged();
 
             await RenderDatas();
-
             StateHasChanged();
         }
     }
