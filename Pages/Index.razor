@@ -1,42 +1,27 @@
 ﻿@page "/"
 @layout EmptyLayout
-@using Newtonsoft.Json
-@using UehInternFrontend
-
-@inject NavigationManager NavigationManager
-@inject HttpClient HttpClient
-@inject IJSRuntime JS
 
 @code {
     protected string? Role = "";
-
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
-        }
-    }
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Role = user.Role;
+            currentUser = await Service.GetUser(JS, NavigationManager, false, false);
+            Role = currentUser != null ? currentUser.Role : null;
             StateHasChanged();
         }
     }
 
     private async Task LoginStUeh(string returnUrl = "/trangchu")
     {
-        if (Role != null && Role != ""){
+        if (Role != null && Role != "")
+        {
             NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + Role);
         }
-        else {
+        else
+        {
             returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
             string encodedReturnUrl = Uri.EscapeDataString(returnUrl);
             string loginUrl = $"https://loginst.ueh.edu.vn/?returnUrl={encodedReturnUrl}";

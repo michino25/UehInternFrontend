@@ -6,8 +6,7 @@ namespace UehInternFrontend
 {
     public class Service
     {
-
-        public static async Task<User?> GetUser(IJSRuntime js, NavigationManager navigationManager, bool debug = false)
+        public static async Task<User?> GetUser(IJSRuntime js, NavigationManager navigationManager, bool debug = false, bool strict = true)
         {
             string token = await js.InvokeAsync<string>("userInfo");
             string json = AES.DecryptData(token);
@@ -20,13 +19,13 @@ namespace UehInternFrontend
                 User? user = JsonConvert.DeserializeObject<User>(json);
                 return user;
             }
-            else
+            else if (strict)
             {
                 // No login cookie
                 navigationManager.NavigateTo("/loginsessionexpired");
                 return null;
             }
+            return null;
         }
-
     }
 }

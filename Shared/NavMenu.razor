@@ -1,35 +1,21 @@
-﻿@inject IJSRuntime JS
-@inject NavigationManager NavigationManager
-@using Newtonsoft.Json
-@using UehInternFrontend
-
+﻿
 @code {
     protected string? Role = "";
     protected string? Name = "";
     protected string? Email = "";
 
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Name = user.Name;
-            Email = user.Email;
-            Role = user.Role;
-            StateHasChanged();
-        }
-    }
-
     private string? roleScreen = "";
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            Role = currentUser.Role;
+            Name = currentUser.Name;
+            Email = currentUser.Email;
+            StateHasChanged();
 
             if (Role == "admin"){
                 roleScreen = "Admin";
@@ -46,13 +32,11 @@
 
             StateHasChanged();
             await JS.InvokeVoidAsync("navLinksClick");
-
         }
     }
 
     private async Task UserLogout()
     {
-@using Newtonsoft.Json
         await JS.InvokeVoidAsync("userLogout");
         NavigationManager.NavigateTo("/");
     }

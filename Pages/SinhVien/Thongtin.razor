@@ -1,40 +1,36 @@
 ﻿@page "/thongtin"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
-@inject NavigationManager NavigationManager
 
 @code {
     public string? api;
-    protected int? DotInfo = -1;
-    protected string? Code = "";
-
-    private bool kiemtra = true;
-    private ChitietModel? chitiet = new ChitietModel();
-    private KetquaModel? ketqua = new KetquaModel();
-    private double sum = 0;
-
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
+    private ChitietModel? chitiet = new ChitietModel();
+    private KetquaModel? ketqua = new KetquaModel();
     private GiangvienModel? giangvien = new GiangvienModel();
-    private string? mssv = "";
-    private string loaihinh = "";
+    private double sum = 0;
 
+    private string? mssv = "";
+    private string? maloai = "";
+    private string? loaihinh = "";
+    protected int? DotInfo = -1;
+
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            mssv = currentUser.Code;
+            maloai = currentUser.MaLoai;
+            DotInfo = currentUser.DotInfo;
+            StateHasChanged();
+
+            loaihinh = maloai == "HKDN" ? "Học kỳ doanh nghiệp" : "Khoá luận tốt nghiệp";
 
             if (DotInfo == 2) {
-                mssv = Code;
                 await RenderDatas();
             }
 
@@ -42,43 +38,16 @@
         }
     }
 
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Code = user.Code;
-            DotInfo = user.DotInfo;
-            StateHasChanged();
-        }
-        else 
-        {
-            // Chưa có cookie đăng nhập
-            NavigationManager.NavigateTo("/loginsessionexpired");
-        }
-    }
-
     private async Task RenderDatas()
     {
-        kiemtra = await KiemTraLoai(mssv);
         chitiet = await GetChitietSinhVien(mssv);
-        loaihinh = await GetLoaiHinhThucTap(mssv);
         giangvien = await GetGvHuongDanSv(mssv);
 
         ketqua = await GetKetQuaSinhVien(mssv);
         sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
 
-        if (kiemtra)
-        {
-            sum = (double)(sum * 0.6 + (ketqua.diemDN ?? 0) * 0.4);
-        }
-        if (sum >= 10)
-        {
-            sum = 10;
-        }
+        sum = maloai == "HKDN" ? (double)(sum * 0.6 + (ketqua.diemDN ?? 0) * 0.4) : sum;
+        sum = sum > 10 ? 10 : sum;
 
         StateHasChanged();
     }
@@ -90,22 +59,6 @@
         {
             var content = await response.Content.ReadAsStringAsync();
             var uploadModel = JsonConvert.DeserializeObject<GiangvienModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất thông tin : {response.StatusCode}");
-            return null;
-        }
-    }
-
-    private async Task<string> GetLoaiHinhThucTap(string mssv)
-    {
-        var response = await Http.GetAsync(api + $"Sinhvien/GetLoaiHinhThucTap?mssv={mssv}");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            string uploadModel = content;
             return uploadModel;
         }
         else
@@ -147,16 +100,6 @@
         }
     }
 
-    private async Task<bool> KiemTraLoai(string mssv)
-    {
-        string url = api + $"Phancong/kiemtra/{mssv}";
-        HttpResponseMessage response = await Http.GetAsync(url);
-
-        string responseBody = await response.Content.ReadAsStringAsync();
-        return responseBody == "true" ? true : false;
-    }
-
-
 }
 <PageTitle>Thông Tin</PageTitle>
 
@@ -186,7 +129,7 @@
         </p>
     </div>
 
-    @if(!kiemtra)
+    @if(maloai != "HKDN")
     {
         <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
             <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">

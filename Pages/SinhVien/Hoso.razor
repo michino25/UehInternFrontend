@@ -1,12 +1,4 @@
 ﻿@page "/hoso"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
-@inject NavigationManager NavigationManager
 
 @code {
     public string? api;
@@ -19,36 +11,18 @@
     private KhoaModel? khoa = new KhoaModel();
     private UserModel? user = new UserModel();
     private string? mssv = "";
-    protected string? Code = "";
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            mssv = currentUser.Code;
+            StateHasChanged();
 
-            mssv = Code;
             await RenderDatas();
-
             StateHasChanged();
-        }
-    }
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Code = user.Code;
-            StateHasChanged();
-        }
-        else 
-        {
-            // Chưa có cookie đăng nhập
-            NavigationManager.NavigateTo("/loginsessionexpired");
         }
     }
 

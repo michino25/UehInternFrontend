@@ -1,7 +1,4 @@
-﻿@inject IJSRuntime JS
-@using UehInternFrontend
-@using Newtonsoft.Json
-
+﻿
 <div class="flex flex-col justify-center items-center px-6 mx-auto h-full xl:px-0">
     <div class="block md:max-w-lg">
         <img src="@img" width="440px" height="440px" alt="">
@@ -69,11 +66,14 @@
 
     protected string? Role = "load";
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager, false, false);
+            Role = currentUser != null ? currentUser.Role : null;
+            StateHasChanged();
 
             if (Role == "admin"){
                 btnlink = "/tongquan";
@@ -87,18 +87,4 @@
             StateHasChanged();
         }
     }
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Role = user.Role;
-            StateHasChanged();
-        }
-    }
-
 }

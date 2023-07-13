@@ -1,10 +1,5 @@
 @page "/uehlogin"
 @layout EmptyLayout
-@inject IJSRuntime JSRuntime
-@inject NavigationManager NavigationManager
-@inject IConfiguration Configuration
-@inject HttpClient HttpClient
-@using System.Text.Json
 
 @code {
     public string? api;
@@ -17,7 +12,7 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("executeLoginScript");
+            await JS.InvokeVoidAsync("executeLoginScript");
         }
     }
 
@@ -25,14 +20,6 @@
 
     private async Task HandleValidSubmit()
     {
-        @* var response = await HttpClient.PostAsJsonAsync( api + "User/login", loginRequest);
-
-        if (response.IsSuccessStatusCode)
-        {
-            // Implement additional login logic here, such as storing the authentication token
-            User? user = await response.Content.ReadFromJsonAsync<User>();
-        } *@
-
         if (loginRequest.Username == "thinhdt")
         {
             NavigationManager.NavigateTo("/LoginCallback/?t=gv");
@@ -44,7 +31,7 @@
         }
         else
         {
-            await JSRuntime.InvokeVoidAsync("showElement", "div.validation-summary-errors");
+            await JS.InvokeVoidAsync("showElement", "div.validation-summary-errors");
         }
     }
     

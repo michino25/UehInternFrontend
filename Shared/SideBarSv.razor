@@ -1,34 +1,15 @@
-﻿@inject IJSRuntime JS
-@inject NavigationManager NavigationManager
-@using UehInternFrontend
-@using Newtonsoft.Json
-
+﻿
 @code {
     protected int? DotInfo = -1;
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
-        }
-    }
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            DotInfo = user.DotInfo;
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            DotInfo = currentUser.DotInfo;
             StateHasChanged();
-        }
-        else 
-        {
-            // Chưa có cookie đăng nhập
-            NavigationManager.NavigateTo("/loginsessionexpired");
         }
     }
 }

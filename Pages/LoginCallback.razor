@@ -1,14 +1,7 @@
 ﻿@page "/LoginCallback/"
 @layout EmptyLayout
-@inject NavigationManager NavigationManager
-@inject IConfiguration Configuration
-@inject IJSRuntime JSRuntime
-@inject HttpClient Http
 
 @using Microsoft.AspNetCore.WebUtilities
-@using UehInternFrontend
-@using Newtonsoft.Json
-@using System.Text.Json
 @using global::Login.ST.UEH
 
 @code {
@@ -92,7 +85,7 @@
             string token = System.Text.Json.JsonSerializer.Serialize(user);
             token = AES.EncryptData(token);
 
-            @* await JSRuntime.InvokeVoidAsync("console.log", token); *@
+            @* await JS.InvokeVoidAsync("console.log", token); *@
 
             token = Uri.EscapeDataString(token);
 
@@ -106,7 +99,7 @@
 
                 string tokenUser = System.Text.Json.JsonSerializer.Serialize(getUser);
                 tokenUser = AES.EncryptData(tokenUser);
-                await JSRuntime.InvokeVoidAsync("userLogin", tokenUser, 30);
+                await JS.InvokeVoidAsync("userLogin", tokenUser, 30);
             }
             else
             {
@@ -117,8 +110,8 @@
 
     private async Task NavigateTo(string RedirectTo)
     {
-        await JSRuntime.InvokeVoidAsync("resetCSSLogin");
-        await JSRuntime.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
+        await JS.InvokeVoidAsync("resetCSSLogin");
+        await JS.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
 
         NavigationManager.NavigateTo(RedirectTo);
     }
