@@ -1,12 +1,5 @@
 ﻿@page "/lichsugap/them/{idSv}"
-@using UehInternFrontend.Components
-@using Newtonsoft.Json
 @using System.Globalization
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
-@inject  NavigationManager NavigationManager
 
 @code {
     [Parameter] public string idSv { get; set; }

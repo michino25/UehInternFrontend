@@ -1,12 +1,4 @@
 ﻿@page "/lichsugap/them"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
-@inject NavigationManager NavigationManager
 
 @code {
     public string? api;
@@ -15,11 +7,9 @@
         api = Configuration["apiBackend"];
     }
     
-    protected string? Code = "";
-
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
-    private DotModel dot = new DotModel();
+    private string? madot = "";
 
     private string selectedStudent;
 
@@ -28,41 +18,28 @@
         NavigationManager.NavigateTo($"/lichsugap/them/{selectedStudent}");
     }
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            magv = currentUser.Code;
+            
+            StateHasChanged();
 
-            magv = Code;
             await RenderDatas();
-
-            StateHasChanged();
-        }
-    }
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Code = user.Code;
-            StateHasChanged();
         }
     }
 
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await SinhVienByGiangVien(dot.madot,magv);
+        var result = await SinhVienByGiangVien(madot, magv);
         if (result != null )
         {
             sinhviens = result;
             StateHasChanged();
-
         }
         else
         {
@@ -86,23 +63,6 @@
         }
     }
 
-    private async Task<DotModel> KiemtraDot()
-    {
-        var response = await Http.GetAsync(api + "Dot");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
-            return null;
-        }
-    }
-
-    
 }
 
 <PageTitle>Thêm lịch sử gặp</PageTitle>

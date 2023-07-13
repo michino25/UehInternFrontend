@@ -1,56 +1,37 @@
 ﻿@page "/baocao"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-@using UehInternFrontend
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
-    protected string? Code = "";
     private List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private DotModel dot = new DotModel();
     private string? magv = "";
-    private string? madot = "DOT001";
+    private string? madot = "";
 
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            magv = currentUser.Code;
+            
+            StateHasChanged();
 
-            magv = Code;
             await RenderDatas();
 
             StateHasChanged();
         }
     }
 
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Code = user.Code;
-            StateHasChanged();
-        }
-    }
-
     private async Task RenderDatas()
     {
-        dot = await KiemtraDot();
-        var result = await SinhVienByGiangVien(dot.madot,magv);
+        var result = await SinhVienByGiangVien(madot, magv);
         if (result != null )
         {
             sinhviens = result;
@@ -78,21 +59,6 @@
         }
     }
 
-    private async Task<DotModel> KiemtraDot()
-    {
-        var response = await Http.GetAsync(api + "Dot");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<DotModel>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất dot: {response.StatusCode}");
-            return null;
-        }
-    }
     private async Task DownloadZipFile(string madot,string magv)
     {
         try
@@ -115,13 +81,11 @@
             else
             {
                 await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
-
             }
         }
         catch (Exception ex)
         {
             await JS.InvokeVoidAsync("alert", "Đã xảy ra xự cố");
-
         }
     }
 

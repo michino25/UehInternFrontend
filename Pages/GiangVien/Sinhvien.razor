@@ -1,13 +1,4 @@
 ﻿@page "/sinhvien"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-@using UehInternFrontend
-
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
@@ -16,49 +7,28 @@
         api = Configuration["apiBackend"];
     }
 
-    protected string? Code = "";
-    protected int? DotInfo = -1;
-    protected string? MaDot = "";
-
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            DotInfo = user.DotInfo;
-            Code = user.Code;
-            MaDot = user.MaDot;
-            StateHasChanged();
-        }
-        else 
-        {
-            // Chưa có cookie đăng nhập
-            NavigationManager.NavigateTo("/loginsessionexpired");
-        }
-    }
-
     List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
     private string? magv = "";
     private string? madot = "";
+    protected int? DotInfo = -1;
 
-    private DotModel dot = new DotModel();
-
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            magv = currentUser.Code;
+            DotInfo = currentUser.DotInfo;
+
+            StateHasChanged();
 
             if (DotInfo == 1) {
                 NavigationManager.NavigateTo("/dangkysom");
             }
 
             if (DotInfo == 2) {
-                magv = Code;
-                madot = MaDot;
                 await RenderDatas();
             }
 
@@ -79,6 +49,7 @@
             await JS.InvokeVoidAsync("alert", "Không tìm thấy sinh viên.");
         }
     }
+
     private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
     {
         var response = await Http.GetAsync(api + $"Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");

@@ -1,11 +1,4 @@
 ﻿@page "/diem"
-@using UehInternFrontend.Components
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
 
 @code {
     public string? api;
@@ -14,47 +7,35 @@
         api = Configuration["apiBackend"];
     }
 
-    protected string? Code = "";
     List<KetquaViewModed>? sinhviens = new List<KetquaViewModed>();
-    @* private DotModel dot = new DotModel(); *@
 
     private string? magv = "";
-    private string? madot = "DOT001";
+    private string? madot = "";
+
     private string? hkdn = "HKDN";
     private string? kltn = "KLTN";
 
     private double sum = 0;
 
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            magv = currentUser.Code;
+            
+            StateHasChanged();
 
-            magv = Code;
             await RenderDatas();
 
             StateHasChanged();
         }
     }
 
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Code = user.Code;
-            StateHasChanged();
-        }
-    }
-
     private async Task RenderDatas()
     {
-        @* dot = await KiemtraDot(); *@
-
         var result = await DanhSachDiem(madot,magv);
         
         if (result != null )
@@ -67,6 +48,7 @@
             await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
         }
     }
+
     private async Task<List<KetquaViewModed>> DanhSachDiem(string madot,string magv)
     {
         var response = await Http.GetAsync(api + $"Giangvien/GetDanhSachDiem?madot={madot}&magv={magv}");
@@ -82,7 +64,6 @@
             return null;
         }
     }
-
 
     private async Task DownloadPdf(string madot,string maloai,string magv)
     {

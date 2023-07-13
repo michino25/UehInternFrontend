@@ -1,11 +1,4 @@
 ﻿@page "/dangkysom"
-@using System.Net.Http.Headers
-@using Newtonsoft.Json
-
-@inject IJSRuntime JS
-@inject HttpClient Http
-@inject IConfiguration Configuration
-
 
 @code {
     public string? api;
@@ -14,45 +7,36 @@
         api = Configuration["apiBackend"];
     }
 
-    protected string? Code = "";
-
     private List<DangkyModel>? sinhviens = new List<DangkyModel>();
+    private DangkyModel dangky = new DangkyModel();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-    private string? magv = "";
-    private string? makhoa = "CNTTKD";
-    private string? madot = "DOT001";
-    private DangkyModel dangky = new DangkyModel();
 
+    private string? magv = "";
+    private string? makhoa = "";
+    private string? madot = "";
+
+    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await GetData();
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+            makhoa = currentUser.MaKhoa;
+            magv = currentUser.Code;
+            
+            StateHasChanged();
 
-            magv = Code;
             await RenderDatas();
 
             StateHasChanged();
         }
     }
 
-    private async Task GetData()
-    {
-        string token = await JS.InvokeAsync<string>("userInfo");
-        string json = AES.DecryptData(token);
-
-        if (!string.IsNullOrEmpty(json))
-        {
-            User? user = JsonConvert.DeserializeObject<User>(json);
-            Code = user.Code;
-            StateHasChanged();
-        }
-    }
-
     private async Task RenderDatas()
     {
-        var result = await GetSinhVienByGiaoVien(madot,makhoa,magv);
+        var result = await GetSinhVienByGiaoVien(madot, makhoa, magv);
         if (result != null )
         {
             sinhviens = result;
@@ -105,9 +89,7 @@
 
         }
         response.EnsureSuccessStatusCode();
-
     }
-
 
     private async Task SubmitDangky()
     {
@@ -131,9 +113,6 @@
         }
     }
 
-   
-
-
     private async Task DeleteDangKy(string mssv)
     {
         var response = await Http.DeleteAsync(api + $"Dangky/DeleteDangky?mssv={mssv}");
@@ -149,7 +128,6 @@
             await JS.InvokeVoidAsync("alert", "Xóa đăng ký thất bại");
         }
     }
-
 
     private async Task<DangkyModel> GetThongTinDangKy(string mssv)
     {
@@ -197,7 +175,6 @@
         deleteAllBtn = false;
         StateHasChanged();
     }
-
 
 }
 
