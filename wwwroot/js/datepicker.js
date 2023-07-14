@@ -58,6 +58,17 @@ function datePicker() {
         // EVENT LISTENERS
         days_element.addEventListener("click", toggleDatePicker);
         selected_date_element.addEventListener("click", toggleDatePicker);
+
+        // Hide popup if we ain`t clicking on
+        document.addEventListener("click", (event) => {
+            if (
+                !event.target.closest(".date-picker .dates .days") &&
+                !event.target.closest(".date-picker .selected-date")
+            ) {
+                dates_element.classList.add("hidden");
+            }
+        });
+
         next_mth_element.addEventListener("click", goToNextMonth);
         prev_mth_element.addEventListener("click", goToPrevMonth);
 
