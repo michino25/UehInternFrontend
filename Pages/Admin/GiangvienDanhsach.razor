@@ -402,12 +402,11 @@
         <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
     }
 
-    <!-- Edit User Modal -->
-    @if (editBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full"
-            id="edit-user-modal">
-            <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
+    <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-fit h-max-full scrollbar-hide">
+        <!-- Edit User Modal -->
+        @if (editBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
                     @* <!-- Modal header --> *@
@@ -441,22 +440,18 @@
                                     <input type="text" @bind =@thongtinchitietgv.tengv name="last-name" id="last-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
-                                 @if (thongtinchitietgv.email != null)
-                                {
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label for="email"
-                                            class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                        <input type="email" @bind =@thongtinchitietgv.email name="email" id="email"
-                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                    </div>
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label for="position"
-                                            class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
-                                        <input type="text" @bind =@thongtinchitietgv.sdt name="position" id="position"
-                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                    </div>
-                                }
-                               
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="email"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                    <input type="email" @bind =@thongtinchitietgv.email name="email" id="email"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="position"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
+                                    <input type="text" @bind =@thongtinchitietgv.sdt name="position" id="position"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -469,14 +464,11 @@
 
                 </div>
             </div>
-        </div>
-    }
+        }
 
-    <!-- Chuyenmon User Modal -->
-    @if (cmBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full scrollbar-hide"
-            id="edit-user-modal">
+        <!-- Chuyenmon User Modal -->
+        @if (cmBtn)
+        {
             <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
@@ -518,7 +510,7 @@
                                         {
                                             foreach (var chuyenganh in chuyennganhs)
                                             {
-                                               bool isChecked = selectedValues.Contains(chuyenganh.macn);
+                                                bool isChecked = selectedValues.Contains(chuyenganh.macn);
                                                 <li>
                                                             <input type="checkbox" id="@chuyenganh.macn.ToLower()-option" value="@chuyenganh.macn" class="hidden peer" checked="@isChecked" @onchange="e => UpdateCheckboxState(chuyenganh.macn, e.Value.ToString())" />
                                                             
@@ -531,9 +523,6 @@
                                                 </li>
                                             }
                                         }
-                                        
-
-
                                     </ul>
                                 </div>
                             </div>
@@ -547,14 +536,12 @@
 
                 </div>
             </div>
-        </div>
-    }
+        }
 
-    <!-- Add User Modal -->
-    @if (addBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full">
-            <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
+        <!-- Add User Modal -->
+        @if (addBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
                     @* <!-- Modal header --> *@
@@ -613,14 +600,11 @@
 
                 </div>
             </div>
-        </div>
-    }
+        }
 
-    <!-- Delete User Modal -->
-    @if (deleteBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full"
-            id="delete-user-modal">
+        <!-- Delete User Modal -->
+        @if (deleteBtn)
+        {
             <div class="relative w-full h-full max-w-md px-4 md:h-auto">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
@@ -656,8 +640,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 
 </div>
 

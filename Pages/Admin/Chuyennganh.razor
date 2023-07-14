@@ -321,12 +321,12 @@
         <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
     }
 
-    <!-- Edit User Modal -->
-    @if (editBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full"
-            id="edit-user-modal">
-            <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
+    <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-fit h-max-full scrollbar-hide">
+
+        <!-- Edit Modal -->
+        @if (editBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
                     @* <!-- Modal header --> *@
@@ -375,14 +375,12 @@
 
                 </div>
             </div>
-        </div>
-    }
+        }
 
-    <!-- Add User Modal -->
-    @if (addBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full">
-            <div class="relative w-full h-full max-w-2xl px-4 md:h-auto">
+        <!-- Add Modal -->
+        @if (addBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
                     @* <!-- Modal header --> *@
@@ -430,14 +428,11 @@
 
                 </div>
             </div>
-        </div>
-    }
+        }
 
-    <!-- Delete User Modal -->
-    @if (deleteBtn)
-    {
-        <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-full"
-            id="delete-user-modal">
+        <!-- Delete Modal -->
+        @if (deleteBtn)
+        {
             <div class="relative w-full h-full max-w-md px-4 md:h-auto">
                 @* <!-- Modal content --> *@
                 <div class="relative bg-white rounded-lg shadow">
@@ -474,8 +469,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+
+    </div>
 
 </div>
 
