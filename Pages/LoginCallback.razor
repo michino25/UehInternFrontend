@@ -110,9 +110,6 @@
 
     private async Task NavigateTo(string RedirectTo)
     {
-        await JS.InvokeVoidAsync("resetCSSLogin");
-        await JS.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
-
         NavigationManager.NavigateTo(RedirectTo);
     }
 }

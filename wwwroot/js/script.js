@@ -105,9 +105,6 @@ function resetCSSLogin() {
 
 function executeLoginScript() {
     login();
-    removeAllStylesheets();
-    loadCss("/css/utilLogin.css");
-    loadCss("/css/login.css");
 }
 
 function toggleSidebarMobile() {
