@@ -20,7 +20,7 @@
             currentUser = await Service.GetUser(JS, NavigationManager);
             madot = currentUser.MaDot;
             magv = currentUser.Code;
-            
+
             StateHasChanged();
 
             await RenderDatas();
@@ -61,38 +61,33 @@
 
     private async Task DownloadZipFile(string madot,string magv)
     {
-        try
+
+        var response = await Http.GetAsync(api + $"Ketqua/generatezip?madot={madot}&giangVienId={magv}");
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Http.GetAsync(api + $"Ketqua/generatezip?madot={madot}&giangVienId={magv}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsByteArrayAsync();
-                
-                // Lấy các giá trị từ tiêu đề HTTP
-                var contentDisposition = response.Content.Headers.ContentDisposition;
-                var fileName = contentDisposition.FileName ?? "Dsbaocaobangdiemchitiet_{magv}.zip";
-                var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/zip";
-                
-                // Tải file zip về máy
+            var content = await response.Content.ReadAsByteArrayAsync();
+
+            // Lấy các giá trị từ tiêu đề HTTP
+            var contentDisposition = response.Content.Headers.ContentDisposition;
+            var fileName = contentDisposition.FileName ?? "Dsbaocaobangdiemchitiet_{magv}.zip";
+            var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/zip";
+
+            // Tải file zip về máy
                 await JS.InvokeVoidAsync("window.downloadFileFromByteArray", fileName, content);
                 await JS.InvokeVoidAsync("alert", "Tải thành công");
 
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
-            }
         }
-        catch (Exception ex)
+        else
         {
-            await JS.InvokeVoidAsync("alert", "Đã xảy ra xự cố");
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
         }
+
+            
     }
 
     private async Task DownloadPdf(string mssv)
     {
-        try
-        {
+
             var response = await Http.GetAsync(api + $"Ketqua/generatepdfbysv?mssv={mssv}");
             if (response.IsSuccessStatusCode)
             {
@@ -112,11 +107,6 @@
                 await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
 
             }
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("alert", "Đã xảy ra xự cố");
-        }
     }
 
 

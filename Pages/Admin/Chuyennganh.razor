@@ -77,7 +77,7 @@
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "File không được cập nhất");
         }
         response.EnsureSuccessStatusCode();
         await JS.InvokeVoidAsync("alert", "Import file thành công");
