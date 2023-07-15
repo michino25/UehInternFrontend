@@ -3,13 +3,10 @@
 @code {
 
     public string? api;
-    protected override void OnInitialized()
-    {
-        api = Configuration["apiBackend"];
-    }
+   
 
     [Parameter] public string idSv { get; set; }
-
+    private ChitietModel? chitiet = new ChitietModel();
     private UserModel user = new UserModel();
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KetquaModel? ketqua = new KetquaModel();
@@ -17,6 +14,12 @@
     private List<LichsuModel> lichsus = new List<LichsuModel>();
     private bool isHKDN;
     private double sum = 0;
+
+
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -31,6 +34,7 @@
         user = await GetInfoUser(idSv);
         files  = await GetFiles(idSv);
         lichsus = await GetLichSuByMssv(idSv);
+        chitiet = await GetChitietSinhVien(idSv);
 
         ketqua = await GetDiemSinhVien(idSv);
         sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
@@ -157,6 +161,22 @@
         }
     }
 
+     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Chitiet/getchitiet?mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<ChitietModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
 }
 
 <PageTitle>Chi tiết sinh viên</PageTitle>
@@ -253,6 +273,87 @@
     
     </div>
 </div>
+
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+        <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2  sm:p-6">
+        @if (isHKDN) {
+            <h3 class="mb-4 text-xl font-semibold">Đăng ký thực tập doanh nghiệp</h3>
+        } else {
+            <h3 class="mb-4 text-xl font-semibold">Đăng ký khóa luận tốt nghiệp</h3>
+        }
+
+            <div class="grid grid-cols-6 gap-6">
+
+            @if (isHKDN) {
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="name-cty" class="block mb-2 text-sm font-medium text-gray-900">
+                        Tên công ty
+                    </label>
+                    <input type="text" @bind="@chitiet.tencty" name="name-cty" id="name-cty" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="position" class="block mb-2 text-sm font-medium text-gray-900">
+                        Vị trí thực tập
+                    </label>
+                    <input type="text" @bind="@chitiet.vitri" name="position" id="position" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="website" class="block mb-2 text-sm font-medium text-gray-900">
+                        Website công ty
+                    </label>
+                    <input type="text" @bind="@chitiet.website" name="website" id="website" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="name-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                        Tên người hướng dẫn
+                    </label>
+                    <input type="text" @bind="@chitiet.huongdan" name="name-hd" id="name-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="position-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                        Chức vụ người hướng dẫn
+                    </label>
+                    <input type="text" @bind="@chitiet.chucvu" name="position-hd" id="position-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="email-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                        Email người hướng dẫn
+                    </label>
+                    <input type="email" @bind="@chitiet.emailhd"  name="email-hd" id="email-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="phone-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                        Số điện thoại người hướng dẫn
+                    </label>
+                        <input type="text" @bind="@chitiet.sdthd" name="phone-hd" id="phone-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+            } else {
+
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="detai" class="block mb-2 text-sm font-medium text-gray-900">
+                        Đề tài
+                    </label>
+                    <input type="text" @bind="@chitiet.tendetai" name="detai" id="detai" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
+                </div>
+
+            }
+
+               
+            </div>
+    </div>
+
+</div>
+           
+
+
 
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
     <div
