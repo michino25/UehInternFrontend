@@ -133,6 +133,17 @@ namespace UehInternFrontend
         public string? macn { get; set; }
 
     }
+
+
+    public class SinhVienInfo
+    {
+        public string? mssv { get; set; }
+        public string? ho { get; set; }
+        public string? ten { get; set; }
+        public string? thuoclop { get; set; }
+        public string? khoagoc { get; set; }
+        public string? email { get; set; }
+    }
     public class KhoaModel
     {
         public string? makhoa { get; set; }
@@ -220,6 +231,7 @@ namespace UehInternFrontend
         public string MaSinhVien { get; set; }
         public string Lop { get; set; }
         public string Khoa { get; set; }
+        public string? Email { get; set; }
         public double Diem { get; set; }
     }
 

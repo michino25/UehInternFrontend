@@ -10,6 +10,7 @@
 
     [Parameter] public string idSv { get; set; }
 
+    private UserModel user = new UserModel();
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KetquaModel? ketqua = new KetquaModel();
     private List<UploadModel> files = new List<UploadModel>();
@@ -27,6 +28,7 @@
 
     private async Task RenderDatas()
     {
+        user = await GetInfoUser(idSv);
         files  = await GetFiles(idSv);
         lichsus = await GetLichSuByMssv(idSv);
 
@@ -48,6 +50,23 @@
             await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
         }
     }
+
+    private async Task<UserModel> GetInfoUser(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"User/GetInfoUser?id={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<UserModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
 
     private async Task<SinhvienModel> GetSinhVien(string mssv)
     {
@@ -195,22 +214,43 @@
                 @sinhvien.tenhp
             </p>
         </div>
-        <div class="col-span-6 sm:col-span-3">
-            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                Email
-            </label>
-            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                email@ueh.edu.vn
-            </p>
-        </div>
-        <div class="col-span-6 sm:col-span-3">
-            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                Số điện thoại
-            </label>
-            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                0908372498
-            </p>
-        </div>
+        @if(user != null) {
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                        Email
+                    </label>
+                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                        @user.email
+                    </p>
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                        Số điện thoại
+                    </label>
+                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                        @user.sdt
+                    </p>
+                </div>
+        } else {
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                        Email
+                    </label>
+                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                        Email chưa cập nhật
+                    </p>
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                        Số điện thoại
+                    </label>
+                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                        SĐT chưa cập nhật
+
+                    </p>
+                </div>
+        }
+    
     </div>
 </div>
 

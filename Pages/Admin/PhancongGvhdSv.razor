@@ -73,7 +73,7 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-        var apiUrl = api + $"Phancong/formFile?madot={Uri.EscapeDataString(madot)}";
+        var apiUrl = api + $"Phancong/formFile?madot={madot}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {

@@ -40,6 +40,21 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
+
+
+    private async Task DeleteChamCheos(string madot,string makhoa)
+    {
+        var response = await Http.DeleteAsync(api + $"Chamcheo/DeleteChamcheos?madot={madot}&makhoa={makhoa}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await RenderDatas();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Đã xảy ra lỗi khi xoá");
+        }
+    }
     private async Task<List<ChamcheoViewModel>> GetChamcheoByGiangVien(string madot,string makhoa)
     {
         var response = await Http.GetAsync(api + $"Chamcheo/chamcheo?madot={madot}&makhoa={makhoa}");
@@ -73,12 +88,13 @@
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy file.");
         }
         response.EnsureSuccessStatusCode();
         await JS.InvokeVoidAsync("alert", "Import file thành công");
+        await RenderDatas();
         response.EnsureSuccessStatusCode();
-
+        
     }
 
     private async Task DownloadExcelFile(string madot, string makhoa)
@@ -117,8 +133,15 @@
             </div>
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                        <button @onclick="() => DeleteChamCheos(madot,makhoa) "
+                                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            Xoá toàn bộ
+                        </button>
                 <button  @onclick = "() => DownloadExcelFile(madot,makhoa) "
-                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
+                                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -165,6 +188,7 @@
                                     class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
                                     Giảng viên
                                 </th>
+                                
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -197,6 +221,8 @@
                                                     @chamcheo.email2</div>
                                             </div>
                                         </td>
+                                      
+                                                
                                     </tr>
 
                                 }   

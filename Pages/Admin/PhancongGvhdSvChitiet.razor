@@ -9,7 +9,7 @@
         api = Configuration["apiBackend"];
     }
 
-    List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+    List<SinhVienInfo>? sinhviens = new List<SinhVienInfo>();
     private string? madot = "";
 
     private User? currentUser;
@@ -38,13 +38,13 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-    private async Task<List<SinhvienModel>> SinhVienByGiangVien(string madot,string magv)
+    private async Task<List<SinhVienInfo>> SinhVienByGiangVien(string madot,string magv)
     {
         var response = await Http.GetAsync(api + $"Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhVienInfo>>(content);
             return uploadModel;
         }
         else
@@ -107,8 +107,17 @@
                                     <div class="text-sm font-normal text-gray-500">
                                         <div class="text-base font-semibold text-gray-900">@sinhvien.ho @sinhvien.ten
                                         </div>
-                                        <div class="text-sm font-normal text-gray-500">
-                                            anh@st.ueh.edu.vn</div>
+                                                        @if (sinhvien.email == null)
+                                                        {
+                                                            <div class="text-sm font-normal text-gray-500">
+                                                                Email chưa được cập nhật
+                                                            </div>
+                                                        } else {
+                                                            <div class="text-sm font-normal text-gray-500">
+                                                                @sinhvien.email
+                                                            </div>
+                                                        }
+                                                        
                                     </div>
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
