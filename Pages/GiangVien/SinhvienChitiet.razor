@@ -1,4 +1,10 @@
 ﻿@page "/sinhvien/{idSv}"
+@using System 
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@using System.Net;
+@inject IWebHostEnvironment env
 
 @code {
 
@@ -145,9 +151,9 @@
 
     }
 
-    private async Task DownloadFile(string storedFileName, string originalFileName, string mssv)
+    private async Task DownloadFile(string storedFileName, string originalFileName, string contentType, string mssv)
     {
-        var response = await Http.GetAsync(api + $"File/{storedFileName}/{mssv}");
+        var response = GetFileDownLoad(storedFileName,contentType);
         if (!response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "File not found.");
@@ -158,6 +164,28 @@
             using var streamRef = new DotNetStreamReference(stream: fileStream);
             await JS.InvokeVoidAsync("downloadFileFromStream", originalFileName, streamRef);
         }
+    }
+
+    private HttpResponseMessage GetFileDownLoad(string storedFileName, string contentType)
+    {
+        var path = Path.Combine(env.WebRootPath, "uploads", storedFileName);
+
+        var memory = new MemoryStream();
+        using (var stream = new FileStream(path, FileMode.Open))
+        {
+            stream.CopyTo(memory);
+        }
+        memory.Position = 0;
+
+        var response = new HttpResponseMessage(HttpStatusCode.OK);
+        response.Content = new StreamContent(memory);
+        response.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+        response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = Path.GetFileName(path)
+            };
+
+        return response;
     }
 
     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
@@ -508,8 +536,8 @@
                         @file.FileType
                     </td>
                     <td class="p-4 space-x-2 whitespace-nowrap">
-                        <button  @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName, idSv))"
-                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                                    <button @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName,file.ContentType, idSv))"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
                             <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
