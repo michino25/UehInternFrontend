@@ -17,6 +17,7 @@
     private KetquaModel? ketqua = new KetquaModel();
     private List<UploadModel> files = new List<UploadModel>();
     private List<LichsuModel> lichsus = new List<LichsuModel>();
+    private string maloai = "";
     private bool isHKDN;
     private double sum = 0;
 
@@ -129,7 +130,7 @@
     {
         string url = api + $"Phancong/kiemtra/{mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
-        
+
         string responseBody = await response.Content.ReadAsStringAsync();
         return responseBody == "true";        
     }
@@ -201,6 +202,28 @@
         {
             Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
             return null;
+        }
+    }
+
+    private async Task UpdateLoaiHinhHuongDan()
+    {
+        if(!isHKDN) {
+            maloai = "HKDN";
+        }
+        else {
+            maloai = "KLTN";
+
+        }
+        var response = await Http.PutAsync(api + $"Phancong/UpdateLoaiHinhThucTap?mssv={idSv}&maloai={maloai}", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thành công");
+            RenderDatas();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
         }
     }
 
@@ -314,7 +337,7 @@
             </label>
             <div class="w-full flex">
                 <p class="shadow-sm border border-teal-700 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 mr-2">
-                    @sinhvien.tenhp
+                    Chỉnh sửa loại hình thực tập
                 </p>
                 <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-teal-700 hover:text-white rounded-lg border border-teal-700 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300"
                     @onclick="() => modelBtnClick(2)"
@@ -932,7 +955,7 @@
                                             <input checked="!@isHKDN" id="tttn" type="radio" name="typeintern" class="hidden peer" />
                                             <label for="tttn" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
                                                 <div class="block">
-                                                    <div class="w-full text-sm font-semibold">Thực tập tốt nghiệp</div>
+                                                    <div class="w-full text-sm font-semibold">Khoá luận tốt nghiệp</div>
                                                 </div>
                                             </label>
                                         </li>
@@ -954,8 +977,7 @@
                         <button 
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit"
-                            @* @onclick="() => UpdateChuyenNganh(thongtinchitietcn.macn)" *@
-                            >
+                                    @onclick="() => UpdateLoaiHinhHuongDan()">
                             Lưu thay đổi
                             </button>
                     </div>
