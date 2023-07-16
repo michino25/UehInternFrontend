@@ -1,0 +1,135 @@
+﻿@page "/trogiup/sinhvien"
+
+<PageTitle>Hướng dẫn</PageTitle>
+
+<CheckUserComponent CheckRole="student">
+    <ItemContent>
+
+        <div class="py-16 px-4 mb-4 bg-white border border-gray-200 rounded-lg flex justify-between mx-auto max-w-screen-xl">
+            <div class="mx-auto w-full max-w-3xl format format-sm sm:format-base lg:format-lg format-blue">
+
+                @* Tiêu đề *@
+                <header class="mb-6 not-format">
+                    <h1 class="text-4xl font-bold py-3 text-gray-900">
+                        Hướng dẫn sử dụng trang web UEH Intern
+                    </h1>
+                    <div class="flex items-center mb-6 text-sm">
+                        <ul class="flex space-x-4 text-gray-700 list-disc list-inside">
+                            <li class="font-semibold list-none">
+                                Phòng CNTT UEH
+                            </li>
+                            <li class="font-light">
+                                Aug. 8, 2023
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+
+                @* Giới thiệu *@
+                <p class="mb-4 text-lg font-normal text-gray-500">
+                    Trang web này được thiết kế để cung cấp một nền tảng trực tuyến để quản lý quá trình 
+                    thực tập và khóa luận tốt nghiệp tại trường đại học. Đây là trang hướng dẫn dành cho 
+                    <a href="/thongtin" class="font-medium text-blue-600 hover:underline">
+                        tài khoản sinh viên</a>.
+                </p>
+                <p class="mb-4 text-lg font-normal text-gray-500">
+                    Hướng dẫn sử dụng chi tiết cho từng vai trò sẽ được trình bày trong các phần tiếp theo. 
+                    Hãy theo dõi các phần hướng dẫn sau đây để biết cách sử dụng trang web một cách hiệu quả 
+                    trong quá trình thực tập và khóa luận tốt nghiệp.
+                </p>
+
+                <h2 class="text-2xl font-bold py-3">Các chức năng chính</h2>
+                <table class="mb-5 mt-2 w-full text-sm text-left text-gray-500">
+                    <thead class="text-sm text-gray-700 uppercase bg-gray-50">
+                        <tr class="bg-white border-b">
+                            <th scope="col" class="px-6 py-3">Chức năng</th>
+                            <th scope="col" class="px-6 py-3">Thời gian mở</th>
+                            <th scope="col" class="px-6 py-3">Mô tả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">Thông tin</td>
+                            <td class="px-6 py-4">Toàn thời gian</td>
+                            <td class="px-6 py-4">Thông tin chung cho sinh viên</td>
+                        </tr>
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">Nộp file</td>
+                            <td class="px-6 py-4">Giai đoạn chính thức</td>
+                            <td class="px-6 py-4">Quản lý các file báo cáo</td>
+                        </tr>
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">Hồ sơ</td>
+                            <td class="px-6 py-4">Giai đoạn chính thức</td>
+                            <td class="px-6 py-4">Xem và chỉnh sửa thông tin cá nhân</td>
+                        </tr>
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">Đăng ký</td>
+                            <td class="px-6 py-4">Giai đoạn chính thức</td>
+                            <td class="px-6 py-4">Đăng ký thực tập hoặc khóa luận tốt nghiệp</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                @* Xem thông tin *@
+                <h2 class="text-2xl font-bold py-3">Xem thông tin</h2>
+                <p class="mb-4 text-lg font-normal text-gray-500">
+                    Tại đây, bạn sẽ thấy thông tin chi tiết về giảng viên được phân công hướng 
+                    dẫn bạn trong quá trình thực tập hoặc khóa luận tốt nghiệp. Ngoài ra, bạn có thể 
+                    xem loại hình thức tập đã đăng ký, đề tài hoặc công ty thực tập, các thông tin về điểm.
+                </p>
+
+                @* Nộp các báo cáo liên quan *@
+                <h2 class="text-2xl font-bold py-3">Nộp các báo cáo liên quan</h2>
+                <p class="mb-4 text-lg font-normal text-gray-500">
+                    Trang web cho phép bạn nộp các tài liệu liên quan đến quá trình thực tập hoặc 
+                    khóa luận tốt nghiệp. Bạn có thể tải file lên, xóa file và tải xuống file đã nộp.
+                </p>
+
+                @* Xem hồ sơ và Cập nhật thông tin liên lạc *@
+                <h2 class="text-2xl font-bold py-3">
+                    Xem hồ sơ và Cập nhật thông tin liên lạc
+                </h2>
+                <p class="mb-4 text-lg font-normal text-gray-500">
+                    Trang web cho phép bạn cập nhật thông tin liên lạc của mình như địa chỉ email và số 
+                    điện thoại. Đảm bảo rằng thông tin liên lạc của bạn luôn được cập nhật để giảng viên 
+                    có thể liên hệ với bạn khi cần thiết.
+                </p>
+
+                <figure class="max-w-full mb-3 mt-4">
+                    <img
+                        class="h-auto max-w-full mx-auto rounded-lg"
+                        src="https://flowbite.s3.amazonaws.com/typography-plugin/typography-image-1.png"
+                    />
+                    <figcaption class="mt-2 text-sm text-center text-gray-500">
+                        Hình ảnh demo
+                    </figcaption>
+                </figure>
+
+                @* Đăng ký đề tài/doanh nghiệp thực tập *@
+                <h2 class="text-2xl font-bold py-3">
+                    Đăng ký đề tài/doanh nghiệp thực tập
+                </h2>
+                <p class="mb-4 text-lg font-normal text-gray-500">
+                    Trước khi bắt đầu quá trình thực tập, bạn cần đăng ký đề tài hoặc doanh nghiệp 
+                    muốn thực tập trên trang web. Thông tin này sẽ được gửi đến giảng viên hướng dẫn để 
+                    duyệt đề tài/doanh nghiệp của bạn. Điền thông tin về đề tài/doanh nghiệp và các yêu 
+                    cầu liên quan đến loại hình doanh nghiệp tương ứng, bao gồm:
+                </p>
+
+                <ul class="pl-8 mb-4 text-lg font-normal text-gray-500 space-y-3 list-disc list-inside">
+                    <li>
+                        <strong class="font-semibold text-gray-900">Thực tập doanh nghiệp:</strong>
+                        Đề tài
+                    </li>
+                    <li>
+                        <strong class="font-semibold text-gray-900">Khóa luận tốt nghiệp:</strong>
+                        Tên công ty, Website công ty, Vị trí thực tập, Tên người hướng dẫn, Email, Số diện 
+                        thoại người hướng dẫn,...
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </ItemContent>
+</CheckUserComponent>

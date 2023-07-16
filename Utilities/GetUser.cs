@@ -22,7 +22,7 @@ namespace UehInternFrontend
             else if (strict)
             {
                 // No login cookie
-                navigationManager.NavigateTo("/loginsessionexpired");
+                navigationManager.NavigateTo("/loginsessionexpired", true);
                 return null;
             }
             return null;
