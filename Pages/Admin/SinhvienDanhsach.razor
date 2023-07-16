@@ -11,7 +11,7 @@
     private string makhoa = "";
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
-    private List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
+    private List<SinhVienInfo>? sinhviens = new List<SinhVienInfo>();
 
 
     protected override void OnInitialized()
@@ -46,13 +46,13 @@
             await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
         }
     }
-    private async Task<List<SinhvienModel>> GetDssvByKhoa(string madot,string makhoa)
+    private async Task<List<SinhVienInfo>> GetDssvByKhoa(string madot, string makhoa)
     {
         var response = await Http.GetAsync(api + $"Sinhvien/dssv?madot={madot}&makhoa={makhoa}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhVienInfo>>(content);
             return uploadModel;
         }
         else
@@ -113,13 +113,14 @@
     }
 
     private string keyword;
+
     private async Task SubmitSearch()
     {
         var response = await Http.GetAsync(api + $"Sinhvien/Search?keyword={keyword}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<SinhvienModel>>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<SinhVienInfo>>(content);
             sinhviens = uploadModel;
         }
         else
@@ -202,14 +203,19 @@
                             @for (int i = (page - 1) * itemsPerPage; i < page * itemsPerPage && i < sinhviens.Count; i++)
                             {
                                 var sinhvien = sinhviens[i];
-
+                                
                                 <tr class="hover:bg-gray-100">
                                     <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                         <div class="text-sm font-normal text-gray-500">
                                             <div class="text-base font-semibold text-gray-900">@sinhvien.ho @sinhvien.ten
                                             </div>
+                                            @if(sinhvien.email == null)
+                                            {
+                                                    <div class="text-sm font-normal text-gray-500">
+                                                Email chưa được cập nhật</div>
+                                            }
                                             <div class="text-sm font-normal text-gray-500">
-                                                dat@st.ueh.edu.vn</div>
+                                             @sinhvien.email   </div>
                                         </div>
                                     </td>
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
