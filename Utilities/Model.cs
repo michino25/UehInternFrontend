@@ -291,4 +291,14 @@ namespace UehInternFrontend
         public string? ContentType { get; set; }
 
     }
+
+
+    public class PhancongRequest
+    {
+        public string mssv { get; set; }
+        public string magv { get; set; }
+        public string maloai { get; set; }
+        public string madot { get; set; }
+
+    }
 }

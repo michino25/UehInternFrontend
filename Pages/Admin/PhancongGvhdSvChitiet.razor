@@ -4,13 +4,19 @@
     [Parameter] public string? idGv { get; set; }
 
     public string? api;
+    private string? makhoa = "";
+    private string magvhd;
+    private string mssv = "";
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
     private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
-    List<SinhVienInfo>? sinhviens = new List<SinhVienInfo>();
+    private List<SinhVienInfo>? sinhviens = new List<SinhVienInfo>();
+    private List<GiangvienRequest>? giangviends = new List<GiangvienRequest>();
+
     private string? madot = "";
 
     private User? currentUser;
@@ -20,6 +26,8 @@
         {
             currentUser = await Service.GetUser(JS, NavigationManager);
             madot = currentUser.MaDot;
+            makhoa = currentUser.MaKhoa;
+
             StateHasChanged();
 
             await RenderDatas();
@@ -28,6 +36,8 @@
 
     private async Task RenderDatas()
     {
+        giangviends = await GetGiangvienByKhoas(makhoa);
+
         thongtinchitietgv = await GetThongTinGiangvien(idGv);
 
         var result = await SinhVienByGiangVien(madot, idGv);
@@ -41,6 +51,25 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
+
+
+
+    private async Task<List<GiangvienRequest>> GetGiangvienByKhoas(string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienRequest>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
     private async Task<List<SinhVienInfo>> SinhVienByGiangVien(string madot,string magv)
     {
         var response = await Http.GetAsync(api + $"Giangvien/SinhVienByGiangVien?madot={madot}&magv={magv}");
@@ -73,6 +102,37 @@
         }
     }
 
+    private async Task UpdateGiangVienHuongDan()
+    {
+        var response = await Http.PutAsync(api + $"Phancong/UpdatePhancong?mssv={mssv}&magv={magvhd}", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật giảng viên hướng dẫn thành công");
+            RenderDatas();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
+
+      private async Task DeletePhanCong()
+    {
+        var response = await Http.PutAsync(api + $"Phancong/DeletePhancong?mssv={mssv}", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật phân công thành công");
+             RenderDatas();
+             closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
+
     private bool editBtn = false;
     private bool deleteBtn = false;
     private async void modelBtnClick(int btn, string data = "")
@@ -81,9 +141,11 @@
         {
             case 2:
                 editBtn = true;
+                mssv = data;
                 break;
             case 3:
                 deleteBtn = true;
+                mssv = data;
                 break;
         }
         StateHasChanged();
@@ -178,7 +240,7 @@
 
                                 <td class="p-4 space-x-2 whitespace-nowrap">
                                     <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
-                                        @onclick="() => modelBtnClick(2)">
+                                        @onclick="() => modelBtnClick(2,sinhvien.mssv)">
                                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -192,7 +254,7 @@
                                     </button>
                                     
                                     <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300"
-                                        @onclick="() => modelBtnClick(3)">
+                                        @onclick="() => modelBtnClick(3,sinhvien.mssv)">
                                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd"
@@ -277,15 +339,16 @@
                                         class="block mb-2 text-sm font-medium text-gray-900">Giảng viên hướng dẫn
                                     </label>
                                     @* Tham khảo cách dùng select: Giangvien/Lichsugapthem.razor *@
-                                    <select id="magv"
+                                    <select @bind="magvhd" id="magv"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                         <option selected hidden>--Chọn giảng viên--</option>
                                         @if (true)
                                         {
-                                            <option value="1">Nguyễn Quốc Hùng</option>
-                                            <option value="2">Nguyễn Mạnh Tuấn</option>
-                                            <option value="3">Nguyễn An Tế</option>
-                                            <option value="4">Ngô Tấn Vũ Khanh</option>
+                                            foreach(var giangvien in giangviends)
+                                            {
+                                               <option value="@giangvien.magv">@giangvien.tengv</option>
+
+                                            }
                                         }
                                     </select>
                                 </div>                                
@@ -297,7 +360,7 @@
                         <button 
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit"
-                            @* @onclick="() => UpdateChuyenNganh(thongtinchitietcn.macn)" *@
+                             @onclick="() => UpdateGiangVienHuongDan()" 
                             >
                             Lưu phân công
                             </button>
@@ -335,7 +398,7 @@
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa phân công này ?</h3>
                         <button 
                             class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3"
-                            @* @onclick="() =>  DeleteChuyenNganh(thongtinchitietcn.macn)" *@
+                             @onclick="() =>  DeletePhanCong()" 
                             >
                             Xóa
                         </button>

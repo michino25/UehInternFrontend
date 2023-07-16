@@ -9,8 +9,13 @@
 
     private string? makhoa = "";
     private string? madot = "";
+    private SinhvienModel sinhvien = new SinhvienModel();
+    private string hoten = "";
+    private string loai = "";
+    private string magvhd;
+    private List<GiangvienViewModel>? giangviens = new List<GiangvienViewModel>();
+    private List<GiangvienRequest>? giangviends = new List<GiangvienRequest>();
 
-    List<GiangvienViewModel>? giangviens = new List<GiangvienViewModel>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
 
@@ -30,6 +35,8 @@
 
     private async Task RenderDatas()
     {
+        giangviends = await GetGiangvienByKhoas(makhoa);
+
         var result = await GetGiangVienAndSinhVienHuongDan(madot,makhoa);
         if (result != null )
         {
@@ -42,7 +49,21 @@
             await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
-
+    private async Task<List<GiangvienRequest>> GetGiangvienByKhoas(string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienRequest>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
     private async Task<List<GiangvienViewModel>> GetGiangVienAndSinhVienHuongDan(string madot,string makhoa)
     {
         var response = await Http.GetAsync(api + $"Giangvien/sinhvientotal?madot={madot}&makhoa={makhoa}");
@@ -86,7 +107,7 @@
         }
 
         response.EnsureSuccessStatusCode();
-        
+
     }
 
     private async Task DownloadExcelFile(string madot, string makhoa)
@@ -106,6 +127,55 @@
             await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp tin.");
         }
     }
+
+
+    private async Task HandleMssvChange(ChangeEventArgs e)
+    {
+        string mssv = e.Value.ToString();
+        if (!string.IsNullOrEmpty(mssv))
+        {
+            var response = await Http.GetAsync(api + $"Sinhvien/{mssv}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var uploadModel = JsonConvert.DeserializeObject<SinhvienModel>(content);
+                sinhvien = uploadModel;
+                hoten = sinhvien.ho + " " + sinhvien.ten;
+                loai = sinhvien.malop.Substring(1, 4);
+            } else {
+                loai ="";
+                hoten = "";
+            }
+
+        }
+
+    }
+
+
+    private async Task SubmitGiangvien()
+    {
+        PhancongRequest phancongRequest = new PhancongRequest();
+        phancongRequest.madot = madot;
+        phancongRequest.mssv = sinhvien.mssv;
+        phancongRequest.maloai = loai;
+        phancongRequest.magv = magvhd;
+
+        var url = api + $"Phancong";
+        var response = await Http.PostAsJsonAsync(url, phancongRequest);
+        closeBtn();
+
+        if (response.IsSuccessStatusCode)
+        {
+            await RenderDatas();
+            await JS.InvokeVoidAsync("alert", "Thêm phân công thành công");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Thêm phân công thất bại");
+        }
+    }
+
+
 
     private bool addBtn = false;
     private async void modelBtnClick()
@@ -292,7 +362,7 @@
                         @* <!-- Modal header --> *@
                         <div class="flex items-start justify-between p-5 border-b rounded-t">
                             <h3 class="text-xl font-semibold">
-                                Thêm chuyên ngành
+                                Thêm phân cônng
                             </h3>
                             <button type="button"
                                 class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -312,39 +382,59 @@
                                         class="block mb-2 text-sm font-medium text-gray-900">Giảng viên hướng dẫn
                                     </label>
                                     @* Tham khảo cách dùng select: Giangvien/Lichsugapthem.razor *@
-                                    <select id="magv"
+                                        <select @bind="magvhd" id="magv"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                         <option selected hidden>--Chọn giảng viên--</option>
                                         @if (true)
                                         {
-                                            <option value="1">Nguyễn Quốc Hùng</option>
-                                            <option value="2">Nguyễn Mạnh Tuấn</option>
-                                            <option value="3">Nguyễn An Tế</option>
-                                            <option value="4">Ngô Tấn Vũ Khanh</option>
+                                            foreach(var giangvien in giangviends)
+                                            {
+                                               <option value="@giangvien.magv">@giangvien.tengv</option>
+
+                                            }
+                                            
                                         }
                                     </select>
                                 </div>
-
+                         
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="masv"
                                         class="block mb-2 text-sm font-medium text-gray-900">Mã sinh viên</label>
-                                    <input type="text" name="masv" id="masv" required
-                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                            <input type="text" name="masv" id="masv" required @oninput="HandleMssvChange"
+                                               class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
+                                @if(sinhvien != null)
+                               {
+                                     <div class="col-span-6 sm:col-span-3">
+                                        <label for="name"
+                                            class="block mb-2 text-sm font-medium text-gray-900">Tên sinh viên</label>
+                                                <input type="text" name="name" id="name" required readonly value="@hoten"
+                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    </div>
 
-                                <div class="col-span-6 sm:col-span-3">
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="type"
+                                            class="block mb-2 text-sm font-medium text-gray-900">Loại hình</label>
+                                        <input type="text" name="type" id="type" required readonly @bind ="@loai"
+                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    </div>      
+                               }
+                               else {
+                                    <div class="col-span-6 sm:col-span-3">
                                     <label for="name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên sinh viên</label>
-                                    <input type="text" name="name" id="name" required readonly
+                                            <input type="text" name="name" id="name" required readonly 
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                </div>
+                                    </div>
 
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label for="type"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Loại hình</label>
-                                    <input type="text" name="type" id="type" required readonly
-                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                </div>
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="type"
+                                            class="block mb-2 text-sm font-medium text-gray-900">Loại hình</label>
+                                        <input type="text" name="type" id="type" required readonly 
+                                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    </div>      
+                               }
+                               
                             </div>
                         </div>
                         @* <!-- Modal footer --> *@
@@ -352,7 +442,7 @@
                             <button
                                 class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                                 type="submit"
-                                @* @onclick="() => SubmitChuyenNganh(makhoa)"  *@
+                                 @onclick="() => SubmitGiangvien()" 
                                 >
                                 Thêm phân công
                             </button>
