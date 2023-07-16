@@ -3,7 +3,6 @@
 @code {
 
     public string? api;
-   
 
     [Parameter] public string idSv { get; set; }
     private ChitietModel? chitiet = new ChitietModel();
@@ -177,6 +176,21 @@
         }
     }
 
+    private bool editBtn = false;
+    private async void modelBtnClick(int btn, string data = "")
+    {
+        editBtn = true;
+        @* thongtinchitietcn  = await GetThongTinChuyenNganh(data);  *@
+        StateHasChanged();
+    }
+
+    private async Task closeBtn()
+    {
+        editBtn = false;
+        StateHasChanged();
+    }
+
+
 }
 
 <PageTitle>Chi tiết sinh viên</PageTitle>
@@ -226,14 +240,7 @@
                 @sinhvien.khoagoc
             </p>
         </div>
-        <div class="col-span-6 sm:col-span-3">
-            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                Loại hình
-            </label>
-            <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                @sinhvien.tenhp
-            </p>
-        </div>
+
         @if(user != null) {
                 <div class="col-span-6 sm:col-span-3">
                     <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
@@ -251,7 +258,9 @@
                         @user.sdt
                     </p>
                 </div>
-        } else {
+        } 
+        else 
+        {
                 <div class="col-span-6 sm:col-span-3">
                     <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
                         Email
@@ -270,89 +279,120 @@
                     </p>
                 </div>
         }
+
+        <div class="col-span-6 sm:col-span-3">
+            <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                Loại hình
+            </label>
+            <div class="w-full flex">
+                <p class="shadow-sm border border-teal-700 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 mr-2">
+                    @sinhvien.tenhp
+                </p>
+                <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-teal-700 hover:text-white rounded-lg border border-teal-700 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300"
+                    @onclick="() => modelBtnClick(2)"
+                    >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                        </path>
+                        <path fill-rule="evenodd"
+                            d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+
     
     </div>
 </div>
 
-<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
-        <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2  sm:p-6">
-        @if (isHKDN) {
-            <h3 class="mb-4 text-xl font-semibold">Đăng ký thực tập doanh nghiệp</h3>
-        } else {
-            <h3 class="mb-4 text-xl font-semibold">Đăng ký khóa luận tốt nghiệp</h3>
-        }
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 sm:p-6">
+    @if (isHKDN) {
+        <h3 class="mb-4 text-xl font-semibold">Đăng ký thực tập doanh nghiệp</h3>
 
-            <div class="grid grid-cols-6 gap-6">
-
-            @if (isHKDN) {
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="name-cty" class="block mb-2 text-sm font-medium text-gray-900">
-                        Tên công ty
-                    </label>
-                    <input type="text" @bind="@chitiet.tencty" name="name-cty" id="name-cty" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="position" class="block mb-2 text-sm font-medium text-gray-900">
-                        Vị trí thực tập
-                    </label>
-                    <input type="text" @bind="@chitiet.vitri" name="position" id="position" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="website" class="block mb-2 text-sm font-medium text-gray-900">
-                        Website công ty
-                    </label>
-                    <input type="text" @bind="@chitiet.website" name="website" id="website" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="name-hd" class="block mb-2 text-sm font-medium text-gray-900">
-                        Tên người hướng dẫn
-                    </label>
-                    <input type="text" @bind="@chitiet.huongdan" name="name-hd" id="name-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="position-hd" class="block mb-2 text-sm font-medium text-gray-900">
-                        Chức vụ người hướng dẫn
-                    </label>
-                    <input type="text" @bind="@chitiet.chucvu" name="position-hd" id="position-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="email-hd" class="block mb-2 text-sm font-medium text-gray-900">
-                        Email người hướng dẫn
-                    </label>
-                    <input type="email" @bind="@chitiet.emailhd"  name="email-hd" id="email-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="phone-hd" class="block mb-2 text-sm font-medium text-gray-900">
-                        Số điện thoại người hướng dẫn
-                    </label>
-                        <input type="text" @bind="@chitiet.sdthd" name="phone-hd" id="phone-hd" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-            } else {
-
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="detai" class="block mb-2 text-sm font-medium text-gray-900">
-                        Đề tài
-                    </label>
-                    <input type="text" @bind="@chitiet.tendetai" name="detai" id="detai" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4" required>
-                </div>
-
-            }
-
-               
+        <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+                <label for="name-cty" class="block mb-2 text-sm font-medium text-gray-900">
+                    Tên công ty
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.tencty
+                </p>
             </div>
-    </div>
 
+            <div class="col-span-6 sm:col-span-3">
+                <label for="position" class="block mb-2 text-sm font-medium text-gray-900">
+                    Vị trí thực tập
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.vitri
+                </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+                <label for="website" class="block mb-2 text-sm font-medium text-gray-900">
+                    Website công ty
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.website
+                </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+                <label for="name-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                    Tên người hướng dẫn
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.huongdan
+                </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+                <label for="position-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                    Chức vụ người hướng dẫn
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.chucvu
+                </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+                <label for="email-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                    Email người hướng dẫn
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.emailhd
+                </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+                <label for="phone-hd" class="block mb-2 text-sm font-medium text-gray-900">
+                    Số điện thoại người hướng dẫn
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.sdthd
+                </p>
+            </div>
+        </div>
+
+    } else {
+        <h3 class="mb-4 text-xl font-semibold">Đăng ký khóa luận tốt nghiệp</h3>
+
+        <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+                <label for="detai" class="block mb-2 text-sm font-medium text-gray-900">
+                    Đề tài
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @chitiet.tendetai
+                </p>
+            </div>
+        </div>
+    }
 </div>
-           
-
 
 
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
@@ -822,6 +862,81 @@
 
 </div>
 
+<!-- Modal -->
+<div class="flex items-center justify-center fixed w-screen h-screen z-30">
+    @if (editBtn)
+    {
+        <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
+    }
+
+    <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-fit h-max-full scrollbar-hide">
+
+        <!-- Edit Modal -->
+        @if (editBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Chỉnh sửa loại hình thực tập
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <form action="#">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6">
+                                    <label for="biography"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Loại hình</label>
+                                    <ul class="grid w-full gap-x-6 gap-y-4 grid-cols-2">
+                                        <li>
+                                            <input checked="!@isHKDN" id="tttn" type="radio" name="typeintern" class="hidden peer" />
+                                            <label for="tttn" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">Thực tập tốt nghiệp</div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <input checked="@isHKDN" id="hkdn" type="radio" name="typeintern" class="hidden peer" />
+                                            <label for="hkdn" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
+                                                <div class="block">
+                                                    <div class="w-full text-sm font-semibold">Học kì doanh nghiệp</div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button 
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit"
+                            @* @onclick="() => UpdateChuyenNganh(thongtinchitietcn.macn)" *@
+                            >
+                            Lưu thay đổi
+                            </button>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
 </ItemContent>
 </CheckUserComponent>
