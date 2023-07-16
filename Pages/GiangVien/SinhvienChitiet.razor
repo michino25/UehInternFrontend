@@ -161,7 +161,7 @@
         }
     }
 
-     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
+    private async Task<ChitietModel> GetChitietSinhVien(string mssv)
     {
         var response = await Http.GetAsync(api + $"Chitiet/getchitiet?mssv={mssv}");
         if (response.IsSuccessStatusCode)

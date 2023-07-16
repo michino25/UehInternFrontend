@@ -219,7 +219,7 @@
                         </p>
                     </div>
                     <div class="grid grid-cols-3 gap-4 px-4 py-3">
-                        <a href="#" class="block p-4 text-center rounded-lg hover:bg-gray-100">
+                        <button class="block p-4 text-center rounded-lg hover:bg-gray-100">
                             <svg class="mx-auto mb-1 text-gray-500 w-7 h-7" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
@@ -227,8 +227,8 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                             <div class="text-sm font-medium text-gray-900">Profile</div>
-                        </a>
-                        <a href="#" class="block p-4 text-center rounded-lg hover:bg-gray-100">
+                        </button>
+                        <button class="block p-4 text-center rounded-lg hover:bg-gray-100">
                             <svg class="mx-auto mb-1 text-gray-500 w-7 h-7" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
@@ -236,7 +236,7 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                             <div class="text-sm font-medium text-gray-900">Settings</div>
-                        </a>
+                        </button>
                         <a href="#" class="block p-4 text-center rounded-lg hover:bg-gray-100"
                             @onclick:preventDefault="true"
                             @onclick="async () => await UserLogout()">
