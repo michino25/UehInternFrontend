@@ -4,6 +4,8 @@
     private int sumsv = 0;
     private int sumgv = 0;
     private int sumcn = 0;
+    private int sumpc = 0;
+
     private string madot = "";
     private string makhoa = "";
 
@@ -38,16 +40,33 @@
         List<SinhvienkhoaModel> sinhvienkhoas = await GetSinhvienByKhoas(madot,makhoa);
         List<GiangvienkhoaModel> giangviens   = await GetGiangvienByKhoas(makhoa);
         List<ChuyennganhModel> chuyennganhs   = await GetChuyennganhsByKhoa(makhoa);
+        List<PhancongRequest> phancong = await GetPhanCongKhoas(madot, makhoa);
 
         if (sinhvienkhoas != null )
         {
             sumsv += sinhvienkhoas.Count;
             sumgv += giangviens.Count;
             sumcn += chuyennganhs.Count;
+            sumpc += phancong.Count;
         }
         else
         {
             await JS.InvokeVoidAsync("alert", "Sinh viên not found.");
+        }
+    }
+    private async Task<List<PhancongRequest>> GetPhanCongKhoas(string madot, string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Phancong/getphancongkhoas?madot={madot}&makhoa={makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<PhancongRequest>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
         }
     }
 
@@ -153,7 +172,7 @@
             <a href="sinhvien/danhsach" 
                 class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
                 <div class="w-full">
-                    <h3 class="text-base font-normal text-gray-500">Sinh viên</h3>
+                    <h3 class="text-base font-normal text-gray-500">Tổng sinh viên đợt này</h3>
                     <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumsv</span>
                 </div>
             </a>
@@ -163,6 +182,14 @@
                 <div class="w-full">
                     <h3 class="text-base font-normal text-gray-500">Chuyên ngành</h3>
                     <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumcn</span>
+                </div>
+            </a>
+
+            <a href="phancong/gvhdsv"
+                   class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                <div class="w-full">
+                    <h3 class="text-base font-normal text-gray-500">Tổng sinh viên đã được phân công</h3>
+                    <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumpc</span>
                 </div>
             </a>
         </div>
