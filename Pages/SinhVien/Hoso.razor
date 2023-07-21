@@ -98,11 +98,11 @@
         if (response.IsSuccessStatusCode)
         {
             await RenderDatas();
-            closeBtn();
+            await closeBtn();
         }
         else
         {
-            Console.WriteLine("Đã xảy ra lỗi khi gửi thông tin!");
+            await JS.InvokeVoidAsync("alert", "Đã xảy ra lỗi khi gửi thông tin!");
         }
     }
 

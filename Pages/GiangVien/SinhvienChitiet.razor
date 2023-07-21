@@ -207,19 +207,15 @@
 
     private async Task UpdateLoaiHinhHuongDan()
     {
-        if(!isHKDN) {
-            maloai = "HKDN";
-        }
-        else {
-            maloai = "KLTN";
+        maloai = !isHKDN ? "HKDN" : "KLTN";
 
-        }
         var response = await Http.PutAsync(api + $"Phancong/UpdateLoaiHinhThucTap?mssv={idSv}&maloai={maloai}", null);
 
         if (response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật thành công");
-            RenderDatas();
+            await RenderDatas();
+            await closeBtn();
         }
         else
         {
@@ -293,42 +289,41 @@
         </div>
 
         @if(user != null) {
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                        Email
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        @user.email
-                    </p>
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                        Số điện thoại
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        @user.sdt
-                    </p>
-                </div>
+            <div class="col-span-6 sm:col-span-3">
+                <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                    Email
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @user.email
+                </p>
+            </div>
+            <div class="col-span-6 sm:col-span-3">
+                <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                    Số điện thoại
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    @user.sdt
+                </p>
+            </div>
         } 
         else 
         {
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                        Email
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        Email chưa cập nhật
-                    </p>
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
-                        Số điện thoại
-                    </label>
-                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                        SĐT chưa cập nhật
-
-                    </p>
-                </div>
+            <div class="col-span-6 sm:col-span-3">
+                <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                    Email
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    Email chưa cập nhật
+                </p>
+            </div>
+            <div class="col-span-6 sm:col-span-3">
+                <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">
+                    Số điện thoại
+                </label>
+                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                    SĐT chưa cập nhật
+                </p>
+            </div>
         }
 
         <div class="col-span-6 sm:col-span-3">
@@ -337,7 +332,7 @@
             </label>
             <div class="w-full flex">
                 <p class="shadow-sm border border-teal-700 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 mr-2">
-                    Chỉnh sửa loại hình thực tập
+                    @( isHKDN ? "Học kì doanh nghiệp" : "Khoá luận tốt nghiệp" )
                 </p>
                 <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-teal-700 hover:text-white rounded-lg border border-teal-700 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300"
                     @onclick="() => modelBtnClick(2)"
@@ -370,7 +365,7 @@
                     Tên công ty
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.tencty
+                    @(chitiet.tencty ?? "Chưa có thông tin" )
                 </p>
             </div>
 
@@ -379,7 +374,7 @@
                     Vị trí thực tập
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.vitri
+                    @(chitiet.vitri ?? "Chưa có thông tin" )
                 </p>
             </div>
 
@@ -388,7 +383,7 @@
                     Website công ty
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.website
+                    @(chitiet.website ?? "Chưa có thông tin" )
                 </p>
             </div>
 
@@ -397,7 +392,7 @@
                     Tên người hướng dẫn
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.huongdan
+                    @(chitiet.huongdan ?? "Chưa có thông tin" )
                 </p>
             </div>
 
@@ -406,7 +401,7 @@
                     Chức vụ người hướng dẫn
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.chucvu
+                    @(chitiet.chucvu ?? "Chưa có thông tin" )
                 </p>
             </div>
 
@@ -415,7 +410,7 @@
                     Email người hướng dẫn
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.emailhd
+                    @(chitiet.emailhd ?? "Chưa có thông tin" )
                 </p>
             </div>
 
@@ -424,7 +419,7 @@
                     Số điện thoại người hướng dẫn
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.sdthd
+                    @(chitiet.sdthd ?? "Chưa có thông tin" )
                 </p>
             </div>
         </div>
@@ -438,7 +433,7 @@
                     Đề tài
                 </label>
                 <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                    @chitiet.tendetai
+                    @(chitiet.tendetai ?? "Chưa có thông tin" )
                 </p>
             </div>
         </div>
