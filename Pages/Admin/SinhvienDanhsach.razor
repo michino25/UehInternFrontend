@@ -116,7 +116,7 @@
 
     private async Task SubmitSearch()
     {
-        var response = await Http.GetAsync(api + $"Sinhvien/Search?keyword={keyword}");
+        var response = await Http.GetAsync(api + $"Sinhvien/Search?madot?={madot}&keyword={keyword}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();

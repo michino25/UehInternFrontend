@@ -113,7 +113,7 @@
 
     private async Task DeleteDangKy(string mssv)
     {
-        var response = await Http.DeleteAsync(api + $"Dangky/DeleteDangky?mssv={mssv}");
+        var response = await Http.DeleteAsync(api + $"Dangky/DeleteDangky?madot={madot}&mssv={mssv}");
 
         if (response.IsSuccessStatusCode)
         {
@@ -129,7 +129,7 @@
 
     private async Task<DangkyModel> GetThongTinDangKy(string mssv)
     {
-        var response = await Http.GetAsync(api + $"Dangky/GetDangky?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Dangky/GetDangky?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();

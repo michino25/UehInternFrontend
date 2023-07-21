@@ -10,7 +10,10 @@
     private ChitietModel? chitiet = new ChitietModel();
     private KetquaModel? ketqua = new KetquaModel();
     private GiangvienModel? giangvien = new GiangvienModel();
+    private GiangvienModel? giangviendk = new GiangvienModel();
+
     private double sum = 0;
+    private string? madot = "";
 
     private string? mssv = "";
     private string? maloai = "";
@@ -26,12 +29,18 @@
             mssv = currentUser.Code;
             maloai = currentUser.MaLoai;
             DotInfo = currentUser.DotInfo;
+            madot = currentUser.MaDot;
+
             StateHasChanged();
 
             loaihinh = maloai == "HKDN" ? "Học kỳ doanh nghiệp" : "Khoá luận tốt nghiệp";
 
             if (DotInfo == 2) {
                 await RenderDatas();
+            }else if(DotInfo ==1)
+            {
+                await RenderDatas();
+
             }
 
             StateHasChanged();
@@ -42,6 +51,7 @@
     {
         chitiet = await GetChitietSinhVien(mssv);
         giangvien = await GetGvHuongDanSv(mssv);
+        giangviendk = await GetDangkyGvHuongDanSv(mssv);
 
         ketqua = await GetKetQuaSinhVien(mssv);
         sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
@@ -54,7 +64,7 @@
 
     private async Task<GiangvienModel> GetGvHuongDanSv(string mssv)
     {
-        var response = await Http.GetAsync(api + $"Sinhvien/GetGvHuongDanSv?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Sinhvien/GetGvHuongDanSv?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -67,7 +77,21 @@
             return null;
         }
     }
-
+    private async Task<GiangvienModel> GetDangkyGvHuongDanSv(string mssv)
+    {
+        var response = await Http.GetAsync(api + $"Sinhvien/GetDangkyGvHuongDanSv?madot={madot}&mssv={mssv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienModel>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất thông tin : {response.StatusCode}");
+            return null;
+        }
+    }
     private async Task<ChitietModel> GetChitietSinhVien(string mssv)
     {
         var response = await Http.GetAsync(api + $"Chitiet/getchitiet?mssv={mssv}");
@@ -174,9 +198,18 @@
                 Đăng ký sớm
             </span>
         </h5>
-        <p class="mb-3 font-normal text-gray-700">
-            Chưa có thông tin
-        </p>
+        @if(giangviendk != null)
+        {
+                    <p class="mb-3 font-normal text-gray-700">
+                        @giangviendk.tengv
+                    </p>
+        } else 
+        {
+            <p class="mb-3 font-normal text-gray-700">
+                 Chưa có thông tin
+            </p>
+        }
+       
     </div>
 
 }
