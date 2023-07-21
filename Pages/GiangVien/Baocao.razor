@@ -71,7 +71,7 @@
             var diem = JsonConvert.DeserializeObject<ChiTietDiem>(content);
 
             await PrintPDF.ChiTietDiem(JS, diem);
-            await JS.InvokeVoidAsync("alert", "Tải dữ liệu in thành công");
+           // await JS.InvokeVoidAsync("alert", "Tải dữ liệu in thành công");
         }
         else
         {
@@ -91,7 +91,7 @@
                 var bangdiem = JsonConvert.DeserializeObject<List<TongHopDiem>>(content);
 
                 await PrintPDF.TongHopDiem(JS, bangdiem, maloai);
-                await JS.InvokeVoidAsync("alert", "Tải dữ liệu thành công");
+               //await JS.InvokeVoidAsync("alert", "Tải dữ liệu thành công");
 
             }
             else
