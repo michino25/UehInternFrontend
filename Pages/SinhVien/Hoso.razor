@@ -99,6 +99,8 @@
         {
             await RenderDatas();
             await closeBtn();
+            await JS.InvokeVoidAsync("alert", "Cập nhật thông tin thành công!");
+
         }
         else
         {
