@@ -95,7 +95,8 @@
         if (response.IsSuccessStatusCode)
         {
             await RenderDatas();
-            await JS.InvokeVoidAsync("alert", "Thêm chuyên ngành  thành công");
+            await JS.InvokeVoidAsync("alert", "Thêm chuyên ngành thành công");
+            closeBtn();
         }
         else
         {
@@ -111,6 +112,7 @@
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật chuyên ngành thành công");
             RenderDatas();
+            closeBtn();
         }
         else
         {

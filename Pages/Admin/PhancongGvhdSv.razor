@@ -168,6 +168,7 @@
         {
             await RenderDatas();
             await JS.InvokeVoidAsync("alert", "Thêm phân công thành công");
+            closeBtn();
         }
         else
         {
@@ -348,7 +349,7 @@
                         @* <!-- Modal header --> *@
                         <div class="flex items-start justify-between p-5 border-b rounded-t">
                             <h3 class="text-xl font-semibold">
-                                Thêm phân cônng
+                                Thêm phân công
                             </h3>
                             <button type="button"
                                 class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -375,23 +376,22 @@
                                         {
                                             foreach(var giangvien in giangviends)
                                             {
-                                               <option value="@giangvien.magv">@giangvien.tengv</option>
-
+                                                <option value="@giangvien.magv">@giangvien.tengv</option>
                                             }
                                             
                                         }
                                     </select>
                                 </div>
-                         
+
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="masv"
                                         class="block mb-2 text-sm font-medium text-gray-900">Mã sinh viên</label>
                                             <input type="text" name="masv" id="masv" required @oninput="HandleMssvChange"
-                                               class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 @if(sinhvien != null)
-                               {
-                                     <div class="col-span-6 sm:col-span-3">
+                                {
+                                    <div class="col-span-6 sm:col-span-3">
                                         <label for="name"
                                             class="block mb-2 text-sm font-medium text-gray-900">Tên sinh viên</label>
                                                 <input type="text" name="name" id="name" required readonly value="@hoten"
@@ -404,8 +404,8 @@
                                         <input type="text" name="type" id="type" required readonly @bind ="@loai"
                                             class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                     </div>      
-                               }
-                               else {
+                                }
+                                else {
                                     <div class="col-span-6 sm:col-span-3">
                                     <label for="name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên sinh viên</label>
@@ -419,8 +419,8 @@
                                         <input type="text" name="type" id="type" required readonly 
                                             class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                     </div>      
-                               }
-                               
+                                }
+
                             </div>
                         </div>
                         @* <!-- Modal footer --> *@
@@ -428,7 +428,7 @@
                             <button
                                 class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                                 type="submit"
-                                 @onclick="() => SubmitGiangvien()" 
+                                @onclick="() => SubmitGiangvien()" 
                                 >
                                 Thêm phân công
                             </button>
