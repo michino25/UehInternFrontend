@@ -357,44 +357,83 @@ namespace UehInternFrontend
                         line-height: 0.8;
                     }
 
-                    @page {
-                        size: A4 landscape;
-                        margin: 1cm;
-                        marks: crop;
-                        bleed: 3mm;
-                        orphans: 2;
-                        widows: 2;
-                    }
-
                     @media print {
                         body {
                             -webkit-print-color-adjust: exact;
                         }
                     }
 
-                    .title {
-                        display: flex;
-                        justify-content: space-between;
-                    }
-
-                    .content {
+                    .center {
                         text-align: center;
                     }
 
-                    .lable {
-                        font-size: 25px;
+                    .right {
+                        text-align: right;
+                    }
+
+                    .no-wrap {
+                        white-space: nowrap;
+                    }
+
+                    .itatic {
+                        font-weight: 100;
+                        font-style: italic;
+                    }
+
+                    /* pretitle */
+
+                    .pretitle {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .pretitle p {
+                        line-height: 0.8;
+                    }
+
+                    /* title */
+
+                    .title {
+                        text-align: center;
+                    }
+
+                    .title .lable {
+                        font-size: 22px;
+                    }
+
+                    .table-wrapper {
+                        display: flex;
+                        justify-content: center;
+                        padding: 12px 0;
+                    }
+
+                    table {
+                        width: 98%;
                     }
 
                     table,
                     th,
                     td {
-                        border: 1px solid black;
+                        border: 1px solid #393939;
                         border-collapse: collapse;
                     }
 
+                    th,
+                    td {
+                        padding: 8px;
+                    }
+
+                    td p {
+                        margin: 4px 0;
+                    }
+
+                    td p + p {
+                        margin: 6px 0;
+                    }
+
                     .table-title {
-                        font-size: 18px;
-                        background-color: rgb(172, 172, 172);
+                        background-color: rgb(191, 191, 191);
                     }
                 </style>
             ";
@@ -402,35 +441,30 @@ namespace UehInternFrontend
             // body
             htmlString += $@"
                 <body>
-                    <div class='title'>
+                    <div class='pretitle'>
                         <div>
                             <p><strong>Trường Đại học Kinh tế Tp. Hồ Chí Minh</strong></p>
                             <p><strong>Khoa {bangdiem[0].tenkhoa}</strong></p>
                             <p><strong>Chuyên ngành ?</strong></p>
                         </div>
                         <div>
-                            <p><strong>Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</strong></p>
-                            <p style='text-align: center;'><strong>Độc lập – Tự do – Hạnh phúc</strong></p>
-                            <p><strong>&nbsp;</strong></p>
+                            <p class='center'><strong>Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</strong></p>
+                            <p class='center'><strong>Độc lập – Tự do – Hạnh phúc</strong></p>
                         </div>
-
                     </div>
-                    <div class='content'>
 
+                    <div class='title'>
                         <p class='lable'><strong>BẢNG ĐIỂM TỔNG HỢP - THỰC TẬP TỐT NGHIỆP</strong></p>
-                        <p class='lable'>
-                            <strong>{bangdiem[0].tendot.ToUpper()}</strong>
-                        </p>
-                        <p class='lable'>
-                            <strong>Hình thức {bangdiem[0].tenloai}</strong>
-                        </p>
-                        <!-- <p><em>(Lưu ý: nếu loại hình thức 'học kỳ doanh nghiệp' thì không có giáo viên chấm 2)</em></p> -->
+                        <p class='lable'><strong>ĐỢT {bangdiem[0].tendot.ToUpper()}</strong></p>
+                        <p class='lable'><strong>HÌNH THỨC {bangdiem[0].tenloai.ToUpper()}</strong></p>
+                        <p class='itatic'><em>(Lưu ý: nếu loại hình thức 'học kỳ doanh nghiệp' thì không có giáo viên chấm 2)</em></p>
                     </div>
-                    <div>
-                        <table style='float:center' width='100%'>
+
+                    <div class='table-wrapper'>
+                        <table>
                             <tr class='table-title'>
-                                <td><strong>STT</strong></td>
-                                <td><strong>Mã số sinh viên|Lớp|Khoa</strong></td>
+                                <td class='center'><strong>STT</strong></td>
+                                <td><strong>Mã số sinh viên | Lớp | Khoa</strong></td>
                                 <td><strong>Tên sinh viên</strong></td>
                                 <td><strong>Tên đề tài</strong></td>
                                 <td><strong>Điểm cuối cùng</strong></td>
@@ -441,11 +475,11 @@ namespace UehInternFrontend
             {
                 htmlString += $@"
                     <tr>
-                        <td>{i + 1}</td>
+                        <td class='center'>{i + 1}</td>
                         <td>{bangdiem[i].mssv} | {bangdiem[i].malop} | {bangdiem[i].khoahoc}</td>
                         <td>{bangdiem[i].hotensv}</td>
                         <td>{bangdiem[i].tendetai}</td>
-                        <td>{null}</td>
+                        <td>{null} ?</td>
                     </tr>
                 ";
             }
@@ -455,9 +489,9 @@ namespace UehInternFrontend
 
                     </div>
                     <div>
-                        <p><strong>Ngày chấm :</strong></p>
-                        <p><strong>Giáo viên hướng dẫn và chấm 1:</strong></p>
-                        <p><strong>Giáo viên chấm 2:</strong></p>
+                        <p><strong>Ngày chấm:</strong> 12-08-2023 ?</p>
+                        <p><strong>Giáo viên hướng dẫn và chấm 1:</strong> Đặng Thái Thịnh ?</p>
+                        <p><strong>Giáo viên chấm 2:</strong> Phan Hiền ?</p>
                     </div>
 
                 </body>

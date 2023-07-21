@@ -22,6 +22,7 @@
     private List<UploadModel> files = new List<UploadModel>();
 
     private string? mssv = "";
+    private string? maloai = "";
 
     private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -30,6 +31,7 @@
         {
             currentUser = await Service.GetUser(JS, NavigationManager);
             mssv = currentUser.Code;
+            maloai = currentUser.MaLoai;
             StateHasChanged();
 
             await RenderDatas();
@@ -190,97 +192,100 @@
 <CheckUserComponent CheckRole="student" CheckDot=2>
     <ItemContent>
 
-    <div class="col-span-2">
-        <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2  sm:p-6">
+    @if (maloai == "HKDN")
+    {
+        <div class="col-span-2">
+            <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2  sm:p-6">
 
-            <h3 class="mb-4 text-xl font-semibold">Đăng kí học kì doanh nghiệp</h3>
-            <div class="flex flex-col items-start pb-4 space-x-2">
+                <h3 class="mb-4 text-xl font-semibold">Đăng kí học kì doanh nghiệp</h3>
+                <div class="flex flex-col items-start pb-4 space-x-2">
 
-                <button @onclick ="() =>LoaiHinhXacNhan()"
-                    class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                    <InputFile id="xacnhan-btn" OnChange="@LoadFiles" class="hidden btn-primary " />
-                    <svg class="w-5 h-5 mr-2 ml-1" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    <label class="cursor-pointer" for="xacnhan-btn">Nhập file</label>
-                </button>
+                    <button @onclick ="() =>LoaiHinhXacNhan()"
+                        class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                        <InputFile id="xacnhan-btn" OnChange="@LoadFiles" class="hidden btn-primary " />
+                        <svg class="w-5 h-5 mr-2 ml-1" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <label class="cursor-pointer" for="xacnhan-btn">Nhập file</label>
+                    </button>
 
+                </div>
+
+                <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    File
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Giờ nộp
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                    Hành động
+                                </th>
+                            </tr>
+                        </thead>
+
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    @if (files.Count > 0)
+                    {
+                    @foreach (var file in files)
+                        {
+                                    if (file.FileType == "Giấy đăng ký học kỳ doang nghiệp")
+                                    {
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                                <div class="text-sm font-normal text-gray-500">
+                                                    <div class="text-base font-semibold text-gray-900">@file.FileName</div>
+                                                </div>
+                                            </td>
+                                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                                @file.DateTime
+                                            </td>
+                                            <td class="p-4 space-x-2 whitespace-nowrap">
+                                                <button @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName,file.ContentType, mssv))"
+                                            type="button" data-modal-toggle="edit-user-modal"
+                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+                                                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Tải xuống
+                                                </button>
+
+                                                <button @onclick="() => DeleteFile(file.StoredFileName)" type=" button" data-modal-toggle="delete-user-modal"
+                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
+                                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Xóa file
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                        }
+                        } else {
+                            <tr class="">
+                                <td class="flex items-center p-4 mr-12 space-x-1 whitespace-nowrap">
+                                    <div class="text-sm font-normal text-gray-500">
+                                        <div class="text-base text-gray-900">Chưa có file</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
             </div>
 
-            <table class="min-w-full divide-y divide-gray-200 table-fixed">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                File
-                            </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Giờ nộp
-                            </th>
-                            <th scope="col"
-                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                Hành động
-                            </th>
-                        </tr>
-                    </thead>
-
-                <tbody class="bg-white divide-y divide-gray-200">
-                @if (files.Count > 0)
-                {
-                @foreach (var file in files)
-                    {
-                                if (file.FileType == "Giấy đăng ký học kỳ doang nghiệp")
-                                {
-                                    <tr class="hover:bg-gray-100">
-                                        <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                            <div class="text-sm font-normal text-gray-500">
-                                                <div class="text-base font-semibold text-gray-900">@file.FileName</div>
-                                            </div>
-                                        </td>
-                                        <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                            @file.DateTime
-                                        </td>
-                                        <td class="p-4 space-x-2 whitespace-nowrap">
-                                            <button @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName,file.ContentType, mssv))"
-                                        type="button" data-modal-toggle="edit-user-modal"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
-                                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
-                                                    <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
-                                                </svg>
-                                                Tải xuống
-                                            </button>
-
-                                            <button @onclick="() => DeleteFile(file.StoredFileName)" type=" button" data-modal-toggle="delete-user-modal"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
-                                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                                                </svg>
-                                                Xóa file
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                    }
-                    } else {
-                        <tr class="">
-                            <td class="flex items-center p-4 mr-12 space-x-1 whitespace-nowrap">
-                                <div class="text-sm font-normal text-gray-500">
-                                    <div class="text-base text-gray-900">Chưa có file</div>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
         </div>
-
-    </div>
+    }
 
     <div class="col-span-2">
         <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2  sm:p-6">

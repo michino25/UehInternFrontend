@@ -146,6 +146,7 @@
         {
             await RenderDatas();
             await JS.InvokeVoidAsync("alert", "Thêm giảng viên thành công");
+            closeBtn();
         }
         else
         {
@@ -161,6 +162,7 @@
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật giảng viên thành công");
             RenderDatas();
+            closeBtn();
         }
         else
         {
@@ -211,6 +213,7 @@
         if (response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thành công");
+            closeBtn();
         }
         else
         {
