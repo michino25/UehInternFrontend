@@ -36,7 +36,7 @@
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
+            //await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
         }
     }
 
@@ -70,13 +70,15 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-        var apiUrl = api + $"Giangvien/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
+        var apiUrl = api + $"Giangvien/formFile?makhoa={makhoa}";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "File not found.");
         }
         response.EnsureSuccessStatusCode();
+        await RenderDatas();
+
     }
 
     private async Task<GiangvienRequest> GetThongTinGiangvien(string magv)
@@ -138,7 +140,7 @@
     private async Task SubmitGiangvien(string makhoa)
     {
         giangvien.status = "true";
-        var url = api + $"Giangvien?makhoa={Uri.EscapeDataString(makhoa)}";
+        var url = api + $"Giangvien?makhoa={makhoa}";
         var response = await Http.PostAsJsonAsync(url, giangvien);
         closeBtn();
 

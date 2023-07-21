@@ -43,7 +43,7 @@
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
+            //await JS.InvokeVoidAsync("alert", "Sinh viên không được tìm thấy.");
         }
     }
     private async Task<List<SinhVienInfo>> GetDssvByKhoa(string madot, string makhoa)
@@ -116,7 +116,7 @@
 
     private async Task SubmitSearch()
     {
-        var response = await Http.GetAsync(api + $"Sinhvien/Search?madot?={madot}&keyword={keyword}");
+        var response = await Http.GetAsync(api + $"Sinhvien/Search?madot={madot}&keyword={keyword}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
