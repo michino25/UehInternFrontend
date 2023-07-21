@@ -1,19 +1,25 @@
 ﻿@page "/demo"
+@layout EmptyLayout
 
 <PageTitle>Demo Page</PageTitle>
 
-<CheckUserComponent CheckRole="admin">
+@* <CheckUserComponent CheckRole="admin">
     <ItemContent>
     <Error Type="NoRole" />
 
     </ItemContent>
-</CheckUserComponent>
+</CheckUserComponent> *@
 
-@code {
-    private int currentCount = 0;
+<div id="text">
+    Có nhiều khi trên công ty, anh cũng
+</div>
+<input type="button" value="Print Div Contents" @onclick="()=>PrintPDF()" id="btnPrint" />
 
-    private void IncrementCount()
+@code
+{
+    private string content = "<p>Có nhiều khi trên công ty, anh cũng muốn thảo luận với mọi người xem, nếu AI cứ phát triển như thế này, một ngày nào đó nó sẽ ngồi code thay chúng ta thì chúng ta phải nghề gì đế kiếm sống đây ? Chỉ dám nghĩ thế thôi chứ anh cũng không giám nói ra vì đó là điều mà cộng đồng lập trình không muốn nghe, họ luôn tin rằng lập trình không chết, con người sẽ cùng AI lập trình. Nhưng thực tế ngày càng chỉ ra rằng, AI chẳng cần con người để lập trình, nó có thể tự làm mọi khâu chỉ cần có đủ dữ liệu và phần cứng đủ mạnh, có thể bây giờ nó vẫn chưa làm được tới mức đó nhưng nên nhớ là có làn sóng các nhà khởi nghiệp trên khắp thế giới đang đổ tiền tấn vào nó nên có lẽ việc AI thay thế hoàn toàn lập trình viên chỉ là vấn đề thời gian. Lan màn dài dòng thế cũng đủ rồi, người anh của tôi chắc vẫn sẽ code tới những ngày cuối cùng trước khi bị AI thay thế hoàn toàn. Thậm chí giờ đây với anh mỗi ngày code là 1 kỷ niệm đẹp vì khoảng chục năm nữa thôi, thế hệ mới sau cả thế hệ Gen Z chắc cũng sẽ không biết nghề coding từng tồn tại và phát triển như thế nào. Mãi mãi là vua của các nghề trong tim anh. Nào ngờ, cơn bão AI ập tới. Khai màn bằng con chatBot hiểu tiếng người đầu tiên ChatGPT. Một con chatbot đến ngày hôm nay vẫn có thể nói là code tốt hơn anh nhiều. Sau đó là nhiều con bot khác của Google, Microsoft. Con nào cũng có thể code tốt và nhanh hơn anh cả trăm lần vậy. Giờ đây, công việc của anh tới công ty chỉ đơn giản là lắng nghe yêu cầu từ sếp, sau đó nói lại với con chatbot nào đó một cách dễ hiểu hơn để nó in ra code theo đúng ý anh.</p>";
+    private async Task PrintPDF()
     {
-        currentCount++;
+        await JS.InvokeVoidAsync("PrintPDF", content, "demo");
     }
 }

@@ -301,4 +301,36 @@ namespace UehInternFrontend
         public string madot { get; set; }
 
     }
+
+    public class ChiTietDiem
+    {
+        public string tenkhoa { get; set; }
+        public string tencn { get; set; }
+        public string tendot { get; set; }
+        public string hotensv { get; set; }
+        public string mssv { get; set; }
+        public string tenkl { get; set; }
+        public string tengv { get; set; }
+        public string tieuchi1 { get; set; }
+        public string tieuchi2 { get; set; }
+        public string tieuchi3 { get; set; }
+        public string tieuchi4 { get; set; }
+        public string tieuchi5 { get; set; }
+        public string tieuchi6 { get; set; }
+        public string tieuchi7 { get; set; }
+        public string diemDN { get; set; }
+        public string diemtong { get; set; }
+    }
+
+    public class TongHopDiem
+    {
+        public string tenkhoa { get; set; }
+        public string tendot { get; set; }
+        public string tenloai { get; set; }
+        public string hotensv { get; set; }
+        public string mssv { get; set; }
+        public string tendetai { get; set; }
+        public string malop { get; set; }
+        public string khoahoc { get; set; }
+    }
 }

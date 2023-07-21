@@ -7,6 +7,9 @@
     private string? magv = "";
     private string? madot = "";
 
+    private string? hkdn = "HKDN";
+    private string? kltn = "KLTN";
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
@@ -59,56 +62,48 @@
         }
     }
 
-    private async Task DownloadZipFile(string madot,string magv)
+    private async Task DownloadPdf(string mssv)
     {
-
-        var response = await Http.GetAsync(api + $"Ketqua/generatezip?madot={madot}&giangVienId={magv}");
+        var response = await Http.GetAsync(api + $"Ketqua/DiemChiTietSv?mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsByteArrayAsync();
+            var content = await response.Content.ReadAsStringAsync();
+            var diem = JsonConvert.DeserializeObject<ChiTietDiem>(content);
 
-            // Lấy các giá trị từ tiêu đề HTTP
-            var contentDisposition = response.Content.Headers.ContentDisposition;
-            var fileName = contentDisposition.FileName ?? "Dsbaocaobangdiemchitiet_{magv}.zip";
-            var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/zip";
-
-            // Tải file zip về máy
-                await JS.InvokeVoidAsync("window.downloadFileFromByteArray", fileName, content);
-                await JS.InvokeVoidAsync("alert", "Tải thành công");
-
+            await PrintPDF.ChiTietDiem(JS, diem);
+            await JS.InvokeVoidAsync("alert", "Tải dữ liệu in thành công");
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
-        }
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy dữ liệu");
 
-            
+        }
     }
 
-    private async Task DownloadPdf(string mssv)
+    private async Task DownloadPdfTongHop(string maloai)
     {
-
-            var response = await Http.GetAsync(api + $"Ketqua/generatepdfbysv?mssv={mssv}");
+        try
+        {
+            var response = await Http.GetAsync(api + $"Ketqua/DsDiemTong?madot={madot}&maloai={maloai}&magv={magv}");
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsByteArrayAsync();
+                var content = await response.Content.ReadAsStringAsync();
+                var bangdiem = JsonConvert.DeserializeObject<List<TongHopDiem>>(content);
 
-                // Lấy các giá trị từ tiêu đề HTTP
-                var contentDisposition = response.Content.Headers.ContentDisposition;
-                var fileName = contentDisposition.FileName ?? "BaoCaoChiTiet_{mssv}.pdf";
-                var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/pdf";
+                await PrintPDF.TongHopDiem(JS, bangdiem, maloai);
+                await JS.InvokeVoidAsync("alert", "Tải dữ liệu thành công");
 
-            
-                await JS.InvokeVoidAsync("window.downloadFileFromPDf", fileName, content);
-                await JS.InvokeVoidAsync("alert", "Tải thành công");
             }
             else
             {
-                await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
-
+                await JS.InvokeVoidAsync("alert", "Không tìm thấy dữ liệu");
             }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", "Đã xảy ra lỗi");
+        }
     }
-
 
 }
 <PageTitle>Báo cáo</PageTitle>
@@ -126,17 +121,28 @@
             </div>
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                <button @onclick="() => DownloadZipFile(madot,magv)"
-                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+
+                <button @onclick="() => DownloadPdfTongHop(hkdn)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
                             d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    Tải toàn bộ 
+                    Tổng hợp điểm HKDN
 
                 </button>
+
+                <button @onclick="() => DownloadPdfTongHop(kltn)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Tổng hợp điểm KLTN
+                </button>
+
             </div>
         </div>
     </div>

@@ -52,14 +52,13 @@ function $(selector) {
         },
 
         // return something
-        get: () => {
-            if (elements.length > 0) {
-                return elements[0];
-            } else return null;
-        },
-        getAll: () => {
-            if (elements.length > 0) {
-                return elements;
+        _: function (property) {
+            if (elements.length > 0 && property) {
+                if (property == "get") {
+                    return elements[0];
+                } else if (property == "getAll") {
+                    return elements;
+                } else return elements[0][property];
             } else return null;
         },
         isNull: () => {
@@ -115,7 +114,7 @@ function toggleSidebarMobile() {
 }
 
 function handleSidebarToggle() {
-    const sidebar = $("#sidebar").get();
+    const sidebar = $("#sidebar")._("get");
 
     if (sidebar) {
         $(sidebar).toggleClass("hidden");
@@ -241,7 +240,7 @@ function loadCss(cssPath) {
 }
 
 function removeAllStylesheets() {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    var links = $('link[rel="stylesheet"]')._("getAll");
     for (var i = 0; i < links.length; i++) {
         links[i].parentNode.removeChild(links[i]);
     }
@@ -369,28 +368,39 @@ window.downloadFileExcel = (fileName, content, contentType) => {
     URL.revokeObjectURL(url);
 };
 
-window.downloadFileFromByteArray = function (fileName, byteArray) {
-    const blob = new Blob([byteArray], { type: "application/zip" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName ?? "file.zip";
-    link.click();
-    URL.revokeObjectURL(url);
-};
+// window.downloadFileFromByteArray = function (fileName, byteArray) {
+//     const blob = new Blob([byteArray], { type: "application/zip" });
+//     const url = URL.createObjectURL(blob);
+//     const link = document.createElement("a");
+//     link.href = url;
+//     link.download = fileName ?? "file.zip";
+//     link.click();
+//     URL.revokeObjectURL(url);
+// };
 
-window.downloadFileFromPDf = function (fileName, byteArray) {
-    const blob = new Blob([byteArray], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-};
+// window.downloadFileFromPDf = function (fileName, byteArray) {
+//     const blob = new Blob([byteArray], { type: "application/pdf" });
+//     const url = URL.createObjectURL(blob);
+//     const link = document.createElement("a");
+//     link.href = url;
+//     link.download = fileName;
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+//     URL.revokeObjectURL(url);
+// };
 
 function getDeviceWidth() {
     return window.innerWidth;
+}
+
+function PrintPDF(content, name) {
+    var printWindow = window.open("", "_blank");
+    printWindow.document.write("<head><title>" + name + "</title></head>");
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.print();
+    setTimeout(function () {
+        printWindow.close();
+    }, 50);
 }

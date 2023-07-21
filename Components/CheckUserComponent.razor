@@ -4,17 +4,30 @@
 else if (Role != CheckRole){
     <Error Type="NoRole" />
 }    
-else {
+else if (
+    (!CheckDotEqual && DotInfo >= CheckDot)
+    || (CheckDotEqual && DotInfo == CheckDot)
+    ){
     @* <h1>@Role Page</h1> *@
     @ItemContent
+}    
+else {
+    <Error Type="PeriodNotOpen" />
 }
 
 @code {
     protected string? Role = "load";
+    protected int? DotInfo = -1;
     private User? currentUser;
 
     [Parameter]
     public string? CheckRole { get; set; }
+
+    [Parameter]
+    public int? CheckDot { get; set; }
+
+    [Parameter]
+    public bool CheckDotEqual { get; set; }
 
     [Parameter]
     public RenderFragment ItemContent { get; set; }
@@ -23,8 +36,12 @@ else {
     {
         if (firstRender)
         {
+            CheckDot = CheckDot == null ? 0 : CheckDot;
+            @* CheckDotEqual = CheckDotEqual == null ? false : true; *@
+
             currentUser = await Service.GetUser(JS, NavigationManager, false);
             Role = currentUser.Role;
+            DotInfo = currentUser.DotInfo;
             StateHasChanged();
 
             if (Role == CheckRole) {
