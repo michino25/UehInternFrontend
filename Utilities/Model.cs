@@ -48,6 +48,7 @@ namespace UehInternFrontend
         public string? Email { get; set; }
         public string? Sdt { get; set; }
         public string? Role { get; set; }
+        public string? RoleRestore { get; set; }
         public int? DotInfo { get; set; }
         public string? MaLoai { get; set; }
         public string? MaDot { get; set; }

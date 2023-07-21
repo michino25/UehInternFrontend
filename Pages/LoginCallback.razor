@@ -20,15 +20,15 @@
 
         switch (t) {
             case "exist-admin":
-                await NavigateTo("/tongquan");
+                NavigationManager.NavigateTo("/tongquan");
                 break;
 
             case "exist-teacher":
-                await NavigateTo("/sinhvien");
+                NavigationManager.NavigateTo("/sinhvien");
                 break;
 
             case "exist-student":
-                await NavigateTo("/thongtin");
+                NavigationManager.NavigateTo("/thongtin");
                 break;
             
             case "admin":
@@ -42,8 +42,7 @@
                     Role = "teacher"
                 };
 
-                await LoginRequest(user);
-                await NavigateTo("/tongquan");
+                await Service.LoginRequest(JS, NavigationManager, api, user, "/tongquan");
                 break;
 
             case "gv":
@@ -57,8 +56,7 @@
                     Role = "teacher"
                 };
 
-                await LoginRequest(user);
-                await NavigateTo("/sinhvien");
+                await Service.LoginRequest(JS, NavigationManager, api, user, "/sinhvien");
                 break;
 
             default:
@@ -69,47 +67,11 @@
                     Student stu = (Student) obj;
                     user = (UserLogin) stu;
 
-                    await LoginRequest(user);
-                    await NavigateTo("/thongtin");
+                    await Service.LoginRequest(JS, NavigationManager, api, user, "/thongtin");
                 }
                 break;
 
         }
 
-    }
-
-    private async Task LoginRequest(UserLogin user)
-    {
-        if (user != null)
-        {
-            string token = System.Text.Json.JsonSerializer.Serialize(user);
-            token = AES.EncryptData(token);
-
-            @* await JS.InvokeVoidAsync("console.log", token); *@
-
-            token = Uri.EscapeDataString(token);
-
-            var url = api + $"User/LoginUser?encryptedJson={token}";
-            var response = await Http.PostAsync(url, new StringContent(""));
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                User? getUser = JsonConvert.DeserializeObject<User>(content);
-
-                string tokenUser = System.Text.Json.JsonSerializer.Serialize(getUser);
-                tokenUser = AES.EncryptData(tokenUser);
-                await JS.InvokeVoidAsync("userLogin", tokenUser, 30);
-            }
-            else
-            {
-                Console.WriteLine("Đã xảy ra lỗi khi gửi !");
-            }
-        }
-    }
-
-    private async Task NavigateTo(string RedirectTo)
-    {
-        NavigationManager.NavigateTo(RedirectTo);
     }
 }

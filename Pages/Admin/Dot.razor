@@ -120,31 +120,7 @@
     private async Task Relogin()
     {
         UserLogin userLogin = (UserLogin) currentUser;
-        if (userLogin != null)
-        {
-            string token = System.Text.Json.JsonSerializer.Serialize(userLogin);
-            token = AES.EncryptData(token);
-            token = Uri.EscapeDataString(token);
-
-            var url = api + $"User/LoginUser?encryptedJson={token}";
-            var response = await Http.PostAsync(url, new StringContent(""));
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                User? getUser = JsonConvert.DeserializeObject<User>(content);
-
-                string tokenUser = System.Text.Json.JsonSerializer.Serialize(getUser);
-                tokenUser = AES.EncryptData(tokenUser);
-                await JS.InvokeVoidAsync("userLogin", tokenUser, 30);
-
-                NavigationManager.NavigateTo("/tongquan", forceLoad: true);
-            }
-            else
-            {
-                Console.WriteLine("Đã xảy ra lỗi!");
-            }
-        }
+        await Service.LoginRequest(JS, NavigationManager, api, userLogin, "/tongquan");
     }
 
     @* model *@
