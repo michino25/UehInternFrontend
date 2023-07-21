@@ -117,15 +117,15 @@
         }
     }
 
-      private async Task DeletePhanCong()
+    private async Task DeletePhanCong()
     {
         var response = await Http.PutAsync(api + $"Phancong/DeletePhancong?mssv={mssv}", null);
 
         if (response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "Cập nhật phân công thành công");
-             RenderDatas();
-             closeBtn();
+            RenderDatas();
+            closeBtn();
         }
         else
         {
@@ -162,7 +162,7 @@
 
 <PageTitle>Danh sách sinh viên</PageTitle>
 
-<CheckUserComponent CheckRole="admin">
+<CheckUserComponent CheckRole="admin" CheckDot=1>
 <ItemContent>
 
 
