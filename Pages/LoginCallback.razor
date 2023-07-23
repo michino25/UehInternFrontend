@@ -19,6 +19,10 @@
         UserLogin? user;
 
         switch (t) {
+            case "exist-dev":
+                NavigationManager.NavigateTo("/khoa");
+                break;
+
             case "exist-admin":
                 NavigationManager.NavigateTo("/tongquan");
                 break;
@@ -31,6 +35,21 @@
                 NavigationManager.NavigateTo("/thongtin");
                 break;
             
+            case "dev":
+
+                User getUser = new User
+                {
+                    Code = "000001",
+                    Name = "Phòng CNTT",
+                    Email = "phongcntt@ueh.edu.vn",
+                    DotInfo = 0,
+                    Role = "dev"
+                };
+
+                await Service.CookieLogin(JS, getUser);
+                NavigationManager.NavigateTo("/khoa");
+                break;
+
             case "admin":
 
                 user = new UserLogin

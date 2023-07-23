@@ -1,0 +1,679 @@
+﻿@page "/adminkhoa"
+
+@code {
+    public string? api;
+    private string makhoa ="";
+    private GiangvienRequest giangvien = new GiangvienRequest();
+    private List<GiangvienRequest>? giangviens = new List<GiangvienRequest>();
+    private List<string> selectedValues = new List<string>();
+    private long maxFileSize = long.MaxValue;
+    private int maxAllowedFiles = int.MaxValue;
+
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            makhoa = currentUser.MaKhoa;
+            StateHasChanged();
+
+            await RenderDatas();
+        }
+    }
+
+    private async Task RenderDatas()
+    {
+        giangviens = await GetGiangvienByKhoas(makhoa);
+        if (giangviens != null && giangviens.Count > 0 )
+        {
+            StateHasChanged();
+        }
+        else
+        {
+            //await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
+        }
+    }
+
+    private async Task<List<GiangvienRequest>> GetGiangvienByKhoas(string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienRequest>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(maxAllowedFiles);
+
+        using var content = new MultipartFormDataContent();
+
+        foreach (var file in files)
+        {
+            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+            content.Add(fileContent, "formFile", file.Name);
+        }
+
+        var apiUrl = api + $"Giangvien/formFile?makhoa={makhoa}";
+        var response = await Http.PostAsync(apiUrl, content);
+        if (!response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "File not found.");
+        }
+        response.EnsureSuccessStatusCode();
+        await RenderDatas();
+
+    }
+
+    private async Task<GiangvienRequest> GetThongTinGiangvien(string magv)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienRequest>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Không tìm thấy : {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private bool addBtn = false;
+    private bool editBtn = false;
+    private bool cmBtn = false;
+    private bool deleteBtn = false;
+    private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
+
+    private async void modelBtnClick(int btn, string data = "")
+    {
+        switch (btn)
+        {
+            case 1:
+                addBtn = true;
+                break;
+            case 2:
+                editBtn = true;
+                thongtinchitietgv  = await GetThongTinGiangvien(data);
+                break;
+            case 3:
+                cmBtn = true;
+                thongtinchitietgv  = await GetThongTinGiangvien(data);
+                chuyennganhs = await GetChuyennganhsByKhoa(makhoa);
+                break;
+            case 4:
+                deleteBtn = true;
+                thongtinchitietgv  = await GetThongTinGiangvien(data);
+                break;
+        }
+        StateHasChanged();
+    }
+
+    private async Task closeBtn()
+    {
+        addBtn = false;
+        editBtn = false;
+        cmBtn = false;
+        deleteBtn = false;
+        StateHasChanged();
+    }
+
+
+    private async Task SubmitGiangvien(string makhoa)
+    {
+        giangvien.status = "true";
+        var url = api + $"Giangvien?makhoa={makhoa}";
+        var response = await Http.PostAsJsonAsync(url, giangvien);
+        closeBtn();
+
+        if (response.IsSuccessStatusCode)
+        {
+            await RenderDatas();
+            await JS.InvokeVoidAsync("alert", "Thêm giảng viên thành công");
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Thêm giảng viên thất bại");
+        }
+    }
+
+    private async Task UpdateGiangVien(string magv )
+    {
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={magv}", thongtinchitietgv);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật giảng viên thành công");
+            RenderDatas();
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
+
+    private async Task DeleteGiangVien(string magv)
+    {
+        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?magv={magv}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa giảng viên thành công");
+            RenderDatas();
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Xóa giảng viên thất bại");
+        }
+    }
+
+    private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
+
+    private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
+    {
+        var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<List<ChuyennganhModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+
+    private async Task UpdateChuyenMon(string magv)
+    {
+        string json = JsonConvert.SerializeObject(selectedValues);
+        thongtinchitietgv.chuyenmon = json;
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={magv}", thongtinchitietgv);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thành công");
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thất bại");
+        }
+    }
+
+    private void UpdateCheckboxState(string value, string isChecked)
+    {
+        if (isChecked == "True")
+        {
+            selectedValues.Add(value);
+        }
+        else
+        {
+            selectedValues.Remove(value);
+        }
+    }
+
+
+}
+
+<PageTitle>Danh sách Admin khoa</PageTitle>
+
+<CheckUserComponent CheckRole="dev">
+<ItemContent>
+
+
+<div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
+<div
+    class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
+    <div class="w-full mb-5 sm:flex">
+        <div class="mb-3 flex flex-col divide-x divide-gray-100">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách Admin khoa</h1>
+        </div>
+
+        <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+
+            <button @onclick="() => modelBtnClick(1)"
+                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Thêm giảng viên
+            </button>
+            <label for="actual-btn" type="button"
+                class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                <span>Nhập file</span>
+                <InputFile id="actual-btn" class="hidden" OnChange="@OnInputFileChange" multiple />
+            </label>
+
+        </div>
+    </div>
+</div>
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Khoa
+                            </th>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Giảng viên
+                            </th>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Mã giảng viên
+                            </th>
+                            <th scope="col"
+                                class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                                Hành động
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+
+                                <tr class="hover:bg-gray-100">
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        Công nghệ thông tin Kinh doanh
+                                    </td>
+                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                        <div class="text-sm font-normal text-gray-500">
+                                            <div class="text-base font-semibold text-gray-900">Phan Hiền
+                                            </div>
+                                            <div class="text-sm font-normal text-gray-500">
+                                                hienphan@ueh.edu.vn</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        000462</td>
+                                    <td class="p-4 space-x-2 whitespace-nowrap">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
+                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
+                                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                                                </path>
+                                                <path fill-rule="evenodd"
+                                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            Sửa
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-100">
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        Tài chính
+                                    </td>
+                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                        <div class="text-sm font-normal text-gray-500">
+                                            <div class="text-base font-semibold text-gray-900">Chưa có admin
+                                            </div>
+                                            <div class="text-sm font-normal text-gray-500">
+                                                </div>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        </td>
+                                    <td class="p-4 space-x-2 whitespace-nowrap">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
+                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
+                                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                                                </path>
+                                                <path fill-rule="evenodd"
+                                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            Sửa
+                                        </button>
+                                    </td>
+                                </tr>
+
+                        @if (giangviens != null)
+                        { 
+                            @foreach (var giangvien in giangviens)
+                            {
+
+                                <tr class="hover:bg-gray-100">
+                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                        <div class="text-sm font-normal text-gray-500">
+                                            <div class="text-base font-semibold text-gray-900">@giangvien.tengv
+                                            </div>
+                                            <div class="text-sm font-normal text-gray-500">
+                                                @giangvien.email</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        @giangvien.magv
+                                    </td>
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        @giangvien.sdt</td>
+                                    <td class="p-4 space-x-2 whitespace-nowrap">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-800 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300"
+                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
+                                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                                                </path>
+                                                <path fill-rule="evenodd"
+                                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            Sửa
+                                        </button>
+                                    </td>
+                                </tr>
+
+                            }   
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sticky bottom-0 right-0 items-center w-full py-4 -mb-4 bg-white border-t border-gray-200 sm:flex sm:justify-between">
+    <div class="flex items-center mb-4 sm:mb-0">
+        <span class="text-sm font-normal text-gray-500">
+            Hiển thị 
+            <span class="font-semibold text-gray-900">@giangviens.Count</span>
+            giảng viên</span>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="flex items-center justify-center fixed w-screen h-screen z-30">
+    @if (addBtn || editBtn || cmBtn || deleteBtn)
+    {
+        <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
+    }
+
+    <div class="fixed top-1/2 left-1/2 right-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center overflow-x-hidden overflow-y-auto h-fit h-max-full scrollbar-hide">
+        <!-- Edit User Modal -->
+        @if (editBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Chỉnh sửa thông tin giảng viên
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <form action="#">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="first-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
+                                    <input type="text" @bind =@thongtinchitietgv.magv  name="first-name" id="first-name"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="last-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
+                                    <input type="text" @bind =@thongtinchitietgv.tengv name="last-name" id="last-name"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="email"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                    <input type="email" @bind =@thongtinchitietgv.email name="email" id="email"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="position"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
+                                    <input type="text" @bind =@thongtinchitietgv.sdt name="position" id="position"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button @onclick="() => UpdateGiangVien(thongtinchitietgv.magv)"
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit">Lưu giảng viên</button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+        <!-- Chuyenmon User Modal -->
+        @if (cmBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Chỉnh sửa chuyên môn
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="first-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
+                                    <input @bind ="thongtinchitietgv.tengv" readonly type="text" name="first-name" id="first-name"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="email"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                    <input @bind ="thongtinchitietgv.email" readonly type="email" name="email" id="email"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                                <div class="col-span-6">
+                                    <label for="biography"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Chuyên môn</label>
+                                    <ul class="grid w-full gap-x-6 gap-y-4 grid-cols-2">
+                                        @if(chuyennganhs.Count > 0)
+                                        {
+                                            foreach (var chuyenganh in chuyennganhs)
+                                            {
+                                                bool isChecked = selectedValues.Contains(chuyenganh.macn);
+                                                <li>
+                                                            <input type="checkbox" id="@chuyenganh.macn.ToLower()-option" value="@chuyenganh.macn" class="hidden peer" checked="@isChecked" @onchange="e => UpdateCheckboxState(chuyenganh.macn, e.Value.ToString())" />
+                                                            
+                                                            <label for="@chuyenganh.macn.ToLower()-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
+                                                        <div class="block">
+                                                            <div class="w-full text-sm font-semibold">@chuyenganh.macn</div>
+                                                            <div class="w-full text-xs">@chuyenganh.tencn</div>
+                                                        </div>
+                                                    </label>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.magv)"
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit">Lưu</button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+        <!-- Add User Modal -->
+        @if (addBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Thêm giảng viên
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="magv"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
+                                <input type="text" @bind="@giangvien.magv" name="magv" id="magv" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="name"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
+                                <input type="text" @bind="@giangvien.tengv" name="name" id="name" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="email"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                <input type="email" @bind="@giangvien.email" name="email" id="email" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="phone"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
+                                <input type="text" @bind="@giangvien.sdt" name="phone" id="phone" required
+                                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                        </div>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit"
+                            @onclick="() => SubmitGiangvien(makhoa)">
+                            Thêm giảng viên
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+        <!-- Delete User Modal -->
+        @if (deleteBtn)
+        {
+            <div class="relative w-full h-full max-w-md px-4 md:h-auto">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex justify-end p-2">
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 pt-0 text-center">
+                        <svg class="w-16 h-16 mx-auto text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa giảng viên này ?</h3>
+                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)" 
+                            class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3">
+                            Xóa
+                        </button>
+                        <button
+                            class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 border border-gray-300 font-medium inline-flex items-center rounded-lg text-base px-6 py-2.5 text-center"
+                            @onclick="() => closeBtn()">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+</div>
+
+</ItemContent>
+</CheckUserComponent>

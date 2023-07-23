@@ -51,9 +51,7 @@ namespace UehInternFrontend
                     User? getUser = JsonConvert.DeserializeObject<User>(content);
                     getUser.RoleRestore = getUser.Role == "admin" ? "admin" : "";
 
-                    string tokenUser = System.Text.Json.JsonSerializer.Serialize(getUser);
-                    tokenUser = AES.EncryptData(tokenUser);
-                    await js.InvokeVoidAsync("userLogin", tokenUser, 30);
+                    CookieLogin(js, getUser);
 
                     if (RedirectTo != null)
                     {
@@ -64,6 +62,16 @@ namespace UehInternFrontend
             }
             await js.InvokeVoidAsync("alert", "Đã xảy ra lỗi khi gửi yêu cầu");
             return false;
+        }
+
+        public static async Task CookieLogin(IJSRuntime js, User user)
+        {
+            if (user != null)
+            {
+                string tokenUser = System.Text.Json.JsonSerializer.Serialize(user);
+                tokenUser = AES.EncryptData(tokenUser);
+                await js.InvokeVoidAsync("userLogin", tokenUser, 30);
+            }
         }
 
         public static async Task AdminChangeMode(IJSRuntime js, NavigationManager navigationManager, string RedirectTo)

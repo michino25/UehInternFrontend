@@ -20,6 +20,11 @@
 
     private async Task HandleValidSubmit()
     {
+        if (loginRequest.Username == "dev")
+        {
+            NavigationManager.NavigateTo("/LoginCallback/?t=dev");
+        }
+        else
         if (loginRequest.Username == "thinhdt")
         {
             NavigationManager.NavigateTo("/LoginCallback/?t=gv");

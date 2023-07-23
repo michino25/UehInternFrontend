@@ -1,0 +1,90 @@
+﻿
+@code {
+    protected int? DotInfo = -1;
+
+    private User? currentUser;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            DotInfo = currentUser.DotInfo;
+            StateHasChanged();
+        }
+    }
+}
+
+<div class="h-full px-3 py-3 pb-20 overflow-y-scroll scrollbar-hide">
+    <ul class="space-y-2 font-medium">
+        @* Info *@
+        <li>
+            <div class="lg:hidden">
+                <div class="relative">
+                    <div class="flex items-center justify-center bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
+                        <span>Dev</span>
+                    </div>
+                </div>
+            </div>
+        </li>
+
+        @if (DotInfo >= 0)
+        {
+            @* Khoa *@
+            <li>
+                <NavLink href="/khoa"
+                    class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <svg aria-hidden="true"
+                        class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                        fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
+                    </svg>
+                    <span class="ml-3">Khoa</span>
+                </NavLink>
+            </li>
+
+            @* Admin khoa *@
+            <li>
+                <NavLink href="/adminkhoa"
+                    class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <svg aria-hidden="true"
+                        class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                        fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-3">Admin khoa</span>
+                </NavLink>
+            </li>
+        }
+
+
+    </ul>
+
+    <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
+        <li>
+            <NavLink href="trogiup/dev" class="nav-link flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <path
+                            d="M19.5816 18.5209C21.0889 16.7701 22 14.4915 22 12C22 9.50853 21.0889 7.22987 19.5816 5.47906L15.3089 9.75178C15.745 10.3925 16 11.1665 16 12C16 12.8335 15.745 13.6075 15.3089 14.2482L19.5816 18.5209Z"
+                            fill="currentColor"></path>
+                        <path
+                            d="M18.5209 19.5816C16.7701 21.0889 14.4915 22 12 22C9.50853 22 7.22987 21.0889 5.47906 19.5816L9.75178 15.3089C10.3925 15.745 11.1665 16 12 16C12.8335 16 13.6075 15.745 14.2482 15.3089L18.5209 19.5816Z"
+                            fill="currentColor"></path>
+                        <path
+                            d="M4.4184 18.5209L8.69112 14.2482C8.25495 13.6075 8 12.8335 8 12C8 11.1665 8.25495 10.3925 8.69112 9.75178L4.4184 5.47906C2.91114 7.22987 2 9.50853 2 12C2 14.4915 2.91114 16.7701 4.4184 18.5209Z"
+                            fill="currentColor"></path>
+                        <path
+                            d="M12 8C11.1665 8 10.3925 8.25495 9.75178 8.69112L5.47906 4.4184C7.22987 2.91114 9.50853 2 12 2C14.4915 2 16.7701 2.91114 18.5209 4.4184L14.2482 8.69112C13.6075 8.25495 12.8335 8 12 8Z"
+                            fill="currentColor"></path>
+                    </g>
+                </svg>
+                <span class="flex-1 ml-3 whitespace-nowrap">Trợ giúp</span>
+            </NavLink>
+        </li>
+    </ul>
+
+</div>
