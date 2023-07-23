@@ -54,10 +54,12 @@
         giangviendk = await GetDangkyGvHuongDanSv(mssv);
 
         ketqua = await GetKetQuaSinhVien(mssv);
-        sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
-
-        sum = maloai == "HKDN" ? (double)(sum * 0.6 + (ketqua.diemDN ?? 0) * 0.4) : sum;
-        sum = sum > 10 ? 10 : sum;
+        if (ketqua != null)
+        {
+            sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
+            sum = maloai == "HKDN" ? (double)(sum * 0.6 + (ketqua.diemDN ?? 0) * 0.4) : sum;
+            sum = sum > 10 ? 10 : sum;
+        }
 
         StateHasChanged();
     }
@@ -198,20 +200,10 @@
                 Đăng ký sớm
             </span>
         </h5>
-        @if(giangviendk != null)
-        {
-                    <p class="mb-3 font-normal text-gray-700">
-                        @giangviendk.tengv
-                    </p>
-        } else 
-        {
-            <p class="mb-3 font-normal text-gray-700">
-                 Chưa có thông tin
-            </p>
-        }
-       
+        <p class="mb-3 font-normal text-gray-700">
+            @(giangviendk?.tengv != null ? giangviendk.tengv : "Chưa có thông tin")
+        </p>
     </div>
-
 }
 
 @if (DotInfo == 0)

@@ -12,6 +12,7 @@
             StateHasChanged();
 
             await JS.InvokeVoidAsync("sidebarClick");
+            await JS.InvokeVoidAsync("sidebarActive");
         }
     }
 
@@ -23,7 +24,7 @@
 
 }
 
-<div class="h-full px-3 py-3 overflow-y-auto">
+<div class="h-full px-3 py-3 pb-20 overflow-y-scroll scrollbar-hide">
     <ul class="space-y-2 font-medium">
         @* Info *@
         <li>

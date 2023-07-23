@@ -75,13 +75,16 @@
 
         var apiUrl = api + $"Chuyennganh/formFile?makhoa={Uri.EscapeDataString(makhoa)}";
         var response = await Http.PostAsync(apiUrl, content);
-        if (!response.IsSuccessStatusCode)
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Import file thành công");
+            await RenderDatas();
+        }
+        else
         {
             await JS.InvokeVoidAsync("alert", "File không được cập nhất");
         }
-        response.EnsureSuccessStatusCode();
-        await JS.InvokeVoidAsync("alert", "Import file thành công");
-        response.EnsureSuccessStatusCode();
     }
 
 

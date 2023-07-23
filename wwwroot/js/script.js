@@ -92,7 +92,6 @@ function $(selector) {
 }
 
 function executeScript() {
-    sidebarActive();
     toggleSidebarMobile();
 }
 

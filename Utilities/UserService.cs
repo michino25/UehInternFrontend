@@ -29,7 +29,7 @@ namespace UehInternFrontend
             return null;
         }
 
-        public static async Task LoginRequest(IJSRuntime js, NavigationManager navigationManager, string api, UserLogin user, string RedirectTo = null)
+        public static async Task<bool> LoginRequest(IJSRuntime js, NavigationManager navigationManager, string api, UserLogin user, string RedirectTo = null)
         {
             if (user != null)
             {
@@ -59,13 +59,11 @@ namespace UehInternFrontend
                     {
                         navigationManager.NavigateTo(RedirectTo, forceLoad: true);
                     }
-
-                }
-                else
-                {
-                    await js.InvokeVoidAsync("Đã xảy ra lỗi khi gửi yêu cầu");
+                    return true;
                 }
             }
+            await js.InvokeVoidAsync("alert", "Đã xảy ra lỗi khi gửi yêu cầu");
+            return false;
         }
 
         public static async Task AdminChangeMode(IJSRuntime js, NavigationManager navigationManager, string RedirectTo)
@@ -88,7 +86,7 @@ namespace UehInternFrontend
                 }
                 else
                 {
-                    await js.InvokeVoidAsync("Đã xảy ra lỗi khi gửi yêu cầu");
+                    await js.InvokeVoidAsync("alert", "Đã xảy ra lỗi khi gửi yêu cầu");
                 }
             }
             else
