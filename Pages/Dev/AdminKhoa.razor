@@ -3,8 +3,8 @@
 @code {
     public string? api;
     private string makhoa ="";
-    private GiangvienRequest giangvien = new GiangvienRequest();
-    private List<GiangvienRequest>? giangviens = new List<GiangvienRequest>();
+    private UserRoleAdminRequest user = new UserRoleAdminRequest();
+    private List<UserRoleAdminRequest>? users = new List<UserRoleAdminRequest>();
     private List<string> selectedValues = new List<string>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
@@ -29,8 +29,8 @@
 
     private async Task RenderDatas()
     {
-        giangviens = await GetGiangvienByKhoas(makhoa);
-        if (giangviens != null && giangviens.Count > 0 )
+        users = await GetUserRoleAdminRequests();
+        if (users != null && users.Count > 0 )
         {
             StateHasChanged();
         }
@@ -40,13 +40,13 @@
         }
     }
 
-    private async Task<List<GiangvienRequest>> GetGiangvienByKhoas(string makhoa)
+    private async Task<List<UserRoleAdminRequest>> GetUserRoleAdminRequests()
     {
-        var response = await Http.GetAsync(api + $"Giangvien/khoa/{makhoa}");
+        var response = await Http.GetAsync(api + $"User/GetUserRoleAdminRequests");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<GiangvienRequest>>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<UserRoleAdminRequest>>(content);
             return uploadModel;
         }
         else
@@ -81,13 +81,13 @@
 
     }
 
-    private async Task<GiangvienRequest> GetThongTinGiangvien(string magv)
+    private async Task<UserRoleAdminRequest> GetThongTinGiangvien(string userId)
     {
-        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?magv={magv}");
+        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?userId={userId}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<GiangvienRequest>(content);
+            var uploadModel = JsonConvert.DeserializeObject<UserRoleAdminRequest>(content);
             return uploadModel;
         }
         else
@@ -101,7 +101,7 @@
     private bool editBtn = false;
     private bool cmBtn = false;
     private bool deleteBtn = false;
-    private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
+    private UserRoleAdminRequest thongtinchitietgv = new UserRoleAdminRequest();
 
     private async void modelBtnClick(int btn, string data = "")
     {
@@ -139,9 +139,8 @@
 
     private async Task SubmitGiangvien(string makhoa)
     {
-        giangvien.status = "true";
         var url = api + $"Giangvien?makhoa={makhoa}";
-        var response = await Http.PostAsJsonAsync(url, giangvien);
+        var response = await Http.PostAsJsonAsync(url, user);
         closeBtn();
 
         if (response.IsSuccessStatusCode)
@@ -156,9 +155,9 @@
         }
     }
 
-    private async Task UpdateGiangVien(string magv )
+    private async Task UpdateGiangVien(string userId )
     {
-        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={magv}", thongtinchitietgv);
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?userId={userId}", thongtinchitietgv);
 
         if (response.IsSuccessStatusCode)
         {
@@ -172,9 +171,9 @@
         }
     }
 
-    private async Task DeleteGiangVien(string magv)
+    private async Task DeleteGiangVien(string userId)
     {
-        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?magv={magv}");
+        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?userId={userId}");
 
         if (response.IsSuccessStatusCode)
         {
@@ -206,11 +205,10 @@
         }
     }
 
-    private async Task UpdateChuyenMon(string magv)
+    private async Task UpdateChuyenMon(string userId)
     {
         string json = JsonConvert.SerializeObject(selectedValues);
-        thongtinchitietgv.chuyenmon = json;
-        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={magv}", thongtinchitietgv);
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?userId={userId}", thongtinchitietgv);
 
         if (response.IsSuccessStatusCode)
         {
@@ -308,37 +306,6 @@
 
                                 <tr class="hover:bg-gray-100">
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        Công nghệ thông tin Kinh doanh
-                                    </td>
-                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                        <div class="text-sm font-normal text-gray-500">
-                                            <div class="text-base font-semibold text-gray-900">Phan Hiền
-                                            </div>
-                                            <div class="text-sm font-normal text-gray-500">
-                                                hienphan@ueh.edu.vn</div>
-                                        </div>
-                                    </td>
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        000462</td>
-                                    <td class="p-4 space-x-2 whitespace-nowrap">
-                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
-                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
-                                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
-                                                </path>
-                                                <path fill-rule="evenodd"
-                                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                                                    clip-rule="evenodd"></path>
-                                            </svg>
-                                            Sửa
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr class="hover:bg-gray-100">
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                         Tài chính
                                     </td>
                                     <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
@@ -353,7 +320,7 @@
                                         </td>
                                     <td class="p-4 space-x-2 whitespace-nowrap">
                                         <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
-                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
+                                            @onclick="() => modelBtnClick(2, user.userId)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -368,28 +335,30 @@
                                     </td>
                                 </tr>
 
-                        @if (giangviens != null)
+                        @if (users != null)
                         { 
-                            @foreach (var giangvien in giangviens)
+                            @foreach (var user in users)
                             {
 
                                 <tr class="hover:bg-gray-100">
-                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                      <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        @user.tenkhoa
+                                    </td>
+                                 
+                                     <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                         <div class="text-sm font-normal text-gray-500">
-                                            <div class="text-base font-semibold text-gray-900">@giangvien.tengv
+                                            <div class="text-base font-semibold text-gray-900">@user.name
                                             </div>
                                             <div class="text-sm font-normal text-gray-500">
-                                                @giangvien.email</div>
+                                                @user.email</div>
                                         </div>
                                     </td>
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        @giangvien.magv
+                                       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        @user.userId
                                     </td>
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        @giangvien.sdt</td>
                                     <td class="p-4 space-x-2 whitespace-nowrap">
                                         <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-800 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300"
-                                            @onclick="() => modelBtnClick(2, giangvien.magv)">
+                                            @onclick="() => modelBtnClick(2, user.userId)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -418,7 +387,7 @@
     <div class="flex items-center mb-4 sm:mb-0">
         <span class="text-sm font-normal text-gray-500">
             Hiển thị 
-            <span class="font-semibold text-gray-900">@giangviens.Count</span>
+            <span class="font-semibold text-gray-900">@users.Count</span>
             giảng viên</span>
     </div>
 </div>
@@ -459,13 +428,13 @@
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
-                                    <input type="text" @bind =@thongtinchitietgv.magv  name="first-name" id="first-name"
+                                    <input type="text" @bind =@thongtinchitietgv.userId  name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="last-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input type="text" @bind =@thongtinchitietgv.tengv name="last-name" id="last-name"
+                                    <input type="text" @bind =@thongtinchitietgv.name name="last-name" id="last-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
@@ -485,7 +454,7 @@
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                        <button @onclick="() => UpdateGiangVien(thongtinchitietgv.magv)"
+                        <button @onclick="() => UpdateGiangVien(thongtinchitietgv.userId)"
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit">Lưu giảng viên</button>
                     </div>
@@ -521,7 +490,7 @@
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input @bind ="thongtinchitietgv.tengv" readonly type="text" name="first-name" id="first-name"
+                                    <input @bind ="thongtinchitietgv.name" readonly type="text" name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
@@ -557,7 +526,7 @@
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.magv)"
+                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.userId)"
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit">Lưu</button>
                     </div>
@@ -591,27 +560,27 @@
                     <div class="p-6 space-y-6">
                         <div class="grid grid-cols-6 gap-6">
                             <div class="col-span-6 sm:col-span-3">
-                                <label for="magv"
+                                <label for="userId"
                                     class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
-                                <input type="text" @bind="@giangvien.magv" name="magv" id="magv" required
+                                <input type="text" @bind="@user.userId" name="userId" id="userId" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="name"
                                     class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                <input type="text" @bind="@giangvien.tengv" name="name" id="name" required
+                                <input type="text" @bind="@user.name" name="name" id="name" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="email"
                                     class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                <input type="email" @bind="@giangvien.email" name="email" id="email" required
+                                <input type="email" @bind="@user.email" name="email" id="email" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="phone"
                                     class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
-                                <input type="text" @bind="@giangvien.sdt" name="phone" id="phone" required
+                                <input type="text" @bind="@user.sdt" name="phone" id="phone" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -656,7 +625,7 @@
                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa giảng viên này ?</h3>
-                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)" 
+                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.userId)" 
                             class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3">
                             Xóa
                         </button>
