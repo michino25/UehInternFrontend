@@ -80,10 +80,11 @@
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "Tải thất bại");
         }
         else {
             await JS.InvokeVoidAsync("alert", "Tải thành công");
+            RenderDatas();
 
         }
         response.EnsureSuccessStatusCode();

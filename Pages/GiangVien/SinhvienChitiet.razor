@@ -9,6 +9,7 @@
 @code {
 
     public string? api;
+    private User? currentUser;
 
     [Parameter] public string idSv { get; set; }
     private ChitietModel? chitiet = new ChitietModel();
@@ -18,6 +19,7 @@
     private List<UploadModel> files = new List<UploadModel>();
     private List<LichsuModel> lichsus = new List<LichsuModel>();
     private string maloai = "";
+    private string? madot = "";
     private bool isHKDN;
     private double sum = 0;
 
@@ -30,6 +32,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
             await RenderDatas();
             StateHasChanged();
         }
@@ -128,7 +132,7 @@
 
     private async Task<bool> IsHKDN(string mssv)
     {
-        string url = api + $"Phancong/kiemtra/{mssv}";
+        string url = api + $"Phancong/kiemtra?madot={madot}&mssv={mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
 
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -146,7 +150,7 @@
         }
         else
         {
-            Console.WriteLine($"Error retrieving files: {response.StatusCode}");
+            Console.WriteLine($"Lỗi khi truy xuất tệp: {response.StatusCode}");
             return null;
         }
 
@@ -157,7 +161,7 @@
         var response = GetFileDownLoad(storedFileName,contentType);
         if (!response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp.");
         }
         else
         {
@@ -200,7 +204,7 @@
         }
         else
         {
-            Console.WriteLine($"Error retrieving sinh viên: {response.StatusCode}");
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
             return null;
         }
     }
@@ -209,7 +213,7 @@
     {
         maloai = !isHKDN ? "HKDN" : "KLTN";
 
-        var response = await Http.PutAsync(api + $"Phancong/UpdateLoaiHinhThucTap?mssv={idSv}&maloai={maloai}", null);
+        var response = await Http.PutAsync(api + $"Phancong/UpdateLoaiHinhThucTap?madot={madot}&mssv={idSv}&maloai={maloai}", null);
 
         if (response.IsSuccessStatusCode)
         {
