@@ -2,12 +2,14 @@
 
 @code {
     public string? api;
-    private string makhoa ="";
+    private GiangvienRequest giangvien = new GiangvienRequest();
     private UserRoleAdminRequest user = new UserRoleAdminRequest();
     private List<UserRoleAdminRequest>? users = new List<UserRoleAdminRequest>();
     private List<string> selectedValues = new List<string>();
     private long maxFileSize = long.MaxValue;
     private int maxAllowedFiles = int.MaxValue;
+    private List<KhoaModel>? khoads = new List<KhoaModel>();
+    private string makhoa;
 
     protected override void OnInitialized()
     {
@@ -20,7 +22,6 @@
         if (firstRender)
         {
             currentUser = await Service.GetUser(JS, NavigationManager);
-            makhoa = currentUser.MaKhoa;
             StateHasChanged();
 
             await RenderDatas();
@@ -29,9 +30,12 @@
 
     private async Task RenderDatas()
     {
+        khoads = await GetListKhoa("CNTTKD");
+
         users = await GetUserRoleAdminRequests();
         if (users != null && users.Count > 0 )
         {
+
             StateHasChanged();
         }
         else
@@ -70,24 +74,38 @@
             content.Add(fileContent, "formFile", file.Name);
         }
 
-        var apiUrl = api + $"Giangvien/formFile?makhoa={makhoa}";
+        var apiUrl = api + $"User/formFile";
         var response = await Http.PostAsync(apiUrl, content);
         if (!response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy tệp.");
         }
         response.EnsureSuccessStatusCode();
         await RenderDatas();
 
     }
-
-    private async Task<UserRoleAdminRequest> GetThongTinGiangvien(string userId)
+     private async Task<List<KhoaModel>> GetListKhoa(string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?userId={userId}");
+        var response = await Http.GetAsync(api + $"Khoa/GetListKhoa");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<UserRoleAdminRequest>(content);
+            var uploadModel = JsonConvert.DeserializeObject<List<KhoaModel>>(content);
+            return uploadModel;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
+            return null;
+        }
+    }
+    private async Task<GiangvienRequest> GetThongTinGiangvien(string userId)
+    {
+        var response = await Http.GetAsync(api + $"Giangvien/GetThongtinGiangvien?magv={userId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var uploadModel = JsonConvert.DeserializeObject<GiangvienRequest>(content);
             return uploadModel;
         }
         else
@@ -101,7 +119,7 @@
     private bool editBtn = false;
     private bool cmBtn = false;
     private bool deleteBtn = false;
-    private UserRoleAdminRequest thongtinchitietgv = new UserRoleAdminRequest();
+    private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
 
     private async void modelBtnClick(int btn, string data = "")
     {
@@ -117,7 +135,6 @@
             case 3:
                 cmBtn = true;
                 thongtinchitietgv  = await GetThongTinGiangvien(data);
-                chuyennganhs = await GetChuyennganhsByKhoa(makhoa);
                 break;
             case 4:
                 deleteBtn = true;
@@ -137,10 +154,13 @@
     }
 
 
-    private async Task SubmitGiangvien(string makhoa)
+
+
+    private async Task SubmitGiangvien()
     {
-        var url = api + $"Giangvien?makhoa={makhoa}";
-        var response = await Http.PostAsJsonAsync(url, user);
+        giangvien.status = "true";
+        var url = api + $"User/CreateUserRoleAdmin?makhoa={makhoa}";
+        var response = await Http.PostAsJsonAsync(url, giangvien);
         closeBtn();
 
         if (response.IsSuccessStatusCode)
@@ -157,7 +177,7 @@
 
     private async Task UpdateGiangVien(string userId )
     {
-        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?userId={userId}", thongtinchitietgv);
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?magv={userId}", thongtinchitietgv);
 
         if (response.IsSuccessStatusCode)
         {
@@ -173,7 +193,7 @@
 
     private async Task DeleteGiangVien(string userId)
     {
-        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?userId={userId}");
+        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?magv={userId}");
 
         if (response.IsSuccessStatusCode)
         {
@@ -208,7 +228,7 @@
     private async Task UpdateChuyenMon(string userId)
     {
         string json = JsonConvert.SerializeObject(selectedValues);
-        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?userId={userId}", thongtinchitietgv);
+        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?makhoa={userId}", thongtinchitietgv);
 
         if (response.IsSuccessStatusCode)
         {
@@ -304,37 +324,6 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
 
-                                <tr class="hover:bg-gray-100">
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        Tài chính
-                                    </td>
-                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
-                                        <div class="text-sm font-normal text-gray-500">
-                                            <div class="text-base font-semibold text-gray-900">Chưa có admin
-                                            </div>
-                                            <div class="text-sm font-normal text-gray-500">
-                                                </div>
-                                        </div>
-                                    </td>
-                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        </td>
-                                    <td class="p-4 space-x-2 whitespace-nowrap">
-                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
-                                            @onclick="() => modelBtnClick(2, user.userId)">
-                                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
-                                                </path>
-                                                <path fill-rule="evenodd"
-                                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                                                    clip-rule="evenodd"></path>
-                                            </svg>
-                                            Sửa
-                                        </button>
-                                    </td>
-                                </tr>
-
                         @if (users != null)
                         { 
                             @foreach (var user in users)
@@ -428,13 +417,13 @@
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
-                                    <input type="text" @bind =@thongtinchitietgv.userId  name="first-name" id="first-name"
+                                    <input type="text" @bind =@thongtinchitietgv.magv  name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="last-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input type="text" @bind =@thongtinchitietgv.name name="last-name" id="last-name"
+                                    <input type="text" @bind =@thongtinchitietgv.tengv name="last-name" id="last-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
@@ -454,7 +443,7 @@
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                        <button @onclick="() => UpdateGiangVien(thongtinchitietgv.userId)"
+                        <button @onclick="() => UpdateGiangVien(thongtinchitietgv.magv)"
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit">Lưu giảng viên</button>
                     </div>
@@ -490,7 +479,7 @@
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="first-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input @bind ="thongtinchitietgv.name" readonly type="text" name="first-name" id="first-name"
+                                    <input @bind ="thongtinchitietgv.tengv" readonly type="text" name="first-name" id="first-name"
                                         class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                                 <div class="col-span-6 sm:col-span-3">
@@ -526,7 +515,7 @@
                     </div>
                     @* <!-- Modal footer --> *@
                     <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.userId)"
+                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.magv)"
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit">Lưu</button>
                     </div>
@@ -544,7 +533,7 @@
                     @* <!-- Modal header --> *@
                     <div class="flex items-start justify-between p-5 border-b rounded-t">
                         <h3 class="text-xl font-semibold">
-                            Thêm giảng viên
+                            Thêm admin
                         </h3>
                         <button type="button"
                             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -559,28 +548,46 @@
                     @* <!-- Modal body --> *@
                     <div class="p-6 space-y-6">
                         <div class="grid grid-cols-6 gap-6">
+                             <div class="col-span-6 sm:col-span-3">
+                                    <label for="magv"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Khoa
+                                    </label>
+                                    @* Tham khảo cách dùng select: Giangvien/Lichsugapthem.razor *@
+                                        <select @bind="makhoa" id="makhoa"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option selected hidden>--Chọn khoa--</option>
+                                        @if (true)
+                                        {
+                                            foreach(var khoa in khoads)
+                                            {
+                                                <option value="@khoa.makhoa">@khoa.tenkhoa</option>
+                                            }
+                                            
+                                        }
+                                    </select>
+                                </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="userId"
                                     class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
-                                <input type="text" @bind="@user.userId" name="userId" id="userId" required
+                                <input type="text" @bind="@giangvien.magv" name="userId" id="userId" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="name"
                                     class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                <input type="text" @bind="@user.name" name="name" id="name" required
+                                <input type="text" @bind="@giangvien.tengv" name="name" id="name" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="email"
                                     class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                <input type="email" @bind="@user.email" name="email" id="email" required
+                                <input type="email" @bind="@giangvien.email" name="email" id="email" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="phone"
                                     class="block mb-2 text-sm font-medium text-gray-900">Số điện thoại</label>
-                                <input type="text" @bind="@user.sdt" name="phone" id="phone" required
+                                            <input type="text" @bind="@giangvien.sdt" name="phone" id="phone" required
                                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -590,7 +597,7 @@
                         <button
                             class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             type="submit"
-                            @onclick="() => SubmitGiangvien(makhoa)">
+                            @onclick="() => SubmitGiangvien()">
                             Thêm giảng viên
                         </button>
                     </div>
@@ -625,7 +632,7 @@
                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa giảng viên này ?</h3>
-                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.userId)" 
+                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)" 
                             class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3">
                             Xóa
                         </button>
