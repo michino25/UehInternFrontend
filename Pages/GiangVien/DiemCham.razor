@@ -4,19 +4,24 @@
     [Parameter] public string idSv { get; set; }
 
     public string? api;
-    protected override void OnInitialized()
-    {
-        api = Configuration["apiBackend"];
-    }
-
+    private string? madot = "";
+    private User? currentUser;
     private SinhvienModel? sinhvien = new SinhvienModel();
     private KetquaModel? ketqua = new KetquaModel();
     private bool isHKDN;
     private double sum = 0;
 
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) {
+            currentUser = await Service.GetUser(JS, NavigationManager);
+            madot = currentUser.MaDot;
+
             await RenderDatas();
             StateHasChanged();
         }
@@ -76,7 +81,7 @@
 
     private async Task<bool> IsHKDN(string mssv)
     {
-        string url = api + $"Phancong/kiemtra/{mssv}";
+        string url = api + $"Phancong/kiemtra?madot={madot}&mssv={mssv}";
         HttpResponseMessage response = await Http.GetAsync(url);
         
         string responseBody = await response.Content.ReadAsStringAsync();

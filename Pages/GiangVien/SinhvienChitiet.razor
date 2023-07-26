@@ -141,7 +141,7 @@
 
     private async Task<List<UploadModel>> GetFiles(string mssv)
     {
-        var response = await Http.GetAsync(api + $"File?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"File?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -498,7 +498,7 @@
                 <tr class="">
                     <td class="flex items-center p-4 mr-12 space-x-1 whitespace-nowrap">
                         <div class="text-sm font-normal text-gray-500">
-                            <div class="text-base text-gray-900">Chưa có file</div>
+                            <div class="text-base text-gray-900">Chưa có lịch sử</div>
                         </div>
                     </td>
                 </tr>

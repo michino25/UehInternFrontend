@@ -160,9 +160,14 @@
         <div class="p-6 mb-4 bg-white border border-gray-200 rounded-lg">
             <h5 class="inline-flex items-center justify-center mb-2 text-2xl font-bold tracking-tight text-gray-900">
                 Đề tài đã đăng ký
-                <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
+                @if (chitiet.tendetai != null && chitiet.tendetai.Length > 0)
+                {
+                      <span class="inline-flex justify-center items-center bg-green-100 text-teal-800 text-sm font-medium ml-5 px-4 py-1 rounded-full">
                     Đã duyệt
                 </span>
+                }
+
+              
             </h5>
             <p class="mb-3 font-normal text-gray-700">
                 @chitiet.tendetai

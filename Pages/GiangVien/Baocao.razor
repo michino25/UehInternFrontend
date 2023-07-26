@@ -10,12 +10,13 @@
     private string? hkdn = "HKDN";
     private string? kltn = "KLTN";
 
+    private User? currentUser;
+
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
     }
 
-    private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

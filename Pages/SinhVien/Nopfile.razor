@@ -23,7 +23,7 @@
 
     private string? mssv = "";
     private string? maloai = "";
-
+    private string? madot = "";
     private User? currentUser;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -32,6 +32,8 @@
             currentUser = await Service.GetUser(JS, NavigationManager);
             mssv = currentUser.Code;
             maloai = currentUser.MaLoai;
+            madot = currentUser.MaDot;
+
             StateHasChanged();
 
             await RenderDatas();
@@ -55,7 +57,7 @@
 
     private async Task<List<UploadModel>> GetFiles(string mssv)
     {
-        var response = await Http.GetAsync(api + $"File?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"File?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -116,7 +118,7 @@
 
             uploadResults.Add(uploadResult);
         }
-        var response = await Http.PostAsJsonAsync(api + $"File/PostFile?mssv={mssv}&loai={loai}",uploadResults);
+        var response = await Http.PostAsJsonAsync(api + $"File/PostFile?madot={madot}&mssv={mssv}&loai={loai}",uploadResults);
 
         if (response.IsSuccessStatusCode)
         {
