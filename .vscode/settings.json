@@ -5,8 +5,6 @@
     "UehInternFrontend.user": true,
     "UehInternFrontend.sln": true,
     "appsettings.Development.json": true,
-    ".gitattributes": true,
-    ".gitignore": true,
     ".vs": true
   }
 }
