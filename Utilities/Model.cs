@@ -310,6 +310,8 @@ namespace UehInternFrontend
         public string tendot { get; set; }
         public string hotensv { get; set; }
         public string mssv { get; set; }
+        public string lop { get; set; }
+        public string khoahoc { get; set; }
         public string tenkl { get; set; }
         public string tengv { get; set; }
         public string tieuchi1 { get; set; }
@@ -333,6 +335,10 @@ namespace UehInternFrontend
         public string tendetai { get; set; }
         public string malop { get; set; }
         public string khoahoc { get; set; }
+        public string hotengv1 { get; set; }
+        public string hotengv2 { get; set; }
+        public string diemtong { get; set; }
+        public string ngaycham { get; set; }
     }
 
 

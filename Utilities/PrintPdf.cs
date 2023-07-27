@@ -206,21 +206,21 @@ namespace UehInternFrontend
                     <div class='title'>
                         <p class='lable'><strong>BẢNG ĐIỂM CHI TIẾT </strong></p>
                         <p class='lable'><strong>THỰC TẬP TỐT NGHIỆP CHO SINH VIÊN </strong></p>
-                        <p class='lable'><strong>{diem.tendot.ToUpper()}</strong></p>
+                        <p class='lable'><strong>ĐỢT {diem.tendot.ToUpper()}</strong></p>
                         <p class='itatic'><em>(Dành cho tất cả hình thức thực tập tốt nghiêp)</em></p>
                     </div>
 
                     <div class='infosv'>
                         <p class='col-6'><strong>Họ tên sinh viên:</strong> {diem.hotensv}</p>
                         <p class='col-6'><strong>Mã số sinh viên:</strong> {diem.mssv}</p>
-                        <p class='col-6'><strong>Khoá:</strong> K46 ?</p>
-                        <p class='col-6'><strong>Lớp:</strong> ST001 ?</p>
+                        <p class='col-6'><strong>Khoá:</strong> {diem.khoahoc}</p>
+                        <p class='col-6'><strong>Lớp:</strong> {diem.lop}</p>
                         <p class='col-12'><strong>Tên khoá luận:</strong> {diem.tenkl}</p>
                     </div>
                     <div class='infogv'>
                         <p class='name'><strong>Họ tên giáo viên chấm:</strong> {diem.tengv}</p>
                         <p class='isgv'>
-                            <strong>Là người hướng dẫn: ?</strong>
+                            <strong>Là người hướng dẫn: </strong>
 
                             <svg class='checkbox' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='#000000'>
                                 <g id='SVGRepo_bgCarrier' stroke-width='0.5'></g>
@@ -232,6 +232,7 @@ namespace UehInternFrontend
                                 </g>
                             </svg>
 
+                            <!--
                             <svg class='checkbox' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='#000000'>
                                 <g id='SVGRepo_bgCarrier' stroke-width='0.5'></g>
                                 <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
@@ -239,6 +240,8 @@ namespace UehInternFrontend
                                     <rect width='20' height='20' x='2' y='2' fill='none' stroke='#000000' stroke-width='2'></rect>
                                 </g>
                             </svg>
+                            -->
+
                         </p>
                     </div>
 
@@ -445,7 +448,10 @@ namespace UehInternFrontend
                         <div>
                             <p><strong>Trường Đại học Kinh tế Tp. Hồ Chí Minh</strong></p>
                             <p><strong>Khoa {bangdiem[0].tenkhoa}</strong></p>
+
+                            <!--
                             <p><strong>Chuyên ngành ?</strong></p>
+                            -->
                         </div>
                         <div>
                             <p class='center'><strong>Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</strong></p>
@@ -479,7 +485,7 @@ namespace UehInternFrontend
                         <td>{bangdiem[i].mssv} | {bangdiem[i].malop} | {bangdiem[i].khoahoc}</td>
                         <td>{bangdiem[i].hotensv}</td>
                         <td>{bangdiem[i].tendetai}</td>
-                        <td>{null} ?</td>
+                        <td>{bangdiem[i].diemtong}</td>
                     </tr>
                 ";
             }
@@ -489,9 +495,9 @@ namespace UehInternFrontend
 
                     </div>
                     <div>
-                        <p><strong>Ngày chấm:</strong> 12-08-2023 ?</p>
-                        <p><strong>Giáo viên hướng dẫn và chấm 1:</strong> Đặng Thái Thịnh ?</p>
-                        <p><strong>Giáo viên chấm 2:</strong> Phan Hiền ?</p>
+                        <p><strong>Ngày chấm:</strong> {bangdiem[0].ngaycham}</p>
+                        <p><strong>Giáo viên hướng dẫn và chấm 1:</strong> {bangdiem[0].hotengv1}</p>
+                        <p><strong>Giáo viên chấm 2:</strong> {bangdiem[0].hotengv2}</p>
                     </div>
 
                 </body>

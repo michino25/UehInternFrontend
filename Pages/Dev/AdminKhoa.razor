@@ -84,9 +84,9 @@
         await RenderDatas();
 
     }
-     private async Task<List<KhoaModel>> GetListKhoa(string makhoa)
+    private async Task<List<KhoaModel>> GetListKhoa(string makhoa)
     {
-        var response = await Http.GetAsync(api + $"Khoa/GetListKhoa");
+        var response = await Http.GetAsync(api + $"Khoa/GetListKhoaNoAdmin");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -117,8 +117,6 @@
 
     private bool addBtn = false;
     private bool editBtn = false;
-    private bool cmBtn = false;
-    private bool deleteBtn = false;
     private GiangvienRequest thongtinchitietgv = new GiangvienRequest();
 
     private async void modelBtnClick(int btn, string data = "")
@@ -132,14 +130,6 @@
                 editBtn = true;
                 thongtinchitietgv  = await GetThongTinGiangvien(data);
                 break;
-            case 3:
-                cmBtn = true;
-                thongtinchitietgv  = await GetThongTinGiangvien(data);
-                break;
-            case 4:
-                deleteBtn = true;
-                thongtinchitietgv  = await GetThongTinGiangvien(data);
-                break;
         }
         StateHasChanged();
     }
@@ -148,13 +138,8 @@
     {
         addBtn = false;
         editBtn = false;
-        cmBtn = false;
-        deleteBtn = false;
         StateHasChanged();
     }
-
-
-
 
     private async Task SubmitGiangvien()
     {
@@ -191,69 +176,6 @@
         }
     }
 
-    private async Task DeleteGiangVien(string userId)
-    {
-        var response = await Http.DeleteAsync(api + $"Giangvien/DeleteGiangvien?magv={userId}");
-
-        if (response.IsSuccessStatusCode)
-        {
-            await JS.InvokeVoidAsync("alert", "Xóa giảng viên thành công");
-            RenderDatas();
-            closeBtn();
-        }
-        else
-        {
-            await JS.InvokeVoidAsync("alert", "Xóa giảng viên thất bại");
-        }
-    }
-
-    private   List<ChuyennganhModel>? chuyennganhs = new List<ChuyennganhModel>();
-
-    private async Task<List<ChuyennganhModel>> GetChuyennganhsByKhoa(string makhoa)
-    {
-        var response = await Http.GetAsync(api + $"Chuyennganh/GetChuyennganhsByKhoa/{makhoa}");
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var uploadModel = JsonConvert.DeserializeObject<List<ChuyennganhModel>>(content);
-            return uploadModel;
-        }
-        else
-        {
-            Console.WriteLine($"Lỗi khi truy xuất sinh viên: {response.StatusCode}");
-            return null;
-        }
-    }
-
-    private async Task UpdateChuyenMon(string userId)
-    {
-        string json = JsonConvert.SerializeObject(selectedValues);
-        var response = await Http.PutAsJsonAsync(api + $"Giangvien/UpdateThongTin?makhoa={userId}", thongtinchitietgv);
-
-        if (response.IsSuccessStatusCode)
-        {
-            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thành công");
-            closeBtn();
-        }
-        else
-        {
-            await JS.InvokeVoidAsync("alert", "Cập nhật chuyên môn thất bại");
-        }
-    }
-
-    private void UpdateCheckboxState(string value, string isChecked)
-    {
-        if (isChecked == "True")
-        {
-            selectedValues.Add(value);
-        }
-        else
-        {
-            selectedValues.Remove(value);
-        }
-    }
-
-
 }
 
 <PageTitle>Danh sách Admin khoa</PageTitle>
@@ -272,16 +194,19 @@
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
 
-            <button @onclick="() => modelBtnClick(1)"
-                class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                Thêm giảng viên
-            </button>
+            @if (khoads.Count > 0)
+            {
+                <button @onclick="() => modelBtnClick(1)"
+                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Thêm giảng viên
+                </button>
+            }
             <label for="actual-btn" type="button"
                 class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
@@ -330,11 +255,10 @@
                             {
 
                                 <tr class="hover:bg-gray-100">
-                                      <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                         @user.tenkhoa
                                     </td>
-                                 
-                                     <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                         <div class="text-sm font-normal text-gray-500">
                                             <div class="text-base font-semibold text-gray-900">@user.name
                                             </div>
@@ -342,11 +266,11 @@
                                                 @user.email</div>
                                         </div>
                                     </td>
-                                       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                                        <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                         @user.userId
                                     </td>
                                     <td class="p-4 space-x-2 whitespace-nowrap">
-                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-800 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300"
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
                                             @onclick="() => modelBtnClick(2, user.userId)">
                                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
@@ -383,7 +307,7 @@
 
 <!-- Modal -->
 <div class="flex items-center justify-center fixed w-screen h-screen z-30">
-    @if (addBtn || editBtn || cmBtn || deleteBtn)
+    @if (addBtn || editBtn)
     {
         <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
     }
@@ -452,78 +376,6 @@
             </div>
         }
 
-        <!-- Chuyenmon User Modal -->
-        @if (cmBtn)
-        {
-            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
-                @* <!-- Modal content --> *@
-                <div class="relative bg-white rounded-lg shadow">
-                    @* <!-- Modal header --> *@
-                    <div class="flex items-start justify-between p-5 border-b rounded-t">
-                        <h3 class="text-xl font-semibold">
-                            Chỉnh sửa chuyên môn
-                        </h3>
-                        <button type="button"
-                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                            @onclick="() => closeBtn()">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    @* <!-- Modal body --> *@
-                    <div class="p-6 space-y-6">
-                            <div class="grid grid-cols-6 gap-6">
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label for="first-name"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Tên giảng viên</label>
-                                    <input @bind ="thongtinchitietgv.tengv" readonly type="text" name="first-name" id="first-name"
-                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                </div>
-                                <div class="col-span-6 sm:col-span-3">
-                                    <label for="email"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                    <input @bind ="thongtinchitietgv.email" readonly type="email" name="email" id="email"
-                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
-                                </div>
-                                <div class="col-span-6">
-                                    <label for="biography"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Chuyên môn</label>
-                                    <ul class="grid w-full gap-x-6 gap-y-4 grid-cols-2">
-                                        @if(chuyennganhs.Count > 0)
-                                        {
-                                            foreach (var chuyenganh in chuyennganhs)
-                                            {
-                                                bool isChecked = selectedValues.Contains(chuyenganh.macn);
-                                                <li>
-                                                            <input type="checkbox" id="@chuyenganh.macn.ToLower()-option" value="@chuyenganh.macn" class="hidden peer" checked="@isChecked" @onchange="e => UpdateCheckboxState(chuyenganh.macn, e.Value.ToString())" />
-                                                            
-                                                            <label for="@chuyenganh.macn.ToLower()-option" class="inline-flex items-center justify-between w-full px-4 py-3 text-gray-800 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-teal-700 hover:text-gray-900 peer-checked:text-teal-800 hover:bg-gray-50">
-                                                        <div class="block">
-                                                            <div class="w-full text-sm font-semibold">@chuyenganh.macn</div>
-                                                            <div class="w-full text-xs">@chuyenganh.tencn</div>
-                                                        </div>
-                                                    </label>
-                                                </li>
-                                            }
-                                        }
-                                    </ul>
-                                </div>
-                            </div>
-                    </div>
-                    @* <!-- Modal footer --> *@
-                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
-                                    <button @onclick="() => UpdateChuyenMon(thongtinchitietgv.magv)"
-                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                            type="submit">Lưu</button>
-                    </div>
-
-                </div>
-            </div>
-        }
-
         <!-- Add User Modal -->
         @if (addBtn)
         {
@@ -548,24 +400,24 @@
                     @* <!-- Modal body --> *@
                     <div class="p-6 space-y-6">
                         <div class="grid grid-cols-6 gap-6">
-                             <div class="col-span-6 sm:col-span-3">
-                                    <label for="magv"
-                                        class="block mb-2 text-sm font-medium text-gray-900">Khoa
-                                    </label>
-                                    @* Tham khảo cách dùng select: Giangvien/Lichsugapthem.razor *@
-                                        <select @bind="makhoa" id="makhoa"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                        <option selected hidden>--Chọn khoa--</option>
-                                        @if (true)
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="magv"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Khoa
+                                </label>
+                                @* Tham khảo cách dùng select: Giangvien/Lichsugapthem.razor *@
+                                <select @bind="makhoa" id="makhoa"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    <option selected hidden>--Chọn khoa--</option>
+                                    @if (khoads.Count > 0)
+                                    {
+                                        foreach(var khoa in khoads)
                                         {
-                                            foreach(var khoa in khoads)
-                                            {
-                                                <option value="@khoa.makhoa">@khoa.tenkhoa</option>
-                                            }
-                                            
+                                            <option value="@khoa.makhoa">@khoa.tenkhoa</option>
                                         }
-                                    </select>
-                                </div>
+                                        
+                                    }
+                                </select>
+                            </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="userId"
                                     class="block mb-2 text-sm font-medium text-gray-900">Mã giảng viên</label>
@@ -606,45 +458,6 @@
             </div>
         }
 
-        <!-- Delete User Modal -->
-        @if (deleteBtn)
-        {
-            <div class="relative w-full h-full max-w-md px-4 md:h-auto">
-                @* <!-- Modal content --> *@
-                <div class="relative bg-white rounded-lg shadow">
-                    @* <!-- Modal header --> *@
-                    <div class="flex justify-end p-2">
-                        <button type="button"
-                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                            @onclick="() => closeBtn()">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    @* <!-- Modal body --> *@
-                    <div class="p-6 pt-0 text-center">
-                        <svg class="w-16 h-16 mx-auto text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa giảng viên này ?</h3>
-                        <button @onclick = "() =>  DeleteGiangVien(thongtinchitietgv.magv)" 
-                            class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3">
-                            Xóa
-                        </button>
-                        <button
-                            class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 border border-gray-300 font-medium inline-flex items-center rounded-lg text-base px-6 py-2.5 text-center"
-                            @onclick="() => closeBtn()">
-                            Hủy
-                        </button>
-                    </div>
-                </div>
-            </div>
-        }
     </div>
 
 </div>
