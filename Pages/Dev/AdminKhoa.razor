@@ -30,18 +30,9 @@
 
     private async Task RenderDatas()
     {
-        khoads = await GetListKhoa("CNTTKD");
-
+        khoads = await GetListKhoa();
         users = await GetUserRoleAdminRequests();
-        if (users != null && users.Count > 0 )
-        {
-
-            StateHasChanged();
-        }
-        else
-        {
-            //await JS.InvokeVoidAsync("alert", "Giảng viên không được tìm thấy.");
-        }
+        StateHasChanged();
     }
 
     private async Task<List<UserRoleAdminRequest>> GetUserRoleAdminRequests()
@@ -84,7 +75,7 @@
         await RenderDatas();
 
     }
-    private async Task<List<KhoaModel>> GetListKhoa(string makhoa)
+    private async Task<List<KhoaModel>> GetListKhoa()
     {
         var response = await Http.GetAsync(api + $"Khoa/GetListKhoaNoAdmin");
         if (response.IsSuccessStatusCode)
@@ -204,7 +195,7 @@
                             d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    Thêm giảng viên
+                    Thêm admin khoa
                 </button>
             }
             <label for="actual-btn" type="button"

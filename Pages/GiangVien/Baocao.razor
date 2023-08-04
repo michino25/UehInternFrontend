@@ -101,8 +101,8 @@
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", "Không tìm thấy dữ liệu");
-            //await JS.InvokeVoidAsync("alert", "Đã xảy ra lỗi");
+            //await JS.InvokeVoidAsync("alert", "Không tìm thấy dữ liệu");
+            await JS.InvokeVoidAsync("alert", "Đã xảy ra lỗi");
         }
     }
 
@@ -168,10 +168,6 @@
                                 </th>
                                 <th scope="col"
                                     class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
-                                    Khóa
-                                </th>
-                                <th scope="col"
-                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
                                     Hành động
                                 </th>
                             </tr>
@@ -194,9 +190,7 @@
                                     @sinhvien.mssv
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    @sinhvien.thuoclop</td>
-                                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    K@(sinhvien.khoagoc.Substring(5,2))</td>
+                                    @sinhvien.malop</td>
                                 <td class="p-4 space-x-2 whitespace-nowrap">
                                     <button @onclick="() => DownloadPdf(sinhvien.mssv)"
                                     type="button" data-modal-toggle="edit-user-modal"

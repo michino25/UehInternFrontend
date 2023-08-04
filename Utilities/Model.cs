@@ -121,18 +121,12 @@ namespace UehInternFrontend
         public string? mssv { get; set; }
         public string? ho { get; set; }
         public string? ten { get; set; }
-        public string? thuoclop { get; set; }
-        public string? khoagoc { get; set; }
-        public string? khoahoc { get; set; }
-        public string? mahp { get; set; }
-        public string? malhp { get; set; }
-        public string? tenhp { get; set; }
-        public string? soct { get; set; }
         public string? malop { get; set; }
-        public string? bacdt { get; set; }
-        public string? loaihinh { get; set; }
+        public string? ngaysinh { get; set; }
+        public string? maloai { get; set; }
+        public string? makhoa { get; set; }
         public string? macn { get; set; }
-
+        public string? madot { get; set; }
     }
 
 
@@ -141,8 +135,7 @@ namespace UehInternFrontend
         public string? mssv { get; set; }
         public string? ho { get; set; }
         public string? ten { get; set; }
-        public string? thuoclop { get; set; }
-        public string? khoagoc { get; set; }
+        public string? malop { get; set; }
         public string? email { get; set; }
     }
     public class KhoaModel
@@ -311,7 +304,6 @@ namespace UehInternFrontend
         public string hotensv { get; set; }
         public string mssv { get; set; }
         public string lop { get; set; }
-        public string khoahoc { get; set; }
         public string tenkl { get; set; }
         public string tengv { get; set; }
         public string tieuchi1 { get; set; }
@@ -334,7 +326,6 @@ namespace UehInternFrontend
         public string mssv { get; set; }
         public string tendetai { get; set; }
         public string malop { get; set; }
-        public string khoahoc { get; set; }
         public string hotengv1 { get; set; }
         public string hotengv2 { get; set; }
         public string diemtong { get; set; }

@@ -32,6 +32,10 @@ namespace UehInternFrontend
                         body {
                             -webkit-print-color-adjust: exact;
                         }
+
+                        .pagebreak {
+                            page-break-before: always;
+                        } /* page-break-after works, as well */
                     }
 
                     .center {
@@ -213,7 +217,11 @@ namespace UehInternFrontend
                     <div class='infosv'>
                         <p class='col-6'><strong>Họ tên sinh viên:</strong> {diem.hotensv}</p>
                         <p class='col-6'><strong>Mã số sinh viên:</strong> {diem.mssv}</p>
-                        <p class='col-6'><strong>Khoá:</strong> {diem.khoahoc}</p>
+
+                        <!--
+                        <p class='col-6'><strong>Khoá:</strong> K46</p>
+                        -->
+
                         <p class='col-6'><strong>Lớp:</strong> {diem.lop}</p>
                         <p class='col-12'><strong>Tên khoá luận:</strong> {diem.tenkl}</p>
                     </div>
@@ -339,6 +347,9 @@ namespace UehInternFrontend
                             <p class='itatic'>(Ký tên và ghi rõ họ tên)</p>
                         </div>
                     </div>
+
+                    <div class='pagebreak'></div>
+                    <div>demo</div>
 
                 </body>
             ";
@@ -470,7 +481,7 @@ namespace UehInternFrontend
                         <table>
                             <tr class='table-title'>
                                 <td class='center'><strong>STT</strong></td>
-                                <td><strong>Mã số sinh viên | Lớp | Khoa</strong></td>
+                                <td><strong>Mã số sinh viên | Lớp</strong></td>
                                 <td><strong>Tên sinh viên</strong></td>
                                 <td><strong>Tên đề tài</strong></td>
                                 <td><strong>Điểm cuối cùng</strong></td>
@@ -482,7 +493,12 @@ namespace UehInternFrontend
                 htmlString += $@"
                     <tr>
                         <td class='center'>{i + 1}</td>
-                        <td>{bangdiem[i].mssv} | {bangdiem[i].malop} | {bangdiem[i].khoahoc}</td>
+ 
+                        <!--
+                        <td>{bangdiem[i].mssv} | {bangdiem[i].malop} | K46</td>
+                        -->
+ 
+                        <td>{bangdiem[i].mssv} | {bangdiem[i].malop}</td>
                         <td>{bangdiem[i].hotensv}</td>
                         <td>{bangdiem[i].tendetai}</td>
                         <td>{bangdiem[i].diemtong}</td>
