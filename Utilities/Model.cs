@@ -253,9 +253,6 @@ namespace UehInternFrontend
 
     }
 
-
-
-
     public class ChitietModel
     {
         public string? emailsv { get; set; }
@@ -283,17 +280,13 @@ namespace UehInternFrontend
         public string? FileName { get; set; }
         public string? StoredFileName { get; set; }
         public string? ContentType { get; set; }
-
     }
-
 
     public class PhancongRequest
     {
         public string mssv { get; set; }
         public string magv { get; set; }
-        public string maloai { get; set; }
         public string madot { get; set; }
-
     }
 
     public class ChiTietDiem
