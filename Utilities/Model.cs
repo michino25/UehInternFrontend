@@ -121,6 +121,7 @@ namespace UehInternFrontend
         public string? mssv { get; set; }
         public string? ho { get; set; }
         public string? ten { get; set; }
+        public string? email { get; set; }
         public string? malop { get; set; }
         public string? ngaysinh { get; set; }
         public string? maloai { get; set; }
@@ -231,7 +232,6 @@ namespace UehInternFrontend
 
     public class KetquaModel
     {
-
         public float? tieuchi1 { get; set; }
         public float? tieuchi2 { get; set; }
         public float? tieuchi3 { get; set; }
@@ -240,7 +240,6 @@ namespace UehInternFrontend
         public float? tieuchi6 { get; set; }
         public float? tieuchi7 { get; set; }
         public float? diemDN { get; set; }
-
     }
 
     public class DotModel
@@ -294,10 +293,12 @@ namespace UehInternFrontend
         public string tenkhoa { get; set; }
         public string tencn { get; set; }
         public string tendot { get; set; }
+        public string maloai { get; set; }
         public string hotensv { get; set; }
         public string mssv { get; set; }
         public string lop { get; set; }
         public string tenkl { get; set; }
+        public string tencty { get; set; }
         public string tengv { get; set; }
         public string tieuchi1 { get; set; }
         public string tieuchi2 { get; set; }

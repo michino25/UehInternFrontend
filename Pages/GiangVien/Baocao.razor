@@ -77,21 +77,41 @@
         else
         {
             await JS.InvokeVoidAsync("alert", "Không tìm thấy dữ liệu");
-
         }
     }
 
-    private async Task DownloadPdfTongHop(string maloai)
+    private async Task DownloadAllChiTietDiem()
+    {
+        var response = await Http.GetAsync(api + $"Ketqua/GetDanhSachDiemChiTietSv?madot={madot}&magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var diem = JsonConvert.DeserializeObject<List<ChiTietDiem>>(content);
+
+            await PrintPDF.AllChiTietDiem(JS, diem);
+           // await JS.InvokeVoidAsync("alert", "Tải dữ liệu in thành công");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy dữ liệu");
+        }
+    }
+
+    private async Task DownloadPdfTongHop()
     {
         try
         {
-            var response = await Http.GetAsync(api + $"Ketqua/DsDiemTong?madot={madot}&maloai={maloai}&magv={magv}");
-            if (response.IsSuccessStatusCode)
+            var responseHKDN = await Http.GetAsync(api + $"Ketqua/DsDiemTong?madot={madot}&maloai={hkdn}&magv={magv}");
+            var responseKLTN = await Http.GetAsync(api + $"Ketqua/DsDiemTong?madot={madot}&maloai={kltn}&magv={magv}");
+            if (responseKLTN.IsSuccessStatusCode && responseHKDN.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                var bangdiem = JsonConvert.DeserializeObject<List<TongHopDiem>>(content);
+                var contentKLTN = await responseKLTN.Content.ReadAsStringAsync();
+                var bangdiemKLTN = JsonConvert.DeserializeObject<List<TongHopDiem>>(contentKLTN);
 
-                await PrintPDF.TongHopDiem(JS, bangdiem, maloai);
+                var contentHKDN = await responseHKDN.Content.ReadAsStringAsync();
+                var bangdiemHKDN = JsonConvert.DeserializeObject<List<TongHopDiem>>(contentHKDN);
+
+                await PrintPDF.TongHopDiem(JS, bangdiemKLTN, bangdiemHKDN);
                //await JS.InvokeVoidAsync("alert", "Tải dữ liệu thành công");
             }
             else
@@ -123,25 +143,24 @@
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
 
-                <button @onclick="() => DownloadPdfTongHop(hkdn)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                <button @onclick="() => DownloadPdfTongHop()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
                             d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    Tổng hợp điểm HKDN
-
+                    Phiếu tổng hợp điểm
                 </button>
 
-                <button @onclick="() => DownloadPdfTongHop(kltn)" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                <button @onclick="() => DownloadAllChiTietDiem()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
                             d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    Tổng hợp điểm KLTN
+                    Toàn bộ bảng điểm chi tiết
                 </button>
 
             </div>
@@ -180,10 +199,12 @@
                                     <tr class="hover:bg-gray-100">
                                 <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                     <div class="text-sm font-normal text-gray-500">
-                                        <div class="text-base font-semibold text-gray-900">@sinhvien.ho @sinhvien.ten
+                                        <div class="text-base font-semibold text-gray-900">
+                                            @sinhvien.ho @sinhvien.ten
                                         </div>
                                         <div class="text-sm font-normal text-gray-500">
-                                            anh@st.ueh.edu.vn</div>
+                                            @(sinhvien.email == null ? "Email chưa được cập nhật" : sinhvien.email) 
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
@@ -192,9 +213,11 @@
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                     @sinhvien.malop</td>
                                 <td class="p-4 space-x-2 whitespace-nowrap">
-                                    <button @onclick="() => DownloadPdf(sinhvien.mssv)"
-                                    type="button" data-modal-toggle="edit-user-modal"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                                    <button 
+                                        type="button" data-modal-toggle="edit-user-modal"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
+                                        @onclick="() => DownloadPdf(sinhvien.mssv)"
+                                        >
                                         <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd"

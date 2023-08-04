@@ -125,16 +125,11 @@
                                 <tr class="hover:bg-gray-100">
                                     <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
                                         <div class="text-sm font-normal text-gray-500">
-                                        <div class="text-base font-semibold text-gray-900">@sinhvien.TenSinhVien
-                                        </div>
-                                            @if (sinhvien.Email == null)
-                                            {
-                                                <div class="text-sm font-normal text-gray-500">
-                                                    Email chưa được cập nhật
-                                                </div>
-                                            }
+                                            <div class="text-base font-semibold text-gray-900">
+                                                @sinhvien.TenSinhVien
+                                            </div>
                                             <div class="text-sm font-normal text-gray-500">
-                                                @sinhvien.Email
+                                                @(sinhvien.Email == null ? "Email chưa được cập nhật" : sinhvien.Email) 
                                             </div>
                                         </div>
                                     </td>
