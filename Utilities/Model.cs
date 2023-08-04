@@ -138,11 +138,11 @@ namespace UehInternFrontend
         public string? malop { get; set; }
         public string? email { get; set; }
     }
+
     public class KhoaModel
     {
         public string? makhoa { get; set; }
         public string? tenkhoa { get; set; }
-
     }
 
     public class SinhvienkhoaModel
@@ -246,7 +246,7 @@ namespace UehInternFrontend
     public class DotModel
     {
         public string madot { get; set; }
-        public string name { get; set; }
+        public string tendot { get; set; }
         public DateTime? ngaybatdau { get; set; }
         public DateTime? ngayketthuc { get; set; }
         public string status { get; set; }
