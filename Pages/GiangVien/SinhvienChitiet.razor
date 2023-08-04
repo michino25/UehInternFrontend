@@ -211,7 +211,7 @@
 
     private async Task UpdateLoaiHinhHuongDan()
     {
-        maloai = !isHKDN ? "HKDN" : "KLTN";
+        maloai = !isHKDN ? "HKDN" : "KL";
 
         var response = await Http.PutAsync(api + $"Phancong/UpdateLoaiHinhThucTap?madot={madot}&mssv={idSv}&maloai={maloai}", null);
 

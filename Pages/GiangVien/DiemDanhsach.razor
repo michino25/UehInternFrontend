@@ -13,7 +13,7 @@
     private string? madot = "";
 
     private string? hkdn = "HKDN";
-    private string? kltn = "KLTN";
+    private string? kltn = "KL";
 
     private double sum = 0;
 
@@ -146,7 +146,7 @@
                                     @* <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                                         K@(sinhvien.Khoa.Substring(5,2))</td> *@
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                        @Math.Round(sinhvien.Diem,2) </td>
+                                        @Math.Round(sum,2) </td>
                                     <td class="p-4 space-x-2 whitespace-nowrap">
                                         <a href="/diem/@sinhvien.MaSinhVien"
                                             class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
