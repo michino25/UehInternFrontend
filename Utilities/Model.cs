@@ -318,6 +318,7 @@ namespace UehInternFrontend
         public string hotensv { get; set; }
         public string mssv { get; set; }
         public string tendetai { get; set; }
+        public string tencty { get; set; }
         public string malop { get; set; }
         public string hotengv1 { get; set; }
         public string hotengv2 { get; set; }
