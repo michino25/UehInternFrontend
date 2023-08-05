@@ -100,7 +100,7 @@
 
     private async Task<List<LichsuModel>> GetLichSuByMssv(string mssv)
     {
-        var response = await Http.GetAsync(api + $"Lichsu/lichsu/{mssv}");
+        var response = await Http.GetAsync(api + $"Lichsu/sinhvien?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
