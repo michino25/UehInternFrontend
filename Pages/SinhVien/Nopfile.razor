@@ -78,7 +78,7 @@
         loai = "Giấy đăng ký học kỳ doang nghiệp";
     }
 
-     private async Task LoaiHinhPhieuChamDiem()
+    private async Task LoaiHinhPhieuChamDiem()
     {
         loai = "Phiếu chấm điểm";
 
@@ -101,39 +101,45 @@
         List<UploadResult> uploadResults = new List<UploadResult>();
         foreach (var file in files)
         {
-            var uploadResult = new UploadResult();
-            string trustedFileNameForFileStorage;
-            var untrustedFilename = file.Name;
-            uploadResult.FileName = untrustedFilename;
-            var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFilename);
+            
+                var uploadResult = new UploadResult();
+                string trustedFileNameForFileStorage;
+                var untrustedFilename = file.Name;
+                uploadResult.FileName = untrustedFilename;
+                var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFilename);
 
-            trustedFileNameForFileStorage = Path.GetRandomFileName();
-            uploadResult.StoredFileName = trustedFileNameForFileStorage;
-            uploadResult.ContentType = file.ContentType;
-            var path = Path.Combine(env.WebRootPath, "uploads", trustedFileNameForFileStorage);
+                trustedFileNameForFileStorage = Path.GetRandomFileName();
+                uploadResult.StoredFileName = trustedFileNameForFileStorage;
+                uploadResult.ContentType = file.ContentType;
+                var path = Path.Combine(env.WebRootPath, "uploads", trustedFileNameForFileStorage);
 
-            var uploadPath = Path.Combine("uploads", trustedFileNameForFileStorage);
-            await using var memoryStream = new MemoryStream();
-            await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+                var uploadPath = Path.Combine("uploads", trustedFileNameForFileStorage);
+                await using var memoryStream = new MemoryStream();
+                await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
 
-            using (var fs = new FileStream(path, FileMode.Create))
-            {
-                memoryStream.Position = 0;
-                await memoryStream.CopyToAsync(fs);
-            }
+                using (var fs = new FileStream(path, FileMode.Create))
+                {
+                    memoryStream.Position = 0;
+                    await memoryStream.CopyToAsync(fs);
+                }
 
-            uploadResults.Add(uploadResult);
-        }
-        var response = await Http.PostAsJsonAsync(api + $"File/PostFile?madot={madot}&mssv={mssv}&loai={loai}",uploadResults);
+                uploadResults.Add(uploadResult);
 
-        if (response.IsSuccessStatusCode)
-        {
-            await RenderDatas();
-            await JS.InvokeVoidAsync("alert", "Upload file thành công");
-        }
-        else
-        {
-            await JS.InvokeVoidAsync("alert", "Upload file thất bại");
+                var response = await Http.PostAsJsonAsync(api + $"File/PostFile?madot={madot}&mssv={mssv}&loai={loai}", uploadResults);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await RenderDatas();
+                    await JS.InvokeVoidAsync("alert", "Upload file thành công");
+                }
+                else
+                {
+                    await JS.InvokeVoidAsync("alert", "Upload file thất bại");
+                }
+            
+
+
+         
         }
 
     }
@@ -145,7 +151,7 @@
         var response = GetFileDownLoad(storedFileName,contentType);
         if (!response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "File not found.");
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy file");
         }
         else
         {
@@ -199,6 +205,9 @@
 
 <CheckUserComponent CheckRole="student" CheckDot=2>
     <ItemContent>
+
+    <h2 class="mb-4 text-xl font-semibold">Chỉ nhận file có đuôi PDF,JPF hoặc PNG</h2>
+
 
     @if (maloai == "HKDN")
     {

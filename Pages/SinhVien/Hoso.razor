@@ -1,4 +1,15 @@
 ﻿@page "/hoso"
+@using System 
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@using System.Net;
+
+@using iText.Kernel.Pdf;
+@using iText.Layout;
+@using iText.Layout.Element;
+@using iText.Kernel.Pdf.Xobject
+@using iText.IO.Image;
 
 @code {
     public string? api;

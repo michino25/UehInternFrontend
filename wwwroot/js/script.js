@@ -377,17 +377,17 @@ window.downloadFileExcel = (fileName, content, contentType) => {
 //     URL.revokeObjectURL(url);
 // };
 
-// window.downloadFileFromPDf = function (fileName, byteArray) {
-//     const blob = new Blob([byteArray], { type: "application/pdf" });
-//     const url = URL.createObjectURL(blob);
-//     const link = document.createElement("a");
-//     link.href = url;
-//     link.download = fileName;
-//     document.body.appendChild(link);
-//     link.click();
-//     document.body.removeChild(link);
-//     URL.revokeObjectURL(url);
-// };
+window.downloadFileFromPDf = function (byteArray, fileName) {
+    const blob = new Blob([byteArray], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
 
 function getDeviceWidth() {
     return window.innerWidth;
@@ -403,3 +403,14 @@ function PrintPDF(content, name) {
         printWindow.close();
     }, 50);
 }
+
+
+window.downloadFileFromBytes = async (pdfData, fileName) => {
+    const blob = new Blob([pdfData], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const anchorElement = document.createElement('a');
+    anchorElement.href = url;
+    anchorElement.download = fileName || 'combined.pdf';
+    anchorElement.click();
+    URL.revokeObjectURL(url);
+};

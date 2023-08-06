@@ -1,5 +1,18 @@
 ﻿@page "/baocao"
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@using System.Net;
 
+@using iText.Kernel.Pdf;
+@using iText.Layout;
+@using iText.Layout.Element;
+@using iText.Kernel.Pdf.Xobject
+@using iText.IO.Image;
+
+
+@inject IWebHostEnvironment env;
 @code {
     public string? api;
     private List<SinhvienModel>? sinhviens = new List<SinhvienModel>();
@@ -126,6 +139,118 @@
         }
     }
 
+
+    private async Task DownloadFileMergePdf()
+    {
+        List<UploadModel> files = new List<UploadModel>();
+        files = await  GetDsFileGvhd();
+
+
+        List<byte[]> pdfBytesList = new List<byte[]>();
+        List<byte[]> imgBytesList = new List<byte[]>();
+
+        for(int i = 0;i <= files.Count-1;i++)
+        {
+            if(files[i].FileType == "Phiếu chấm điểm")
+            {
+                if(files[i].ContentType == "image/jpeg" ||  files[i].ContentType == "image/png")
+                {
+                    string filePath = Path.Combine(env.WebRootPath, "uploads", files[i].StoredFileName);
+                    if (File.Exists(filePath))
+                    {
+                        byte[] imgBytes = await File.ReadAllBytesAsync(filePath);
+                        imgBytesList.Add(imgBytes);
+                    }
+                }
+                else
+                {
+                    string filePath = Path.Combine(env.WebRootPath, "uploads", files[i].StoredFileName);
+                    if (File.Exists(filePath))
+                    {
+                        byte[] pdfBytes = await File.ReadAllBytesAsync(filePath);
+                        pdfBytesList.Add(pdfBytes);
+                    }
+                }
+            }
+           
+        }
+
+
+        // Gọi hàm gộp PDF
+        byte[] mergedBytes = MergePdfFiles(pdfBytesList,imgBytesList);
+        if (mergedBytes == null)
+        {
+             await JS.InvokeVoidAsync("alert", "Chưa có file nào thuộc phiếu chấm điểm");
+
+        }
+        // Tạo tên tệp PDF đã gộp
+        string storedFileName = "merged.pdf";
+
+        // Gọi hàm JavaScript để tải xuống
+        await JS.InvokeVoidAsync("downloadFileFromBytes", mergedBytes, storedFileName);
+    }
+
+
+    private async Task<List<UploadModel>> GetDsFileGvhd()
+    {
+        var response = await Http.GetAsync(api + $"File/GetDsFileGvhd?madot={madot}&magv={magv}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var listfiles = JsonConvert.DeserializeObject<List<UploadModel>>(content);
+            return listfiles;
+        }
+        else
+        {
+            Console.WriteLine($"Lỗi khi truy xuất tệp: {response.StatusCode}");
+            return null;
+        }
+
+    }
+
+
+    private byte[] MergePdfFiles(List<byte[]> pdfBytesList, List<byte[]> imageBytesList)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            PdfWriter writer = new PdfWriter(ms);
+            PdfDocument mergedDocument = new PdfDocument(writer);
+            Document document = new Document(mergedDocument);
+
+            foreach (var pdfBytes in pdfBytesList)
+            {
+                PdfReader reader = new PdfReader(new MemoryStream(pdfBytes));
+                PdfDocument pdfDocument = new PdfDocument(reader);
+                int numberOfPages = pdfDocument.GetNumberOfPages();
+
+                for (int pageNum = 1; pageNum <= numberOfPages; pageNum++)
+                {
+                    PdfPage page = pdfDocument.GetPage(pageNum);
+                    PdfFormXObject formXObject = page.CopyAsFormXObject(mergedDocument);
+                    Image img = new Image(formXObject);
+
+                    document.Add(img);
+                }
+
+                pdfDocument.Close();
+            }
+
+            foreach (var imageBytes in imageBytesList)
+            {
+                // Tạo đối tượng Image từ mảng byte của ảnh
+                ImageData imageData = ImageDataFactory.Create(imageBytes);
+                Image image = new Image(imageData);
+
+                document.Add(image);
+            }
+
+            document.Close();
+            return ms.ToArray();
+        }
+
+
+    }
+
 }
 <PageTitle>Báo cáo</PageTitle>
 
@@ -142,6 +267,16 @@
             </div>
 
             <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+
+                        <button @onclick="() => DownloadFileMergePdf()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Phiểm điêm tổng hợp DN
+                </button>
 
                 <button @onclick="() => DownloadPdfTongHop()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
