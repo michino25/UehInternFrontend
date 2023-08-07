@@ -318,7 +318,7 @@ namespace UehInternFrontend
                                         <p>+ …</p>
                                         <p class='itatic'>(Ít nhất phải thể hiện được 3 kỹ năng, mỗi kỹ năng tối đa được 3 điểm)</p>
                                     </td>
-                                    <td class='right'>{diem.tieuchi3} /5</td>
+                                    <td class='right'>{diem.tieuchi3} / 5</td>
                                 </tr>
                                 <tr>
                                     <td class='center'>4</td>

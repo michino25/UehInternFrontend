@@ -250,49 +250,45 @@
     }
 
 
-  
-
-   private async Task DownloadFileMergePdf()
-{
-    List<string> storenames = files.Select(file => file.StoredFileName).ToList();
-
-    List<byte[]> pdfBytesList = new List<byte[]>();
-    List<byte[]> imgBytesList = new List<byte[]>();
-
-    for(int i = 0;i <= files.Count-1;i++)
+    private async Task DownloadFileMergePdf()
     {
-        if(files[i].ContentType == "image/jpeg" ||  files[i].ContentType == "image/png")
+        List<string> storenames = files.Select(file => file.StoredFileName).ToList();
+
+        List<byte[]> pdfBytesList = new List<byte[]>();
+        List<byte[]> imgBytesList = new List<byte[]>();
+
+        for(int i = 0;i <= files.Count-1;i++)
         {
-            string filePath = Path.Combine(env.WebRootPath, "uploads", files[i].StoredFileName);
-            if (File.Exists(filePath))
+            if(files[i].ContentType == "image/jpeg" ||  files[i].ContentType == "image/png")
             {
-                byte[] imgBytes = await File.ReadAllBytesAsync(filePath);
-                imgBytesList.Add(imgBytes);
+                string filePath = Path.Combine(env.WebRootPath, "uploads", files[i].StoredFileName);
+                if (File.Exists(filePath))
+                {
+                    byte[] imgBytes = await File.ReadAllBytesAsync(filePath);
+                    imgBytesList.Add(imgBytes);
+                }
+            }
+            else
+            {
+                string filePath = Path.Combine(env.WebRootPath, "uploads", files[i].StoredFileName);
+                if (File.Exists(filePath))
+                {
+                    byte[] pdfBytes = await File.ReadAllBytesAsync(filePath);
+                    pdfBytesList.Add(pdfBytes);
+                }
             }
         }
-        else
-        {
-            string filePath = Path.Combine(env.WebRootPath, "uploads", files[i].StoredFileName);
-            if (File.Exists(filePath))
-            {
-                byte[] pdfBytes = await File.ReadAllBytesAsync(filePath);
-                pdfBytesList.Add(pdfBytes);
-            }
-        }
+
+
+        // Gọi hàm gộp PDF
+        byte[] mergedBytes = MergePdfFiles(pdfBytesList,imgBytesList);
+
+        // Tạo tên tệp PDF đã gộp
+        string storedFileName = "merged.pdf";
+
+        // Gọi hàm JavaScript để tải xuống
+        await JS.InvokeVoidAsync("downloadFileFromBytes", mergedBytes, storedFileName);
     }
-
-
-    // Gọi hàm gộp PDF
-    byte[] mergedBytes = MergePdfFiles(pdfBytesList,imgBytesList);
-
-    // Tạo tên tệp PDF đã gộp
-    string storedFileName = "merged.pdf";
-
-    // Gọi hàm JavaScript để tải xuống
-    await JS.InvokeVoidAsync("downloadFileFromBytes", mergedBytes, storedFileName);
-}
-
-
 
 
 
@@ -344,15 +340,6 @@
 
 <CheckUserComponent CheckRole="teacher" CheckDot=2>
 <ItemContent>
-        <button @onclick="() => DownloadFileMergePdf()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
-                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Phiếu tổng hợp điểm
-                </button>
 
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
     <div
@@ -610,7 +597,20 @@
             <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">File đã nộp</h1>
         </div>
 
-
+    @if (files.Count > 0)
+    {
+        <div class="flex items-center mb-3 ml-auto mr-2 space-x-2 sm:space-x-3">
+            <button @onclick="() => DownloadFileMergePdf()" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Tải file nối toàn bộ pdf
+            </button>
+        </div>
+    }
     </div>
     
     <table class="min-w-full divide-y divide-gray-200 table-fixed">
