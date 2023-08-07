@@ -137,17 +137,20 @@
 
     private bool editBtn = false;
     private bool deleteBtn = false;
-    private async void modelBtnClick(int btn, string data = "")
+    private SinhVienInfo thongtinsv = new SinhVienInfo();
+
+    private async void modelBtnClick(int btn, SinhVienInfo data = null)
     {
         switch (btn)
         {
             case 2:
                 editBtn = true;
-                mssv = data;
+                mssv = data.mssv;
                 break;
             case 3:
                 deleteBtn = true;
-                mssv = data;
+                thongtinsv = data;
+                mssv = data.mssv;
                 break;
         }
         StateHasChanged();
@@ -235,7 +238,7 @@
 
                                 <td class="p-4 space-x-2 whitespace-nowrap">
                                     <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300"
-                                        @onclick="() => modelBtnClick(2,sinhvien.mssv)">
+                                        @onclick="() => modelBtnClick(2,sinhvien)">
                                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -249,7 +252,7 @@
                                     </button>
                                     
                                     <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300"
-                                        @onclick="() => modelBtnClick(3,sinhvien.mssv)">
+                                        @onclick="() => modelBtnClick(3,sinhvien)">
                                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd"
@@ -374,7 +377,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa phân công này ?</h3>
+                        <h3 class="mt-5 mb-6 text-lg text-gray-500">Bạn có chắc muốn xóa sinh viên <strong>@thongtinsv.ho @thongtinsv.ten</strong> được phân công cho giảng viên <strong>@thongtinchitietgv.tengv</strong> ?</h3>
                         <button 
                             class="text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-base inline-flex items-center px-6 py-2.5 text-center mr-3"
                             @onclick="() =>  DeletePhanCong()" 
