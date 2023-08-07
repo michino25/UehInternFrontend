@@ -103,7 +103,7 @@
         else {
             RenderDatas();
             await JS.InvokeVoidAsync("alert", "Cập nhật thành công");
-
+            await Relogin();
         }
 
         response.EnsureSuccessStatusCode();
@@ -146,9 +146,7 @@
                 loai ="";
                 hoten = "";
             }
-
         }
-
     }
 
 
@@ -176,7 +174,11 @@
         }
     }
 
-
+    private async Task Relogin()
+    {
+        UserLogin userLogin = (UserLogin) currentUser;
+        await Service.LoginRequest(JS, NavigationManager, api, userLogin, "/phancong/gvhdsv");
+    }
 
     private bool addBtn = false;
     private async void modelBtnClick()
