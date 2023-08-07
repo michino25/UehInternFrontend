@@ -101,40 +101,49 @@
         List<UploadResult> uploadResults = new List<UploadResult>();
         foreach (var file in files)
         {
-            var uploadResult = new UploadResult();
-            string trustedFileNameForFileStorage;
-            var untrustedFilename = file.Name;
-            uploadResult.FileName = untrustedFilename;
-            var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFilename);
-
-            trustedFileNameForFileStorage = Path.GetRandomFileName();
-            uploadResult.StoredFileName = trustedFileNameForFileStorage;
-            uploadResult.ContentType = file.ContentType;
-            var path = Path.Combine(env.WebRootPath, "uploads", trustedFileNameForFileStorage);
-
-            var uploadPath = Path.Combine("uploads", trustedFileNameForFileStorage);
-            await using var memoryStream = new MemoryStream();
-            await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
-
-            using (var fs = new FileStream(path, FileMode.Create))
+            if(file.ContentType =="image/jpeg" ||file.ContentType == "image/png" || file.ContentType == "application/pdf")
             {
-                memoryStream.Position = 0;
-                await memoryStream.CopyToAsync(fs);
+                var uploadResult = new UploadResult();
+                string trustedFileNameForFileStorage;
+                var untrustedFilename = file.Name;
+                uploadResult.FileName = untrustedFilename;
+                var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFilename);
+
+                trustedFileNameForFileStorage = Path.GetRandomFileName();
+                uploadResult.StoredFileName = trustedFileNameForFileStorage;
+                uploadResult.ContentType = file.ContentType;
+                var path = Path.Combine(env.WebRootPath, "uploads", trustedFileNameForFileStorage);
+
+                var uploadPath = Path.Combine("uploads", trustedFileNameForFileStorage);
+                await using var memoryStream = new MemoryStream();
+                await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+
+                using (var fs = new FileStream(path, FileMode.Create))
+                {
+                    memoryStream.Position = 0;
+                    await memoryStream.CopyToAsync(fs);
+                }
+
+                uploadResults.Add(uploadResult);
+
+                var response = await Http.PostAsJsonAsync(api + $"File/PostFile?madot={madot}&mssv={mssv}&loai={loai}", uploadResults);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await RenderDatas();
+                    await JS.InvokeVoidAsync("alert", "Upload file thành công");
+                }
+                else
+                {
+                    await JS.InvokeVoidAsync("alert", "Upload file thất bại");
+                }
             }
-
-            uploadResults.Add(uploadResult);
-
-            var response = await Http.PostAsJsonAsync(api + $"File/PostFile?madot={madot}&mssv={mssv}&loai={loai}", uploadResults);
-
-            if (response.IsSuccessStatusCode)
+            else 
             {
-                await RenderDatas();
-                await JS.InvokeVoidAsync("alert", "Upload file thành công");
+                   await JS.InvokeVoidAsync("alert", "Vui lòng nhập đúng kiểu file yêu cầu ");
+
             }
-            else
-            {
-                await JS.InvokeVoidAsync("alert", "Upload file thất bại");
-            }
+           
         }
 
     }
