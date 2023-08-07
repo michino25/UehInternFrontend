@@ -85,7 +85,7 @@
 
     private async Task<KetquaModel> GetDiemSinhVien(string mssv)
     {
-        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -110,7 +110,7 @@
 
     private async Task SubmitScores(string mssv)
     {
-        var response = await Http.PutAsJsonAsync(api + $"Ketqua/diem?mssv={mssv}", ketqua);
+        var response = await Http.PutAsJsonAsync(api + $"Ketqua/diem?madot={madot}&mssv={mssv}", ketqua);
 
         if (response.IsSuccessStatusCode)
         {
@@ -163,7 +163,7 @@
                 Lớp
             </label>
             <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-base rounded-lg block w-full p-2.5">
-                @sinhvien.malop
+                @sinhvien.malop 
             </p>
         </div>
         <div class="col-span-6 sm:col-span-3">

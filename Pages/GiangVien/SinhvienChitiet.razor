@@ -124,7 +124,7 @@
 
     private async Task<KetquaModel> GetDiemSinhVien(string mssv)
     {
-        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
