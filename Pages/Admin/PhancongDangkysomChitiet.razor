@@ -13,6 +13,7 @@
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
+        idGv = Cipher.Decrypt(idGv);
     }
 
     private User? currentUser;

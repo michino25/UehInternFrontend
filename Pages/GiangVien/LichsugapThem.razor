@@ -15,7 +15,7 @@
 
     private void ChooseStudent()
     {
-        NavigationManager.NavigateTo($"/lichsugap/them/{selectedStudent}");
+        NavigationManager.NavigateTo($"/lichsugap/them/{Cipher.Encrypt(selectedStudent)}");
     }
 
     private User? currentUser;

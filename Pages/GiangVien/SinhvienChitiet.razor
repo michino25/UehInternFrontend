@@ -11,7 +11,6 @@
 @using iText.Kernel.Pdf.Xobject
 @using iText.IO.Image;
 
-
 @inject IWebHostEnvironment env;
 
 @code {
@@ -20,6 +19,13 @@
     private User? currentUser;
 
     [Parameter] public string idSv { get; set; }
+
+    protected override void OnInitialized()
+    {
+        api = Configuration["apiBackend"];
+        idSv = Cipher.Decrypt(idSv);
+    }
+
     private ChitietModel? chitiet = new ChitietModel();
     private UserModel user = new UserModel();
     private SinhvienModel? sinhvien = new SinhvienModel();
@@ -30,12 +36,6 @@
     private string? madot = "";
     private bool isHKDN;
     private double sum = 0;
-
-
-    protected override void OnInitialized()
-    {
-        api = Configuration["apiBackend"];
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -236,19 +236,46 @@
     }
 
     private bool editBtn = false;
-    private async void modelBtnClick(int btn, string data = "")
+    private bool editLsBtn = false;
+    private LichsuModel thongtinlichsu = new LichsuModel();
+    private async void modelBtnClick(int btn, LichsuModel data = null)
     {
-        editBtn = true;
-    @* thongtinchitietcn  = await GetThongTinChuyenNganh(data);  *@
+        switch (btn)
+        {
+            case 1:
+                editLsBtn = true;
+                thongtinlichsu = data;
+                break;
+            case 2:
+                editBtn = true;
+                @* thongtinchitietcn  = await GetThongTinChuyenNganh(data);  *@
+                break;
+        }
         StateHasChanged();
     }
 
     private async Task closeBtn()
     {
         editBtn = false;
+        editLsBtn = false;
         StateHasChanged();
     }
 
+    private async Task UpdateLichsu()
+    {
+        var response = await Http.PutAsJsonAsync(api + $"Lichsu/UpdateLichsu", thongtinlichsu);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật lịch sử gặp thành công");
+            RenderDatas();
+            closeBtn();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
 
     private async Task DownloadFileMergePdf()
     {
@@ -290,8 +317,6 @@
         await JS.InvokeVoidAsync("downloadFileFromBytes", mergedBytes, storedFileName);
     }
 
-
-
     private byte[] MergePdfFiles(List<byte[]> pdfBytesList, List<byte[]> imageBytesList)
     {
         using (MemoryStream ms = new MemoryStream())
@@ -330,8 +355,6 @@
             document.Close();
             return ms.ToArray();
         }
-
-
     }
 }
 
@@ -434,10 +457,7 @@
                     </svg>
                 </button>
             </div>
-
         </div>
-
-    
     </div>
 </div>
 
@@ -535,7 +555,7 @@
         </div>
 
         <div class="flex items-center mb-3 ml-auto mr-2 space-x-2 sm:space-x-3">
-            <a href="lichsugap/them/@sinhvien.mssv"
+            <a href="lichsugap/them/@(Cipher.Encrypt(idSv))"
                 class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg">
@@ -559,6 +579,10 @@
                     class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
                     Nội dung
                 </th>
+                <th scope="col"
+                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase">
+                    Hành động
+                </th>
             </tr>
         </thead>
 
@@ -567,12 +591,27 @@
             {
                 foreach (var lichsu in lichsus)
                 {
-                    <tr class="hover:bg-gray-100">
+                <tr class="hover:bg-gray-100">
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        @lichsu.ngay
+                        @(DateTime.ParseExact(lichsu.ngay, "dd/MM/yyyy h:mm:ss tt", null).ToString("dd-MM-yyyy"))
                     </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <td class="break-word p-4 text-base font-medium text-gray-900">
                         @lichsu.noidung
+                    </td>
+                    <td class="p-4 space-x-2 whitespace-nowrap">
+                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-teal-700 rounded-lg hover:bg-teal-800 focus:ring-4 focus:ring-teal-500"
+                            @onclick="() => modelBtnClick(1, lichsu)">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                                </path>
+                                <path fill-rule="evenodd"
+                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            Sửa
+                        </button>
                     </td>
                 </tr>
                 }
@@ -689,7 +728,7 @@
         </div>
 
         <div class="flex items-center mb-3 ml-auto mr-2 space-x-2 sm:space-x-3">
-            <a href="diem/@sinhvien.mssv"
+            <a href="diem/@(Cipher.Encrypt(idSv))"
                 class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:ring-orange-300">
                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg">
@@ -1009,7 +1048,7 @@
 
 <!-- Modal -->
 <div class="flex items-center justify-center fixed w-screen h-screen z-30">
-    @if (editBtn)
+    @if (editBtn || editLsBtn)
     {
         <div class="fixed inset-0 bg-gray-900/50" @onclick="() => closeBtn()"></div>
     }
@@ -1079,6 +1118,69 @@
                 </div>
             </div>
         }
+
+        @if (editLsBtn)
+        {
+            <div class="relative w-full h-auto max-w-2xl max-h-screen px-4 py-4">
+                @* <!-- Modal content --> *@
+                <div class="relative bg-white rounded-lg shadow">
+                    @* <!-- Modal header --> *@
+                    <div class="flex items-start justify-between p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold">
+                            Chỉnh sửa lịch sử gặp
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            @onclick="() => closeBtn()">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    @* <!-- Modal body --> *@
+                    <div class="p-6 space-y-6">
+                        <form action="#">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="first-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Tên sinh viên</label>
+                                <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                                        @sinhvien.ho  @sinhvien.ten
+                                    </p>
+                                </div>
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="last-name"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Ngày gặp</label>
+                                    <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
+                                        @(DateTime.ParseExact(thongtinlichsu.ngay, "dd/MM/yyyy h:mm:ss tt", null).ToString("dd-MM-yyyy"))
+                                    </p>
+                                </div>
+                                <div class="col-span-12 sm:col-span-6">
+                                    <label for="position"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Nội dung</label>
+                                    <input type="text" @bind =@thongtinlichsu.noidung name="position" id="position"
+                                        class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @* <!-- Modal footer --> *@
+                    <div class="items-center p-6 border-t border-gray-200 rounded-b">
+                        <button 
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            type="submit"
+                            @onclick="() => UpdateLichsu()"
+                            >
+                            Lưu lịch sử gặp
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
     </div>
 </div>
 

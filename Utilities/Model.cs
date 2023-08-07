@@ -99,8 +99,9 @@ namespace UehInternFrontend
 
     public class LichsuModel
     {
+        public string id { get; set; }
         public string noidung { get; set; }
-        public DateTime ngay { get; set; }
+        public string ngay { get; set; }
     }
 
     public class UploadModel

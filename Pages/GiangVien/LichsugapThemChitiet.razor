@@ -8,6 +8,7 @@
     protected override void OnInitialized()
     {
         api = Configuration["apiBackend"];
+        idSv = Cipher.Decrypt(idSv);
     }
 
     private SinhvienModel? sinhvien = new SinhvienModel();
@@ -16,7 +17,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        lichsu.ngay = DateTime.ParseExact(initialDate, "dd-MM-yyyy", null);
+        lichsu.ngay = initialDate;
         if (firstRender) {
             await RenderDatas();
             StateHasChanged();
@@ -62,8 +63,6 @@
 
     private async Task SubmitLichSu(string mssv)
     {
-        lichsu.ngay = DateTime.ParseExact(initialDate, "dd-MM-yyyy", null);
-
         var url = api + $"Lichsu?mssv={mssv}";
         var response = await Http.PostAsJsonAsync(url, lichsu);
 

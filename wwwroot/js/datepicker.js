@@ -62,6 +62,7 @@ function datePicker() {
         // Hide popup if we ain`t clicking on
         document.addEventListener("click", (event) => {
             if (
+                !event.target.closest(".date-picker .dates .month") &&
                 !event.target.closest(".date-picker .dates .days") &&
                 !event.target.closest(".date-picker .selected-date")
             ) {

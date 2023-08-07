@@ -51,7 +51,7 @@ namespace UehInternFrontend
         public static string Encrypt(string plaintext)
         {
             // Text with Random Numbers
-            plaintext = AddRandomNumbers(plaintext);
+            plaintext = Cipher.AddRandomNumbers(plaintext);
 
             var random = new Random();
             int randomShift = random.Next(1, 10); // Random shift between 1 and 9
@@ -84,7 +84,7 @@ namespace UehInternFrontend
             StringBuilder decryptedText = new StringBuilder();
             for (int i = 0; i < ciphertext.Length; i++)
             {
-                if (i == 4)
+                if (i == 3)
                 {
                     continue;
                 }
@@ -101,12 +101,12 @@ namespace UehInternFrontend
                 }
             }
 
-            string decryptedPlaintext = RemoveRandomNumbers(decryptedText.ToString());
+            string decryptedPlaintext = Cipher.RemoveRandomNumbers(decryptedText.ToString());
             return decryptedPlaintext;
         }
 
-    // Encrypt(plaintext);
-    // Decrypt(encryptedText);
+    // Cipher.Encrypt(plaintext);
+    // Cipher.Decrypt(encryptedText);
 
     }
 }
