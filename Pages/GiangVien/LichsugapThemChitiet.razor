@@ -16,7 +16,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        lichsu.ngay = initialDate;
+        lichsu.ngay = DateTime.ParseExact(initialDate, "dd-MM-yyyy", null);
         if (firstRender) {
             await RenderDatas();
             StateHasChanged();
@@ -62,6 +62,8 @@
 
     private async Task SubmitLichSu(string mssv)
     {
+        lichsu.ngay = DateTime.ParseExact(initialDate, "dd-MM-yyyy", null);
+
         var url = api + $"Lichsu?mssv={mssv}";
         var response = await Http.PostAsJsonAsync(url, lichsu);
 

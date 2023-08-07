@@ -284,7 +284,7 @@
         byte[] mergedBytes = MergePdfFiles(pdfBytesList,imgBytesList);
 
         // Tạo tên tệp PDF đã gộp
-        string storedFileName = "merged.pdf";
+        string storedFileName = $"ToanBoPDF_{idSv}.pdf";
 
         // Gọi hàm JavaScript để tải xuống
         await JS.InvokeVoidAsync("downloadFileFromBytes", mergedBytes, storedFileName);
