@@ -7,7 +7,6 @@
     "appsettings.Development.json": true,
     ".vs": true,
     ".gitattributes": true,
-    ".gitignore": true,
     ".prettierignore": true,
     "UehInternFrontend.csproj.user": true
   }
