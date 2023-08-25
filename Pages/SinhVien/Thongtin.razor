@@ -59,6 +59,7 @@
             sum = (double)((ketqua.tieuchi1 ?? 0) + (ketqua.tieuchi2 ?? 0) + (ketqua.tieuchi3 ?? 0) + (ketqua.tieuchi4 ?? 0) + (ketqua.tieuchi5 ?? 0) + (ketqua.tieuchi6 ?? 0) + (ketqua.tieuchi7 ?? 0));
             sum = maloai == "HKDN" ? (double)(sum * 0.6 + (ketqua.diemDN ?? 0) * 0.4) : sum;
             sum = sum > 10 ? 10 : sum;
+            sum = (double)Math.Round((decimal)sum, 1);
         }
 
         StateHasChanged();
@@ -112,7 +113,7 @@
     
     private async Task<KetquaModel> GetKetQuaSinhVien(string mssv)
     {
-        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?mssv={mssv}");
+        var response = await Http.GetAsync(api + $"Ketqua/sinhvien?madot={madot}&mssv={mssv}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -169,7 +170,7 @@
 
             </h5>
             <p class="mb-3 font-normal text-gray-700">
-                @chitiet.tendetai
+                @(chitiet.tendetai != null ? chitiet.tendetai : "Chưa có thông tin")
             </p>
         </div>
     } 
@@ -180,7 +181,7 @@
                 Tên công ty
             </h5>
             <p class="mb-3 font-normal text-gray-700">
-                @chitiet.tencty
+                @(chitiet.tencty != null ? chitiet.tencty : "Chưa có thông tin")
             </p>
         </div>
     }
@@ -190,7 +191,7 @@
             Kết quả thực tập
         </h5>
         <p class="mb-3 font-normal text-gray-700">
-            @sum
+            @(sum != 0 ? sum : "Chưa có thông tin")
         </p>
     </div>
 }

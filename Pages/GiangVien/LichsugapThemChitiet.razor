@@ -68,7 +68,7 @@
 
         if (response.IsSuccessStatusCode)
         {
-            NavigationManager.NavigateTo($"/sinhvien/{mssv}"); 
+            NavigationManager.NavigateTo($"/sinhvien/{Cipher.Encrypt(mssv)}"); 
             @* NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);  *@
         }
         else
