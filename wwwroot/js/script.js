@@ -399,18 +399,17 @@ function PrintPDF(content, name) {
     printWindow.document.write(content);
     printWindow.document.close();
     printWindow.print();
-    setTimeout(function () {
-        printWindow.close();
-    }, 50);
+    // setTimeout(function () {
+    //     printWindow.close();
+    // }, 50);
 }
 
-
 window.downloadFileFromBytes = async (pdfData, fileName) => {
-    const blob = new Blob([pdfData], { type: 'application/pdf' });
+    const blob = new Blob([pdfData], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
-    const anchorElement = document.createElement('a');
+    const anchorElement = document.createElement("a");
     anchorElement.href = url;
-    anchorElement.download = fileName || 'combined.pdf';
+    anchorElement.download = fileName || "combined.pdf";
     anchorElement.click();
     URL.revokeObjectURL(url);
 };
