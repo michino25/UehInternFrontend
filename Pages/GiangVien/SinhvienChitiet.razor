@@ -356,6 +356,17 @@
             return ms.ToArray();
         }
     }
+
+    private string GetDate(string input, int index = 0)
+    {
+        var words = input.Split(' ');
+        if (index >= 0 && index < words.Length)
+        {
+            return words[index];
+        }
+        return string.Empty; // Return an empty string if the index is out of bounds
+    }
+
 }
 
 
@@ -593,7 +604,8 @@
                 {
                 <tr class="hover:bg-gray-100">
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        @(DateTime.ParseExact(lichsu.ngay, "d/M/yyyy h:mm:ss tt", null).ToString("dd-MM-yyyy"))
+                        @* @(DateTime.ParseExact(lichsu.ngay, "d/M/yyyy h:mm:ss tt", null).ToString("dd-MM-yyyy")) *@
+                        @GetDate(lichsu.ngay)
                     </td>
                     <td class="break-word p-4 text-base font-medium text-gray-900">
                         @lichsu.noidung
@@ -764,139 +776,138 @@
                 </th>
             </tr>
         </thead>
-        @if(isHKDN)
-        {
-            <tbody class="bg-white divide-y divide-gray-200">
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Về vấn đề được đặt ra hay mục tiêu 
-                        (dựa trên có hay không, tính rõ ràng, tính hợp thời, tính mức độ cấp thiết, tính mức độ phức tạp,…)
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi1" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Về vấn đề được đặt ra hay mục tiêu 
+                    (dựa trên có hay không, tính rõ ràng, tính hợp thời, tính mức độ cấp thiết, tính mức độ phức tạp,…)
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi1" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                        required>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    2
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Phương pháp giải quyết vấn đề hay phương pháp để đạt mục tiêu:<br>
+                    + Rõ ràng và hợp lý | đúng.<br>
+                    + Mức độ áp dụng kiến thức ngành đã học | tự học.<br>
+                    + Hợp thời đại | thiết thực.
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi2"   name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
                             required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1.5</td>
+            </tr>
 
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        2
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Phương pháp giải quyết vấn đề hay phương pháp để đạt mục tiêu:<br>
-                        + Rõ ràng và hợp lý | đúng.<br>
-                        + Mức độ áp dụng kiến thức ngành đã học | tự học.<br>
-                        + Hợp thời đại | thiết thực.
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi2"   name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                                required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1.5</td>
-                </tr>
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    3
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Kỹ năng giải quyết vấn đề và kết quả đạt được so với mục tiêu, gồm:<br>
+                    + Kỹ năng phân tích nghiệp vụ<br>
+                    + Kỹ năng phân tích mô hình | hệ thống | giải pháp.<br>
+                    + Kỹ năng thiết kế mô hình | hệ thống | giải pháp.<br>
+                    + Kỹ năng thiết kế dữ liệu.<br>
+                    + Kỹ năng thu thập và phân tích dữ liệu.<br>
+                    + Kỹ năng lập trình.<br>
+                    + Kỹ năng sử dụng, vận dụng các công cụ công nghệ giải quyết các vấn đề.<br>
+                    + Kỹ năng lập kế hoạch và chiến lược công nghệ.<br>
+                    + …<br>
+                    (Ít nhất phải thể hiện được 3 kỹ năng, mỗi kỹ năng tối đa được 3 điểm)
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi3" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                        required>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1.5</td>
+            </tr>
 
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        3
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Kỹ năng giải quyết vấn đề và kết quả đạt được so với mục tiêu, gồm:<br>
-                        + Kỹ năng phân tích nghiệp vụ<br>
-                        + Kỹ năng phân tích mô hình | hệ thống | giải pháp.<br>
-                        + Kỹ năng thiết kế mô hình | hệ thống | giải pháp.<br>
-                        + Kỹ năng thiết kế dữ liệu.<br>
-                        + Kỹ năng thu thập và phân tích dữ liệu.<br>
-                        + Kỹ năng lập trình.<br>
-                        + Kỹ năng sử dụng, vận dụng các công cụ công nghệ giải quyết các vấn đề.<br>
-                        + Kỹ năng lập kế hoạch và chiến lược công nghệ.<br>
-                        + …<br>
-                        (Ít nhất phải thể hiện được 3 kỹ năng, mỗi kỹ năng tối đa được 3 điểm)
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi3" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    4
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Mức độ kết quả đạt được so với mục tiêu đã đề ra
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi4" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                        required>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    5
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Cách thức trình bày nội dung
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi5" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                        required>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
+
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    6
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Tuân thủ quy định làm thực tập tốt nghiệp (dựa trên thái độ, hành vi, tính chuyên cần, …)
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi6" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
                             required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1.5</td>
-                </tr>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    1</td>
+            </tr>
 
+            <tr class="hover:bg-gray-100">
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    7
+                </td>
+                <td class="break-word p-4 text-base font-medium text-gray-900">
+                    Điểm cộng thêm cho một số trường hợp đặc biệt:<br>
+                    + Bài mang tính mới, giải quyết được và cho kết quả chấp nhận được.<br>
+                    + Có bài báo được đăng trên các tạp chí khoa học.
+
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    <input type="number" readonly  @bind="@ketqua.tieuchi7" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
+                        required>
+                </td>
+                <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
+                    0.5</td>
+            </tr>
+
+            @if(isHKDN)
+            {
                 <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        4
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Mức độ kết quả đạt được so với mục tiêu đã đề ra
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi4" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        5
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Cách thức trình bày nội dung
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi5" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        6
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Tuân thủ quy định làm thực tập tốt nghiệp (dựa trên thái độ, hành vi, tính chuyên cần, …)
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi6" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                                required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        7
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Điểm cộng thêm cho một số trường hợp đặc biệt:<br>
-                        + Bài mang tính mới, giải quyết được và cho kết quả chấp nhận được.<br>
-                        + Có bài báo được đăng trên các tạp chí khoa học.
-
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi7" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        0.5</td>
-                </tr>
-
-                    <tr class="hover:bg-gray-100">
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                         8
                     </td>
                     <td class="break-word p-4 text-base font-medium text-gray-900">
                         Điểm doanh nghiệp chấm<br>
-                        
-
                     </td>
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                         <input type="number" readonly  @bind="@ketqua.diemDN" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
@@ -905,135 +916,10 @@
                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
                         10</td>
                 </tr>
-            </tbody>
-                
-        } else 
-        {
-            <tbody class="bg-white divide-y divide-gray-200">
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Về vấn đề được đặt ra hay mục tiêu 
-                        (dựa trên có hay không, tính rõ ràng, tính hợp thời, tính mức độ cấp thiết, tính mức độ phức tạp,…)
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi1" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
+            }
 
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        2
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Phương pháp giải quyết vấn đề hay phương pháp để đạt mục tiêu:<br>
-                        + Rõ ràng và hợp lý | đúng.<br>
-                        + Mức độ áp dụng kiến thức ngành đã học | tự học.<br>
-                        + Hợp thời đại | thiết thực.
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi2"   name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                                required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1.5</td>
-                </tr>
+        </tbody>
 
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        3
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Kỹ năng giải quyết vấn đề và kết quả đạt được so với mục tiêu, gồm:<br>
-                        + Kỹ năng phân tích nghiệp vụ<br>
-                        + Kỹ năng phân tích mô hình | hệ thống | giải pháp.<br>
-                        + Kỹ năng thiết kế mô hình | hệ thống | giải pháp.<br>
-                        + Kỹ năng thiết kế dữ liệu.<br>
-                        + Kỹ năng thu thập và phân tích dữ liệu.<br>
-                        + Kỹ năng lập trình.<br>
-                        + Kỹ năng sử dụng, vận dụng các công cụ công nghệ giải quyết các vấn đề.<br>
-                        + Kỹ năng lập kế hoạch và chiến lược công nghệ.<br>
-                        + …<br>
-                        (Ít nhất phải thể hiện được 3 kỹ năng, mỗi kỹ năng tối đa được 3 điểm)
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi3" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        5</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        4
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Mức độ kết quả đạt được so với mục tiêu đã đề ra
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi4" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        5
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Cách thức trình bày nội dung
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi5" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        6
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Tuân thủ quy định làm thực tập tốt nghiệp (dựa trên thái độ, hành vi, tính chuyên cần, …)
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi6" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                                required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        1</td>
-                </tr>
-
-                <tr class="hover:bg-gray-100">
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        7
-                    </td>
-                    <td class="break-word p-4 text-base font-medium text-gray-900">
-                        Điểm cộng thêm cho một số trường hợp đặc biệt:<br>
-                        + Bài mang tính mới, giải quyết được và cho kết quả chấp nhận được.<br>
-                        + Có bài báo được đăng trên các tạp chí khoa học.
-
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        <input type="number" readonly  @bind="@ketqua.tieuchi7" name="tieuchi1" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full py-2.5 px-4"
-                            required>
-                    </td>
-                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                        0.5</td>
-                </tr>
-                
-            </tbody>
-        }
         <tfoot>
             <tr class="font-semibold text-gray-900 dark:text-white">
                 <td class="px-6 py-3"></td>
@@ -1154,7 +1040,8 @@
                                     <label for="last-name"
                                         class="block mb-2 text-sm font-medium text-gray-900">Ngày gặp</label>
                                     <p class="shadow-sm border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5">
-                                        @(DateTime.ParseExact(thongtinlichsu.ngay, "dd/MM/yyyy h:mm:ss tt", null).ToString("dd-MM-yyyy"))
+                                        @* @(DateTime.ParseExact(thongtinlichsu.ngay, "dd/MM/yyyy h:mm:ss tt", null).ToString("dd-MM-yyyy")) *@
+                                        @GetDate(thongtinlichsu.ngay)
                                     </p>
                                 </div>
                                 <div class="col-span-12 sm:col-span-6">

@@ -61,7 +61,7 @@
                     Role = "teacher"
                 };
 
-                await Service.LoginRequest(JS, NavigationManager, api, user, "/tongquan");
+                await Service.LoginRequest(JS, NavigationManager, api, user, "auto");
                 break;
 
             case "gv":
@@ -75,24 +75,68 @@
                     Role = "teacher"
                 };
 
-                await Service.LoginRequest(JS, NavigationManager, api, user, "/sinhvien");
+                await Service.LoginRequest(JS, NavigationManager, api, user, "auto");
                 break;
 
             default:
+                var from = queryParameters["from"];
 
-                var obj = LoginStUEH.GetInfo(t);
-                if (obj != null)
-                {
-                    Student stu = (Student) obj;
-                    user = (UserLogin) stu;
+                if(from == "stueh"){
+                    var obj = LoginStUEH.GetInfo(t);
+                    if (obj != null)
+                    {
+                        Student stu = (Student) obj;
+                        user = (UserLogin) stu;
 
-                    await Service.LoginRequest(JS, NavigationManager, api, user, "/thongtin");
+                        await Service.LoginRequest(JS, NavigationManager, api, user, "auto");
+                    }
+                }
+
+                if(from == "ueh"){
+                    var teacher = await getTeacherData(t);
+                    if (teacher != null)
+                    {
+                        user = (UserLogin) teacher;
+                        await Service.LoginRequest(JS, NavigationManager, api, user, "auto");
+                    }
                 }
                 break;
 
         }
-
     }
+
+    private async Task<Teacher> getTeacherData(string token)
+    {
+        using (var client = new HttpClient())
+        {
+            var requestBody = new Dictionary<string, string>
+            {
+                { "token", token }
+            };
+
+            var encodedContent = new FormUrlEncodedContent(requestBody);
+            encodedContent.Headers.Clear();
+            encodedContent.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
+            client.BaseAddress = new Uri("https://login.ueh.edu.vn/api/");
+            client.DefaultRequestHeaders.Add("client_id", "3307");
+            client.DefaultRequestHeaders.Add("client_key", "vc_pwmUD6kXAE6AGMpwmUD6kXAE6AGMJvMj5QJQXFXS6fQXkPbhgUxufyJvMj5QJQXFXS6fQXkPbhgUxufy");
+
+            var response = await client.PostAsync("key", encodedContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var responseContent = JsonConvert.DeserializeObject<Teacher>(content);
+                return responseContent;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
 }
 
 

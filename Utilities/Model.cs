@@ -41,6 +41,16 @@ namespace UehInternFrontend
 
     }
 
+    public class Teacher
+    {
+        public string? MQL { get; set; }
+        public string? FullName { get; set; }
+        public string? DonVi { get; set; }
+        public string? CMND { get; set; }
+        public string? Email { get; set; }
+        public string? DienThoaiDiDong { get; set; }
+    }
+
     public class User
     {
         public string? Code { get; set; }
@@ -72,6 +82,18 @@ namespace UehInternFrontend
                 Email = student.email,
                 Sdt = student.phone,
                 Role = "student"
+            };
+        }
+
+        public static explicit operator UserLogin(Teacher teacher)
+        {
+            return new UserLogin
+            {
+                UserId = teacher.MQL,
+                Name = teacher.FullName,
+                Email = teacher.Email,
+                Sdt = teacher.DienThoaiDiDong,
+                Role = "teacher"
             };
         }
 

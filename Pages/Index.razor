@@ -14,7 +14,7 @@
         }
     }
 
-    private async Task LoginStUeh(string returnUrl = "/trangchu")
+    private async Task LoginStUeh()
     {
         if (Role != null && Role != "")
         {
@@ -22,7 +22,7 @@
         }
         else
         {
-            returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
+            string returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
             string encodedReturnUrl = Uri.EscapeDataString(returnUrl);
             string loginUrl = $"https://loginst.ueh.edu.vn/?returnUrl={encodedReturnUrl}";
 
@@ -30,19 +30,38 @@
         }
     }
 
-    private void LoginUeh()
+    private async Task LoginUeh()
     {
-        if (Role != null && Role != ""){
+        if (Role != null && Role != "")
+        {
             NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + Role);
         }
         else
+        {
+            string returnUrl = NavigationManager.ToAbsoluteUri("/LoginCallback/").ToString();
+            string encodedReturnUrl = Uri.EscapeDataString(returnUrl);
+            string loginUrl = $"https://login.ueh.edu.vn/?returnURL={encodedReturnUrl}";
+
+            NavigationManager.NavigateTo(loginUrl);
+        }
+    }
+
+    private void LoginUehDev()
+    {
+        if (Role != null && Role != "")
+        {
+            NavigationManager.NavigateTo("/LoginCallback/?t=exist-" + Role);
+        }
+        else
+        {
             NavigationManager.NavigateTo("/uehlogin");
+        }
     }
 }
 
 <header class="py-4">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <nav class="relative z-50 flex justify-center sm:justify-between">
+        <nav class="relative z-50 flex-col gap-y-5 sm:flex-row justify-center sm:justify-between items-center">
             <div class="flex items-center md:gap-x-12">
                 <a aria-label="Home" href="/">
                     <img src="/images/ueh-logo-full.png" class="h-16 mr-3" alt="Logo" />
@@ -59,13 +78,13 @@
                     </a>
                 </div>
             </div>
-            <div class="hidden sm:flex items-center gap-x-5 md:gap-x-8">
-                <button class="inline-block rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-2 border-teal-800"
-                    @onclick="() => LoginUeh()">
+            <div class="flex-col sm:flex-row gap-y-3 items-center gap-x-5 md:gap-x-8">
+                <button class="block w-full sm:w-auto rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-2 border-teal-800"
+                    @onclick="async () => await LoginUeh()">
                     UEHer đăng nhập
                 </button>
                 <button
-                    class="inline-block rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-teal-800 text-white hover:text-slate-100 hover:bg-teal-700 border-2 border-teal-800 hover:border-teal-700 active:bg-teal-800 active:text-teal-100 focus-visible:outline-teal-700"
+                    class="block w-full sm:w-auto rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-teal-800 text-white hover:text-slate-100 hover:bg-teal-700 border-2 border-teal-800 hover:border-teal-700 active:bg-teal-800 active:text-teal-100 focus-visible:outline-teal-700"
                     @onclick="async () => await LoginStUeh()">
                     Sinh viên đăng nhập
                 </button>
@@ -74,19 +93,22 @@
     </div>
 </header>
 <main>
-    <section id="welcome" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-72 pt-48 text-center lg:pt-32">
-        <h1 class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-teal-900 sm:text-7xl">
+    <section id="welcome" class="flex items-center justify-center flex-col h-screen px-6 sm:pb-32 text-center">
+        <h1 class="mx-auto max-w-4xl font-display text-3xl sm:text-5xl font-medium tracking-tight text-teal-900 sm:text-7xl">
             Dành cho
             <span class="whitespace-nowrap text-orange-600">
                 sinh viên UEH
             </span>
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg tracking-tight text-slate-700">
+        <p class="mx-auto mt-4 max-w-2xl text-md sm:text-lg tracking-tight text-slate-700">
             Quản lý thực tập và luận tốt nghiệp dễ dàng và tiện lợi hơn bao giờ
             hết.
         </p>
-        <div class="mt-24 flex justify-center gap-x-6">
-            <a class="hidden sm:inline-flex items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-teal-800 text-white hover:bg-border-teal-700 hover:text-slate-100 active:bg-teal-700 active:text-slate-300 focus-visible:outline-slate-900"
+        <p class="inline-flex sm:hidden p-5 my-4 text-sm text-yellow-800 rounded-lg bg-yellow-50">
+            Khuyến cáo không sử dụng trên điện thoại di động
+        </p>
+        <div class="mt-24 hidden sm:flex justify-center gap-x-6">
+            <a class="inline-flex items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-teal-800 text-white hover:bg-border-teal-700 hover:text-slate-100 active:bg-teal-700 active:text-slate-300 focus-visible:outline-slate-900"
                 href="/loginoption">Đăng nhập ngay
             </a>
             <a class="group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 text-sm focus:outline-none ring-orange-200 text-slate-700 hover:text-slate-900 hover:ring-orange-300 active:bg-orange-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-orange-300"
@@ -199,15 +221,20 @@
             <img src="/images/ueh-logo-full.png" class="h-20 mr-3" alt="Logo" />
             <nav class="mt-10 text-sm" aria-label="quick links">
                 <div class="-my-1 flex justify-center gap-x-0 sm:gap-x-6">
-                    <a class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                    <a class="hidden sm:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                         href="https://lms.ueh.edu.vn/">E-learning
                     </a>
-                    <a class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                    <a class="hidden sm:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                         href="https://dsa.ueh.edu.vn/viec-lam/">Cơ hội nghề nghiệp
                     </a>
-                    <a class="hidden sm:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                    <a class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                         href="https://tuyensinh.ueh.edu.vn/">Tuyển sinh
                     </a>
+                    <button class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                        @onclick="() => LoginUehDev()">
+                        Chế độ nhà phát triển
+                    </button>
+
                 </div>
             </nav>
         </div>

@@ -55,8 +55,18 @@ namespace UehInternFrontend
 
                     if (RedirectTo != null)
                     {
+                        if (RedirectTo == "auto") {
+                            switch (getUser.Role)
+                            {
+                                case "admin": RedirectTo = "/tongquan"; break;
+                                case "teacher": RedirectTo = "/sinhvien"; break;
+                                case "student": RedirectTo = "/thongtin"; break;
+                                default: break;
+                            }
+                        }
                         navigationManager.NavigateTo(RedirectTo, forceLoad: true);
                     }
+
                     return true;
                 }
             }

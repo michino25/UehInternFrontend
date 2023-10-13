@@ -46,12 +46,15 @@ else {
 
             if (Role == CheckRole) {
                 await JS.InvokeVoidAsync("userExtend", 30);
+
+                @* Debug console log userinfo *@
+                @* await JS.InvokeVoidAsync("console.log", Role); *@
             }
 
             await JS.InvokeVoidAsync("loadScript", "/js/tailwindcss.js");
 
             // Check thiết bị người dùng
-            CheckUserDevice();
+            // CheckUserDevice();
         }
     }
 
@@ -74,6 +77,5 @@ else {
                 (userAgent.Contains("Android", StringComparison.OrdinalIgnoreCase) && userAgent.Contains("Mobile", StringComparison.OrdinalIgnoreCase)) ||
                 userAgent.Contains("BlackBerry", StringComparison.OrdinalIgnoreCase) ||
                 userAgent.Contains("Windows Phone", StringComparison.OrdinalIgnoreCase);
-    }
-
+    } 
 }
