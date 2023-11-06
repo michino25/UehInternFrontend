@@ -522,11 +522,6 @@ namespace UehInternFrontend
                     htmlString += $@"
                         <tr>
                             <td class='center'>{i + 1}</td>
-    
-                            <!--
-                            <td>{bangdiem[i].mssv} | {bangdiem[i].malop} | K46</td>
-                            -->
-    
                             <td>{bangdiem[i].mssv} | {bangdiem[i].malop}</td>
                             <td>{bangdiem[i].hotensv}</td>
                             <td>{(bangdiem[0].tenloai.ToUpper().Contains("DOANH NGHIỆP")?bangdiem[i].tencty:bangdiem[i].tendetai)}</td>

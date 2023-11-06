@@ -83,9 +83,10 @@
         {
             var content = await response.Content.ReadAsStringAsync();
             var diem = JsonConvert.DeserializeObject<ChiTietDiem>(content);
+            
 
             await PrintPDF.ChiTietDiem(JS, diem);
-           // await JS.InvokeVoidAsync("alert", "Tải dữ liệu in thành công");
+            // await JS.InvokeVoidAsync("console.log", diem);
         }
         else
         {
