@@ -127,10 +127,10 @@
 
 @if (DotInfo >= 1)
 {
-    <div class="grid grid-cols-1 mb-5 xl:grid-cols-2 xl:gap-4">
+    <div class="grid grid-cols-1 mb-5 md:grid-cols-2 gap-4">
 
         @* <!-- Activity Card --> *@
-        <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm  sm:p-6  xl:mb-0">
+        <div class="p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Đợt tháng 8/2023</h3>
                 <a href="dot" class="inline-flex items-center p-2 text-sm font-semibold rounded-lg text-teal-800 hover:bg-gray-100">
@@ -160,9 +160,9 @@
             </ol>
         </div>
 
-        <div>
+        <div class="w-full">
             <a href="giangvien/danhsach" 
-                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm flex">
                 <div class="w-full">
                     <h3 class="text-base font-normal text-gray-500">Giảng viên</h3>
                     <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumgv</span>
@@ -170,7 +170,7 @@
             </a>
 
             <a href="sinhvien/danhsach" 
-                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm flex">
                 <div class="w-full">
                     <h3 class="text-base font-normal text-gray-500">Tổng sinh viên đợt này</h3>
                     <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumsv</span>
@@ -178,7 +178,7 @@
             </a>
 
             <a href="chuyennganh" 
-                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm flex">
                 <div class="w-full">
                     <h3 class="text-base font-normal text-gray-500">Chuyên ngành</h3>
                     <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumcn</span>
@@ -186,7 +186,7 @@
             </a>
 
             <a href="phancong/gvhdsv"
-                   class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex">
+                   class="items-center justify-between mb-3 px-4 py-8 bg-white border border-gray-200 rounded-lg shadow-sm flex">
                 <div class="w-full">
                     <h3 class="text-base font-normal text-gray-500">Tổng sinh viên đã được phân công</h3>
                     <span class="text-2xl font-bold leading-none text-teal-800 sm:text-3xl">@sumpc</span>

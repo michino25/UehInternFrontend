@@ -143,11 +143,10 @@
         <div class="mb-4">
             <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách sinh viên</h1>
         </div>
-        <div class="sm:flex">
-            <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0">
-                <form class="lg:pr-3" @onsubmit="SubmitSearch">
-                    <label for="users-search" class="sr-only">Search</label>
-                    <div class="relative mt-1 lg:w-64 xl:w-96">
+        <div class="flex">
+            <div class="hidden sm:flex flex-1 items-center w-full">
+                <form class="lg:pr-3 w-full" @onsubmit="SubmitSearch">
+                    <div class="relative mt-1 w-full">
                         <input type="text" name="email" id="search-input"
                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
                             placeholder="Tìm kiếm" @bind="keyword">
@@ -155,9 +154,9 @@
                 </form>
             </div>
 
-            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+            <div class="flex items-center justify-end flex-1 ml-auto">
                 <label for="actual-btn" type="button" 
-                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"

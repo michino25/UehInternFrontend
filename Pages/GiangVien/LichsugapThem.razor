@@ -78,7 +78,7 @@
     </div>
 
     <label for="students" class="block mb-2 text-sm font-medium text-gray-900">Chọn một sinh viên</label>
-    <select @bind="selectedStudent" id="students" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-1/2 p-2.5">
+    <select @bind="selectedStudent" id="students" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full sm:w-1/2 p-2.5">
         <option selected hidden>--Chọn sinh viên--</option>
         @if (sinhviens != null)
         {

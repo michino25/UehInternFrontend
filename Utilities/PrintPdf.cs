@@ -122,12 +122,12 @@ namespace UehInternFrontend
 
                         .infogv {
                             display: flex;
-                            margin-top: 2px;
+                            margin-top: 22px;
                             width: 100%;
                         }
 
                         .infogv > * {
-                            margin-top: 12px;
+                            margin-top: 20px;
                             margin-bottom: 0;
                         }
                         .infogv .name {
@@ -201,6 +201,10 @@ namespace UehInternFrontend
                         .sign > * {
                             margin: 6px 0;
                         }
+
+                        .sign-name {
+                            margin-top: 60px;
+                        }
                     </style>
                 ";
             }
@@ -212,7 +216,7 @@ namespace UehInternFrontend
                     <div>
                         <div class='pretitle'>
                             <div>
-                                <p><strong>Trường Đại học Kinh tế Tp. Hồ Chí Minh</strong></p>
+                                <p><strong>Đại học UEH – Trường Công nghệ và Thiết kế</strong></p>
                                 <p><strong>Khoa {diem.tenkhoa}</strong></p>
                                 <p><strong>Chuyên ngành {diem.tencn}</strong></p>
                             </div>
@@ -230,19 +234,15 @@ namespace UehInternFrontend
                         </div>
 
                         <div class='infosv'>
-                            <p class='col-6'><strong>Họ tên sinh viên:</strong> {diem.hotensv}</p>
-                            <p class='col-6'><strong>Mã số sinh viên:</strong> {diem.mssv}</p>
-
-                            <!--
-                            <p class='col-6'><strong>Khoá:</strong> K46</p>
-                            -->
-
-                            <p class='col-6'><strong>Lớp:</strong> {diem.lop}</p>
+                            <p class='col-6'>Họ tên sinh viên: {diem.hotensv}</p>
+                            <p class='col-6'>Mã số sinh viên: {diem.mssv}</p>
+                            <p class='col-6'>Khoá:</p>
+                            <p class='col-6'>Lớp: {diem.lop}</p>
 
                             {(diem.maloai == "HKDN" ? $@"
-                                <p class='col-6'><strong>Tên công ty:</strong> {diem.tencty}</p>
+                                <p class='col-6'>Tên công ty: {diem.tencty}</p>
                             " : $@"
-                                <p class='col-6'><strong>Tên khoá luận:</strong> {diem.tenkl}</p>
+                                <p class='col-6'>Tên khoá luận: {diem.tenkl}</p>
                             ")}
 
                         </div>
@@ -262,22 +262,12 @@ namespace UehInternFrontend
                                     </g>
                                 </svg>
 
-                                <!--
-                                <svg class='checkbox' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='#000000'>
-                                    <g id='SVGRepo_bgCarrier' stroke-width='0.5'></g>
-                                    <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
-                                    <g id='SVGRepo_iconCarrier'>
-                                        <rect width='20' height='20' x='2' y='2' fill='none' stroke='#000000' stroke-width='2'></rect>
-                                    </g>
-                                </svg>
-                                -->
-
                             </p>
                         </div>
 
                         <div class='score-title'>Điểm thành phần</div>
                         <div class='score-wrapper'>
-                            <table width='90%'>
+                            <table>
                                 <tr class='table-title'>
                                     <td><strong>STT</strong></td>
                                     <td><strong>Tiêu chí</strong></td>
@@ -379,6 +369,7 @@ namespace UehInternFrontend
                             <div class='sign'>
                                 <p><strong>Giáo viên chấm</strong></p>
                                 <p class='itatic'>(Ký tên và ghi rõ họ tên)</p>
+                                <p class='sign-name'>{diem.tengv}</p>
                             </div>
                         </div>
 
@@ -498,12 +489,9 @@ namespace UehInternFrontend
                     <div>
                         <div class='pretitle'>
                             <div>
-                                <p><strong>Trường Đại học Kinh tế Tp. Hồ Chí Minh</strong></p>
+                                <p><strong>Đại học UEH – Trường Công nghệ và Thiết kế</strong></p>
                                 <p><strong>Khoa {bangdiem[0].tenkhoa}</strong></p>
-
-                                <!--
-                                <p><strong>Chuyên ngành ?</strong></p>
-                                -->
+                                <p><strong>Chuyên ngành</strong></p>
                             </div>
                             <div>
                                 <p class='center'><strong>Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</strong></p>
@@ -522,7 +510,7 @@ namespace UehInternFrontend
                             <table>
                                 <tr class='table-title'>
                                     <td class='center'><strong>STT</strong></td>
-                                    <td><strong>Mã số sinh viên | Lớp</strong></td>
+                                    <td><strong>Mã số sinh viên | Lớp | Khóa</strong></td>
                                     <td><strong>Tên sinh viên</strong></td>
                                     <td><strong>{(bangdiem[0].tenloai.ToUpper().Contains("DOANH NGHIỆP")?"Tên công ty":"Tên đề tài")}</strong></td>
                                     <td><strong>Điểm cuối cùng</strong></td>
@@ -541,7 +529,7 @@ namespace UehInternFrontend
     
                             <td>{bangdiem[i].mssv} | {bangdiem[i].malop}</td>
                             <td>{bangdiem[i].hotensv}</td>
-                            <td><strong>{(bangdiem[0].tenloai.ToUpper().Contains("DOANH NGHIỆP")?bangdiem[i].tencty:bangdiem[i].tendetai)}</strong></td>
+                            <td>{(bangdiem[0].tenloai.ToUpper().Contains("DOANH NGHIỆP")?bangdiem[i].tencty:bangdiem[i].tendetai)}</td>
                             <td>{bangdiem[i].diemtong}</td>
                         </tr>
                     ";

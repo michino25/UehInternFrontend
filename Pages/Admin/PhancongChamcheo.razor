@@ -126,21 +126,21 @@
 <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg">
     <div
         class="bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
-        <div class="w-full mb-5 sm:flex">
+        <div class="w-full mb-5 sm:flex flex-wrap">
             <div class="mb-3 flex flex-col divide-x divide-gray-100">
                 <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Danh sách giảng viên chấm chéo</h1>
             </div>
 
-            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+            <div class="flex flex-wrap items-center ml-auto gap-2 sm:gap-3">
                 <button @onclick="() => DeleteChamCheos(madot,makhoa) "
-                        class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
+                        class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                     </svg>
                     Xoá toàn bộ
                 </button>
                 <button  @onclick = "() => DownloadExcelFile(madot,makhoa) "
-                    class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
+                    class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-orange-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -150,7 +150,7 @@
                     Tải danh sách chấm chéo
                 </button>
                 <label for="actual-btn" 
-                    class="cursor-pointer inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
+                    class="cursor-pointer inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-teal-300 sm:w-auto">
                     <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"

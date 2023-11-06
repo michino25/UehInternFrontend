@@ -49,11 +49,11 @@
 
     private async Task AutoFillDiem()
     {
-        ketqua.tieuchi1 = (float?)Math.Round( 1 * diemauto / 10.5, 1);
-        ketqua.tieuchi2 = (float?)Math.Round( 1.5 * diemauto / 10.5, 1);
-        ketqua.tieuchi4 = (float?)Math.Round( 1 * diemauto / 10.5, 1);
-        ketqua.tieuchi5 = (float?)Math.Round( 1 * diemauto / 10.5, 1);
-        ketqua.tieuchi6 = (float?)Math.Round( 1 * diemauto / 10.5, 1);
+        ketqua.tieuchi1 = (float?)Math.Round( 1 * diemauto / 10, 1);
+        ketqua.tieuchi2 = (float?)Math.Round( 1.5 * diemauto / 10, 1);
+        ketqua.tieuchi4 = (float?)Math.Round( 1 * diemauto / 10, 1);
+        ketqua.tieuchi5 = (float?)Math.Round( 1 * diemauto / 10, 1);
+        ketqua.tieuchi6 = (float?)Math.Round( 0.5 * diemauto / 10, 1);
         ketqua.tieuchi3 = (float?)Math.Round((decimal)(diemauto - ketqua.tieuchi1 - ketqua.tieuchi2 - ketqua.tieuchi4 - ketqua.tieuchi5 - ketqua.tieuchi6), 1);
         StateHasChanged();
         TinhTongDiem();
@@ -323,7 +323,7 @@
                                         @bind-value:event="oninput" @onchange="TinhTongDiem" required>
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    1</td>
+                                    0.5</td>
                             </tr>
 
                             <tr class="hover:bg-gray-100">
@@ -341,7 +341,7 @@
                                         @bind-value:event="oninput" @onchange="TinhTongDiem" required>
                                 </td>
                                 <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap">
-                                    0.5</td>
+                                    1</td>
                             </tr>
 
                             @if(isHKDN)
