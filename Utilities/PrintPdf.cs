@@ -587,12 +587,21 @@ namespace UehInternFrontend
             string htmlString = "";
 
             htmlString += PrintPDF.TongHopDiemHTML("style");
-            htmlString += PrintPDF.TongHopDiemHTML("content", bangdiemKLTN);
-            htmlString += PrintPDF.PageBreak();
-            htmlString += PrintPDF.TongHopDiemHTML("content", bangdiemHKDN);
+
+            if (bangdiemKLTN != null && bangdiemKLTN.Any())
+            {
+                htmlString += PrintPDF.TongHopDiemHTML("content", bangdiemKLTN);
+                htmlString += PrintPDF.PageBreak();
+            }
+
+            if (bangdiemHKDN != null && bangdiemHKDN.Any())
+            {
+                htmlString += PrintPDF.TongHopDiemHTML("content", bangdiemHKDN);
+            }
 
             await js.InvokeVoidAsync("PrintPDF", htmlString, "PhieuDiemTongHop");
             return null;
         }
+
     }
 }
